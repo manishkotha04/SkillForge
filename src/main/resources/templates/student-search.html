@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Discover Students - SkillForge</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #172554;
+            color: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 9px 16px;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .container {
+            width: min(1050px, 90%);
+            margin: 45px auto;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            color: #172554;
+        }
+
+        .page-header p {
+            color: #64748b;
+        }
+
+        .search-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 13px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .search-button {
+            border: none;
+            border-radius: 9px;
+            padding: 0 24px;
+            background: #2563eb;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background: #1d4ed8;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07);
+        }
+
+        .student-name {
+            color: #172554;
+            font-size: 21px;
+            margin-bottom: 14px;
+        }
+
+        .label {
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 16px;
+            margin-bottom: 5px;
+        }
+
+        .student-text {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 16px;
+            padding: 45px;
+            text-align: center;
+            color: #64748b;
+            box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07);
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 5%;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-button {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="brand">SkillForge</div>
+
+    <a class="nav-link" th:href="@{/profile}">
+        My Profile
+    </a>
+</nav>
+
+<main class="container">
+
+    <header class="page-header">
+        <h1>Discover Students</h1>
+        <p>Find students by name, interests, or skills.</p>
+    </header>
+
+    <section class="search-card">
+        <form class="search-form"
+              th:action="@{/students/search}"
+              th:object="${search}"
+              method="get">
+
+            <input
+                class="search-input"
+                type="text"
+                th:field="*{query}"
+                placeholder="Search by name, interest, or skill">
+
+            <button class="search-button" type="submit">
+                Search
+            </button>
+        </form>
+    </section>
+
+    <section class="results"
+             th:if="${students != null and !students.isEmpty()}">
+
+        <article class="student-card"
+                 th:each="student : ${students}">
+
+            <h2 class="student-name"
+                th:text="${student.displayName}">
+                Student Name
+            </h2>
+
+            <div>
+                <div class="label">Bio</div>
+
+                <p class="student-text"
+                   th:text="${student.bio}">
+                    Student bio
+                </p>
+            </div>
+
+            <div>
+                <div class="label">Interests</div>
+
+                <p class="student-text"
+                   th:text="${student.interests}">
+                    Student interests
+                </p>
+            </div>
+
+        </article>
+
+    </section>
+
+    <section class="empty-state"
+             th:if="${students == null or students.isEmpty()}">
+
+        <h2>No students found</h2>
+
+        <p>
+            Try searching for a different name, interest, or skill.
+        </p>
+
+    </section>
+
+</main>
+
+</body>
+</html>

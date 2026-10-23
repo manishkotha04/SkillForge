@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile - SkillForge</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: #172554;
+            color: white;
+            padding: 18px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 9px 16px;
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .container {
+            width: min(1000px, 90%);
+            margin: 45px auto;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, #1d4ed8, #3730a3);
+            color: white;
+            padding: 42px;
+        }
+
+        .profile-header h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .profile-header p {
+            color: #dbeafe;
+        }
+
+        .profile-content {
+            padding: 35px 42px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-content {
+            color: #334155;
+            line-height: 1.7;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .skill {
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .no-skills {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .actions {
+            margin-top: 35px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 11px 20px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary:hover {
+            background: #1d4ed8;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 16px 5%;
+            }
+
+            .container {
+                width: 94%;
+                margin: 25px auto;
+            }
+
+            .profile-header,
+            .profile-content {
+                padding: 28px;
+            }
+
+            .profile-header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="brand">SkillForge</div>
+
+    <a class="nav-link" th:href="@{/profile/edit}">
+        Edit Profile
+    </a>
+</nav>
+
+<main class="container">
+
+    <div class="profile-card">
+
+        <header class="profile-header">
+            <h1 th:text="${profile.displayName}">
+                Student Name
+            </h1>
+
+            <p>
+                Student Profile
+            </p>
+        </header>
+
+        <div class="profile-content">
+
+            <section class="section">
+                <div class="section-title">About Me</div>
+
+                <p class="section-content"
+                   th:text="${profile.bio}">
+                    Tell other students about yourself.
+                </p>
+            </section>
+
+            <section class="section">
+                <div class="section-title">Interests</div>
+
+                <p class="section-content"
+                   th:text="${profile.interests}">
+                    Add your interests.
+                </p>
+            </section>
+
+            <section class="section">
+                <div class="section-title">Skills</div>
+
+                <div class="skills"
+                     th:if="${profile.skills != null and !profile.skills.isEmpty()}">
+
+                    <span class="skill"
+                          th:each="skill : ${profile.skills}"
+                          th:text="${skill}">
+                        Java
+                    </span>
+                </div>
+
+                <p class="no-skills"
+                   th:if="${profile.skills == null or profile.skills.isEmpty()}">
+                    No skills added yet.
+                </p>
+            </section>
+
+            <div class="actions">
+                <a class="button primary"
+                   th:href="@{/profile/edit}">
+                    Edit My Profile
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+</body>
+</html>
