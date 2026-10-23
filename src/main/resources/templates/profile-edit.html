@@ -1,254 +1,400 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#172554">
 
-    <title>Edit Profile - SkillForge</title>
+    <title>Dashboard | SkillForge</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f7fb;
-            color: #1f2937;
-            min-height: 100vh;
-        }
-
-        .navbar {
-            background: #172554;
-            color: white;
-            padding: 18px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .brand {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            font-size: 14px;
-            padding: 9px 16px;
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 8px;
-        }
-
-        .nav-link:hover {
-            background: rgba(255,255,255,0.1);
-        }
-
-        .container {
-            width: min(800px, 90%);
-            margin: 45px auto;
-        }
-
-        .form-card {
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
-            overflow: hidden;
-        }
-
-        .form-header {
-            background: linear-gradient(135deg, #1d4ed8, #3730a3);
-            color: white;
-            padding: 35px 42px;
-        }
-
-        .form-header h1 {
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-
-        .form-header p {
-            color: #dbeafe;
-        }
-
-        .form-body {
-            padding: 40px 42px;
-        }
-
-        .form-group {
-            margin-bottom: 24px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #334155;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #cbd5e1;
-            border-radius: 9px;
-            font-family: inherit;
-            font-size: 15px;
-            color: #1f2937;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input:focus,
-        textarea:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
-        }
-
-        textarea {
-            min-height: 130px;
-            resize: vertical;
-        }
-
-        .hint {
-            margin-top: 6px;
-            color: #94a3b8;
-            font-size: 13px;
-        }
-
-        .actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 32px;
-        }
-
-        button,
-        .cancel-button {
-            padding: 11px 20px;
-            border-radius: 9px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
-        button {
-            border: none;
-            background: #2563eb;
-            color: white;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        .cancel-button {
-            border: 1px solid #cbd5e1;
-            color: #475569;
-            background: white;
-        }
-
-        .cancel-button:hover {
-            background: #f8fafc;
-        }
-
-        @media (max-width: 600px) {
-            .navbar {
-                padding: 16px 5%;
-            }
-
-            .container {
-                width: 94%;
-                margin: 25px auto;
-            }
-
-            .form-header,
-            .form-body {
-                padding: 28px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
-<body>
+<body class="dashboard-page">
 
-<nav class="navbar">
-    <div class="brand">SkillForge</div>
+<header class="dashboard-header">
 
-    <a class="nav-link" th:href="@{/profile}">
-        My Profile
+    <!-- Logo -->
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
     </a>
-</nav>
 
-<main class="container">
+    <!-- Main navigation -->
+    <nav class="dashboard-nav" aria-label="Main navigation">
 
-    <div class="form-card">
+        <a class="active" th:href="@{/dashboard}">
+            Dashboard
+        </a>
 
-        <header class="form-header">
-            <h1>Edit Profile</h1>
-            <p>Keep your SkillForge profile up to date.</p>
-        </header>
+        <a th:href="@{/dashboard#projects}">
+            Explore projects
+        </a>
 
-        <form class="form-body"
-              th:action="@{/profile/edit}"
-              th:object="${profile}"
-              method="post">
+        <!-- IMPORTANT: Goes to the actual student search page -->
+        <a th:href="@{/students/search}">
+            Find teammates
+        </a>
 
-            <div class="form-group">
-                <label for="displayName">Display Name</label>
+        <a th:href="@{/profile}">
+            My profile
+        </a>
 
-                <input
-                    type="text"
-                    id="displayName"
-                    th:field="*{displayName}"
-                    placeholder="Enter your display name"
-                    required>
-            </div>
+    </nav>
 
-            <div class="form-group">
-                <label for="bio">Bio</label>
+    <!-- Logout -->
+    <form th:action="@{/logout}" method="post" class="logout-form">
 
-                <textarea
-                    id="bio"
-                    th:field="*{bio}"
-                    placeholder="Tell other students about yourself"></textarea>
+        <button type="submit" class="header-action">
+            Sign out
+        </button>
 
-                <p class="hint">
-                    A short introduction helps other students know you better.
+    </form>
+
+</header>
+
+
+<main class="dashboard-container">
+
+    <!-- ========================================================= -->
+    <!-- WELCOME -->
+    <!-- ========================================================= -->
+
+    <section class="welcome-section">
+
+        <div>
+
+            <p class="eyebrow">
+                STUDENT COLLABORATION PLATFORM
+            </p>
+
+            <h1>
+                Build something <span>great.</span>
+            </h1>
+
+            <p class="welcome-description">
+                Discover projects, connect with talented students,
+                and turn your ideas into reality.
+            </p>
+
+        </div>
+
+        <a class="primary-button" th:href="@{/students/search}">
+            Find teammates
+            <span aria-hidden="true">→</span>
+        </a>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- QUICK ACTIONS -->
+    <!-- ========================================================= -->
+
+    <section class="dashboard-stats" aria-label="Platform overview">
+
+        <!-- Discover -->
+        <a class="stat-card" th:href="@{/dashboard#projects}">
+
+            <span class="stat-icon">✦</span>
+
+            <p>Discover</p>
+
+            <h2>Explore projects</h2>
+
+            <span class="stat-description">
+                Find project ideas worth building
+            </span>
+
+        </a>
+
+
+        <!-- Find teammates -->
+        <a class="stat-card" th:href="@{/students/search}">
+
+            <span class="stat-icon">♧</span>
+
+            <p>Connect</p>
+
+            <h2>Find teammates</h2>
+
+            <span class="stat-description">
+                Meet students with useful skills
+            </span>
+
+        </a>
+
+
+        <!-- Profile -->
+        <a class="stat-card" th:href="@{/profile}">
+
+            <span class="stat-icon">↗</span>
+
+            <p>Your space</p>
+
+            <h2>My profile</h2>
+
+            <span class="stat-description">
+                Manage your skills and interests
+            </span>
+
+        </a>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- PROJECTS -->
+    <!-- ========================================================= -->
+
+    <section class="content-section" id="projects">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    YOUR NEXT OPPORTUNITY
                 </p>
-            </div>
 
-            <div class="form-group">
-                <label for="interests">Interests</label>
+                <h2>
+                    Explore projects
+                </h2>
 
-                <textarea
-                    id="interests"
-                    th:field="*{interests}"
-                    placeholder="Describe your interests"></textarea>
-
-                <p class="hint">
-                    Mention areas you enjoy learning or working on.
+                <p>
+                    Discover sample projects and the skills they need.
                 </p>
+
             </div>
 
-            <div class="actions">
-                <button type="submit">
-                    Save Changes
-                </button>
+        </div>
 
-                <a class="cancel-button"
-                   th:href="@{/profile}">
-                    Cancel
+
+        <div class="project-grid">
+
+
+            <!-- ================================================= -->
+            <!-- PROJECT 1 -->
+            <!-- ================================================= -->
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Web Development
+                    </span>
+
+                    <span class="project-symbol">
+                        01
+                    </span>
+
+                </div>
+
+                <h3>
+                    Campus Connect
+                </h3>
+
+                <p>
+                    A sample platform for helping students discover
+                    campus activities and connect with peers.
+                </p>
+
+                <div class="skill-list">
+
+                    <span>Java</span>
+                    <span>HTML/CSS</span>
+                    <span>UI Design</span>
+
+                </div>
+
+                <!-- Go to actual teammate discovery -->
+                <a class="text-link" th:href="@{/students/search}">
+                    Find teammates →
                 </a>
-            </div>
 
-        </form>
-    </div>
+            </article>
+
+
+            <!-- ================================================= -->
+            <!-- PROJECT 2 -->
+            <!-- ================================================= -->
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Artificial Intelligence
+                    </span>
+
+                    <span class="project-symbol">
+                        02
+                    </span>
+
+                </div>
+
+                <h3>
+                    Smart Study Planner
+                </h3>
+
+                <p>
+                    A sample application for organizing study schedules,
+                    tasks, and academic goals.
+                </p>
+
+                <div class="skill-list">
+
+                    <span>Python</span>
+                    <span>Problem Solving</span>
+                    <span>Design</span>
+
+                </div>
+
+                <a class="text-link" th:href="@{/students/search}">
+                    Find teammates →
+                </a>
+
+            </article>
+
+
+            <!-- ================================================= -->
+            <!-- PROJECT 3 -->
+            <!-- ================================================= -->
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Social Impact
+                    </span>
+
+                    <span class="project-symbol">
+                        03
+                    </span>
+
+                </div>
+
+                <h3>
+                    Green Campus
+                </h3>
+
+                <p>
+                    A sample student initiative for tracking sustainability
+                    ideas and encouraging greener campus habits.
+                </p>
+
+                <div class="skill-list">
+
+                    <span>Research</span>
+                    <span>Web Design</span>
+                    <span>Teamwork</span>
+
+                </div>
+
+                <a class="text-link" th:href="@{/students/search}">
+                    Find teammates →
+                </a>
+
+            </article>
+
+        </div>
+
+
+        <p class="demo-notice">
+            These are demonstration projects for the current SkillForge
+            dashboard. Project functionality can be connected as the
+            project develops.
+        </p>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- TEAMMATE DISCOVERY CTA -->
+    <!-- ========================================================= -->
+
+    <section class="collaboration-section" id="teams">
+
+        <div>
+
+            <p class="eyebrow">
+                BETTER IDEAS, TOGETHER
+            </p>
+
+            <h2>
+                Your skills deserve the right team.
+            </h2>
+
+            <p>
+                Find students who share your interests and have
+                skills that complement your own.
+            </p>
+
+        </div>
+
+
+        <!-- IMPORTANT: actual teammate page -->
+        <a class="primary-button" th:href="@{/students/search}">
+            Find teammates →
+        </a>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- PROFILE CTA -->
+    <!-- ========================================================= -->
+
+    <section class="profile-placeholder" id="profile">
+
+        <div>
+
+            <p class="eyebrow">
+                YOUR SPACE
+            </p>
+
+            <h2>
+                Your student profile
+            </h2>
+
+            <p>
+                Keep your display name, bio, interests, and skills
+                up to date so other students can discover you.
+            </p>
+
+        </div>
+
+
+        <a class="profile-badge" th:href="@{/profile}">
+            View my profile →
+        </a>
+
+    </section>
 
 </main>
+
+
+<!-- ============================================================= -->
+<!-- FOOTER -->
+<!-- ============================================================= -->
+
+<footer class="dashboard-footer">
+
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
+    </a>
+
+    <p>
+        Find your people. Build your idea.
+    </p>
+
+</footer>
 
 </body>
 </html>

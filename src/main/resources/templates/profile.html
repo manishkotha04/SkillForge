@@ -16,89 +16,187 @@
         body {
             font-family: Arial, Helvetica, sans-serif;
             background: #f4f7fb;
-            color: #1f2937;
+            color: #172554;
             min-height: 100vh;
         }
 
+        /* ---------- NAVBAR ---------- */
+
         .navbar {
+            height: 78px;
             background: #172554;
             color: white;
-            padding: 18px 8%;
+            padding: 0 7%;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
         }
 
         .brand {
-            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            text-decoration: none;
+            font-size: 26px;
             font-weight: 700;
         }
 
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: #4f7df3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .nav-link {
-            color: white;
+            color: #e2e8f0;
             text-decoration: none;
+            padding: 11px 16px;
+            border-radius: 9px;
             font-size: 14px;
-            padding: 9px 16px;
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.2s;
         }
 
         .nav-link:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.10);
+            color: white;
         }
 
-        .container {
-            width: min(1000px, 90%);
-            margin: 45px auto;
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.14);
+            color: white;
         }
+
+        /* ---------- PAGE ---------- */
+
+        .page {
+            width: min(1000px, 90%);
+            margin: 48px auto 70px;
+        }
+
+        .page-intro {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            color: #52709f;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .page-intro h1 {
+            font-size: 42px;
+            line-height: 1.15;
+            margin-bottom: 12px;
+            color: #172554;
+        }
+
+        .page-intro p {
+            color: #64748b;
+            font-size: 17px;
+            line-height: 1.6;
+            max-width: 700px;
+        }
+
+        /* ---------- PROFILE CARD ---------- */
 
         .profile-card {
             background: white;
-            border-radius: 18px;
-            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+            border-radius: 22px;
             overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.08);
         }
 
         .profile-header {
+            padding: 42px;
             background: linear-gradient(135deg, #1d4ed8, #3730a3);
             color: white;
-            padding: 42px;
+            display: flex;
+            align-items: center;
+            gap: 22px;
         }
 
-        .profile-header h1 {
-            font-size: 34px;
-            margin-bottom: 8px;
+        .avatar {
+            width: 76px;
+            height: 76px;
+            flex-shrink: 0;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .profile-header h2 {
+            font-size: 30px;
+            margin-bottom: 7px;
         }
 
         .profile-header p {
             color: #dbeafe;
+            font-size: 15px;
         }
 
         .profile-content {
-            padding: 35px 42px;
+            padding: 42px;
         }
+
+        /* ---------- SECTIONS ---------- */
 
         .section {
+            padding-bottom: 30px;
             margin-bottom: 30px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .section:last-child {
+        .section:last-of-type {
+            border-bottom: none;
             margin-bottom: 0;
         }
 
         .section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: #475569;
-            margin-bottom: 10px;
+            color: #52709f;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 11px;
         }
 
         .section-content {
             color: #334155;
-            line-height: 1.7;
+            font-size: 16px;
+            line-height: 1.75;
+            white-space: pre-line;
         }
+
+        .empty-text {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* ---------- SKILLS ---------- */
 
         .skills {
             display: flex;
@@ -109,30 +207,32 @@
         .skill {
             background: #eff6ff;
             color: #1d4ed8;
+            border: 1px solid #dbeafe;
             padding: 8px 14px;
             border-radius: 999px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
-        .no-skills {
-            color: #94a3b8;
-            font-style: italic;
-        }
+        /* ---------- ACTIONS ---------- */
 
         .actions {
-            margin-top: 35px;
             display: flex;
             gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 35px;
         }
 
         .button {
-            display: inline-block;
-            padding: 11px 20px;
-            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 10px;
             text-decoration: none;
-            font-weight: 600;
             font-size: 14px;
+            font-weight: 700;
+            transition: 0.2s;
         }
 
         .primary {
@@ -142,25 +242,86 @@
 
         .primary:hover {
             background: #1d4ed8;
+            transform: translateY(-1px);
         }
 
-        @media (max-width: 600px) {
+        .secondary {
+            background: white;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .secondary:hover {
+            background: #f8fafc;
+        }
+
+        /* ---------- FOOTER ---------- */
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 0 20px 30px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 750px) {
+
             .navbar {
+                height: auto;
                 padding: 16px 5%;
+                gap: 15px;
+                flex-direction: column;
             }
 
-            .container {
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .page {
                 width: 94%;
-                margin: 25px auto;
+                margin-top: 30px;
             }
 
-            .profile-header,
+            .page-intro h1 {
+                font-size: 34px;
+            }
+
+            .profile-header {
+                padding: 30px;
+            }
+
             .profile-content {
-                padding: 28px;
+                padding: 30px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .brand {
+                font-size: 23px;
             }
 
-            .profile-header h1 {
-                font-size: 28px;
+            .profile-header {
+                align-items: flex-start;
+            }
+
+            .avatar {
+                width: 62px;
+                height: 62px;
+                font-size: 26px;
+            }
+
+            .profile-header h2 {
+                font-size: 24px;
+            }
+
+            .nav-link {
+                padding: 9px 11px;
+                font-size: 13px;
             }
         }
     </style>
@@ -169,49 +330,110 @@
 <body>
 
 <nav class="navbar">
-    <div class="brand">SkillForge</div>
 
-    <a class="nav-link" th:href="@{/profile/edit}">
-        Edit Profile
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
     </a>
+
+    <div class="nav-links">
+
+        <a class="nav-link"
+           th:href="@{/dashboard}">
+            Dashboard
+        </a>
+
+        <a class="nav-link"
+           th:href="@{/students/search}">
+            Find teammates
+        </a>
+
+        <a class="nav-link active"
+           th:href="@{/profile}">
+            My Profile
+        </a>
+
+    </div>
+
 </nav>
 
-<main class="container">
+<main class="page">
 
-    <div class="profile-card">
+    <div class="page-intro">
+        <div class="eyebrow">Your SkillForge identity</div>
+
+        <h1>My Profile</h1>
+
+        <p>
+            Keep your profile up to date so other students can understand
+            your interests, background, and skills.
+        </p>
+    </div>
+
+    <section class="profile-card">
 
         <header class="profile-header">
-            <h1 th:text="${profile.displayName}">
-                Student Name
-            </h1>
 
-            <p>
-                Student Profile
-            </p>
+            <div class="avatar"
+                 th:text="${#strings.substring(profile.displayName, 0, 1).toUpperCase()}">
+                S
+            </div>
+
+            <div>
+                <h2 th:text="${profile.displayName}">
+                    Student Name
+                </h2>
+
+                <p>SkillForge student</p>
+            </div>
+
         </header>
 
         <div class="profile-content">
 
             <section class="section">
-                <div class="section-title">About Me</div>
+
+                <div class="section-title">
+                    About Me
+                </div>
 
                 <p class="section-content"
+                   th:if="${profile.bio != null and !#strings.isEmpty(profile.bio)}"
                    th:text="${profile.bio}">
                     Tell other students about yourself.
                 </p>
+
+                <p class="section-content empty-text"
+                   th:if="${profile.bio == null or #strings.isEmpty(profile.bio)}">
+                    No bio added yet.
+                </p>
+
             </section>
 
             <section class="section">
-                <div class="section-title">Interests</div>
+
+                <div class="section-title">
+                    Interests
+                </div>
 
                 <p class="section-content"
+                   th:if="${profile.interests != null and !#strings.isEmpty(profile.interests)}"
                    th:text="${profile.interests}">
-                    Add your interests.
+                    Your interests.
                 </p>
+
+                <p class="section-content empty-text"
+                   th:if="${profile.interests == null or #strings.isEmpty(profile.interests)}">
+                    No interests added yet.
+                </p>
+
             </section>
 
             <section class="section">
-                <div class="section-title">Skills</div>
+
+                <div class="section-title">
+                    Skills
+                </div>
 
                 <div class="skills"
                      th:if="${profile.skills != null and !profile.skills.isEmpty()}">
@@ -221,25 +443,44 @@
                           th:text="${skill}">
                         Java
                     </span>
+
                 </div>
 
-                <p class="no-skills"
+                <p class="section-content empty-text"
                    th:if="${profile.skills == null or profile.skills.isEmpty()}">
                     No skills added yet.
                 </p>
+
             </section>
 
             <div class="actions">
+
                 <a class="button primary"
                    th:href="@{/profile/edit}">
                     Edit My Profile
                 </a>
+
+                <a class="button secondary"
+                   th:href="@{/students/search}">
+                    Find Teammates
+                </a>
+
+                <a class="button secondary"
+                   th:href="@{/dashboard}">
+                    Back to Dashboard
+                </a>
+
             </div>
 
         </div>
-    </div>
+
+    </section>
 
 </main>
+
+<footer>
+    SkillForge · Build skills. Find teammates. Build together.
+</footer>
 
 </body>
 </html>

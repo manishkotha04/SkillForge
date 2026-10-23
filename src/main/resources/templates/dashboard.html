@@ -1,6 +1,7 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,178 +13,528 @@
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
+
+
 <body class="dashboard-page">
 
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
 <header class="dashboard-header">
+
     <a class="brand" th:href="@{/dashboard}">
         <span class="brand-mark">S</span>
         <span>SkillForge</span>
     </a>
 
+
     <nav class="dashboard-nav" aria-label="Main navigation">
-        <a class="active" th:href="@{/dashboard}">Dashboard</a>
-        <a href="#projects">Explore projects</a>
-        <a href="#teams">Find teammates</a>
-        <a href="#profile">My profile</a>
+
+        <a class="active"
+           th:href="@{/dashboard}">
+            Dashboard
+        </a>
+
+        <a th:href="@{/dashboard#projects}">
+            Explore projects
+        </a>
+
+        <a th:href="@{/students/search}">
+            Find teammates
+        </a>
+
+        <a th:href="@{/profile}">
+            My profile
+        </a>
+
     </nav>
 
-    <a class="header-action" th:href="@{/login}">Sign out</a>
+
+    <form th:action="@{/logout}"
+          method="post"
+          class="logout-form">
+
+        <button type="submit"
+                class="header-action">
+            Sign out
+        </button>
+
+    </form>
+
 </header>
+
+
+
+<!-- =========================================================
+     MAIN DASHBOARD
+========================================================= -->
 
 <main class="dashboard-container">
 
+
+    <!-- =====================================================
+         WELCOME
+    ====================================================== -->
+
     <section class="welcome-section">
+
         <div>
-            <p class="eyebrow">STUDENT COLLABORATION PLATFORM</p>
-            <h1>Build something <span>great.</span></h1>
+
+            <p class="eyebrow">
+                STUDENT COLLABORATION PLATFORM
+            </p>
+
+            <h1>
+                Build something <span>great.</span>
+            </h1>
+
             <p class="welcome-description">
                 Discover projects, connect with talented students,
                 and turn your ideas into reality.
             </p>
+
         </div>
 
-        <a class="primary-button" href="#projects">
-            Explore projects <span aria-hidden="true">→</span>
+
+        <a class="primary-button"
+           th:href="@{/dashboard#projects}">
+
+            Explore projects
+
+            <span aria-hidden="true">
+                →
+            </span>
+
         </a>
+
     </section>
 
-    <section class="dashboard-stats" aria-label="Platform overview">
-        <article class="stat-card">
-            <span class="stat-icon">✦</span>
-            <p>Discover</p>
-            <h2>New ideas</h2>
-            <span class="stat-description">Find projects worth building</span>
-        </article>
+
+
+    <!-- =====================================================
+         PLATFORM OVERVIEW
+    ====================================================== -->
+
+    <section class="dashboard-stats"
+             aria-label="Platform overview">
+
+
+        <!-- Discover -->
 
         <article class="stat-card">
-            <span class="stat-icon">♧</span>
-            <p>Connect</p>
-            <h2>Find teammates</h2>
-            <span class="stat-description">Meet students with useful skills</span>
+
+            <span class="stat-icon">
+                ✦
+            </span>
+
+            <p>
+                Discover
+            </p>
+
+            <h2>
+                New ideas
+            </h2>
+
+            <span class="stat-description">
+                Find projects worth building
+            </span>
+
         </article>
 
+
+
+        <!-- Connect -->
+
         <article class="stat-card">
-            <span class="stat-icon">↗</span>
-            <p>Collaborate</p>
-            <h2>Build together</h2>
-            <span class="stat-description">Bring your ideas to life</span>
+
+            <span class="stat-icon">
+                ♧
+            </span>
+
+            <p>
+                Connect
+            </p>
+
+            <h2>
+                Find teammates
+            </h2>
+
+            <span class="stat-description">
+                Meet students with useful skills
+            </span>
+
         </article>
+
+
+
+        <!-- Collaborate -->
+
+        <article class="stat-card">
+
+            <span class="stat-icon">
+                ↗
+            </span>
+
+            <p>
+                Collaborate
+            </p>
+
+            <h2>
+                Build together
+            </h2>
+
+            <span class="stat-description">
+                Bring your ideas to life
+            </span>
+
+        </article>
+
+
     </section>
 
-    <section class="content-section" id="projects">
+
+
+    <!-- =====================================================
+         PROJECTS
+    ====================================================== -->
+
+    <section class="content-section"
+             id="projects">
+
+
         <div class="section-heading">
+
             <div>
-                <p class="eyebrow">YOUR NEXT OPPORTUNITY</p>
-                <h2>Explore projects</h2>
-                <p>Discover sample projects and the skills they need.</p>
+
+                <p class="eyebrow">
+                    YOUR NEXT OPPORTUNITY
+                </p>
+
+                <h2>
+                    Explore projects
+                </h2>
+
+                <p>
+                    Discover sample projects and the skills they need.
+                </p>
+
             </div>
+
         </div>
+
+
 
         <div class="project-grid">
 
+
+            <!-- =================================================
+                 PROJECT 1
+            ================================================== -->
+
             <article class="project-card">
+
                 <div class="project-card-top">
-                    <span class="project-category">Web Development</span>
-                    <span class="project-symbol">01</span>
+
+                    <span class="project-category">
+                        Web Development
+                    </span>
+
+                    <span class="project-symbol">
+                        01
+                    </span>
+
                 </div>
-                <h3>Campus Connect</h3>
+
+
+                <h3>
+                    Campus Connect
+                </h3>
+
+
                 <p>
                     A sample platform for helping students discover
                     campus activities and connect with peers.
                 </p>
+
+
                 <div class="skill-list">
-                    <span>Java</span>
-                    <span>HTML/CSS</span>
-                    <span>UI Design</span>
+
+                    <span>
+                        Java
+                    </span>
+
+                    <span>
+                        HTML/CSS
+                    </span>
+
+                    <span>
+                        UI Design
+                    </span>
+
                 </div>
-                <a class="text-link" href="#teams">
-                    Explore opportunities →
+
+
+                <a class="text-link"
+                   th:href="@{/students/search}">
+
+                    Find teammates →
+
                 </a>
+
             </article>
 
+
+
+            <!-- =================================================
+                 PROJECT 2
+            ================================================== -->
+
             <article class="project-card">
+
                 <div class="project-card-top">
-                    <span class="project-category">Artificial Intelligence</span>
-                    <span class="project-symbol">02</span>
+
+                    <span class="project-category">
+                        Artificial Intelligence
+                    </span>
+
+                    <span class="project-symbol">
+                        02
+                    </span>
+
                 </div>
-                <h3>Smart Study Planner</h3>
+
+
+                <h3>
+                    Smart Study Planner
+                </h3>
+
+
                 <p>
                     A sample application for organizing study schedules,
                     tasks, and academic goals.
                 </p>
+
+
                 <div class="skill-list">
-                    <span>Python</span>
-                    <span>Problem Solving</span>
-                    <span>Design</span>
+
+                    <span>
+                        Python
+                    </span>
+
+                    <span>
+                        Problem Solving
+                    </span>
+
+                    <span>
+                        Design
+                    </span>
+
                 </div>
-                <a class="text-link" href="#teams">
-                    Explore opportunities →
+
+
+                <a class="text-link"
+                   th:href="@{/students/search}">
+
+                    Find teammates →
+
                 </a>
+
             </article>
 
+
+
+            <!-- =================================================
+                 PROJECT 3
+            ================================================== -->
+
             <article class="project-card">
+
                 <div class="project-card-top">
-                    <span class="project-category">Social Impact</span>
-                    <span class="project-symbol">03</span>
+
+                    <span class="project-category">
+                        Social Impact
+                    </span>
+
+                    <span class="project-symbol">
+                        03
+                    </span>
+
                 </div>
-                <h3>Green Campus</h3>
+
+
+                <h3>
+                    Green Campus
+                </h3>
+
+
                 <p>
-                    A sample student initiative for tracking sustainability
-                    ideas and encouraging greener campus habits.
+                    A sample student initiative for tracking
+                    sustainability ideas and encouraging greener
+                    campus habits.
                 </p>
+
+
                 <div class="skill-list">
-                    <span>Research</span>
-                    <span>Web Design</span>
-                    <span>Teamwork</span>
+
+                    <span>
+                        Research
+                    </span>
+
+                    <span>
+                        Web Design
+                    </span>
+
+                    <span>
+                        Teamwork
+                    </span>
+
                 </div>
-                <a class="text-link" href="#teams">
-                    Explore opportunities →
+
+
+                <a class="text-link"
+                   th:href="@{/students/search}">
+
+                    Find teammates →
+
                 </a>
+
             </article>
+
 
         </div>
 
+
+
         <p class="demo-notice">
-            These are demonstration projects. Real project data will be
-            connected after the frontend is completed.
+
+            These are demonstration projects.
+            Real project data will be connected after
+            the frontend is completed.
+
         </p>
+
+
     </section>
 
-    <section class="collaboration-section" id="teams">
+
+
+    <!-- =====================================================
+         TEAM / COLLABORATION
+    ====================================================== -->
+
+    <section class="collaboration-section"
+             id="teams">
+
+
         <div>
-            <p class="eyebrow">BETTER IDEAS, TOGETHER</p>
-            <h2>Your skills deserve the right team.</h2>
+
+            <p class="eyebrow">
+                BETTER IDEAS, TOGETHER
+            </p>
+
+
+            <h2>
+                Your skills deserve the right team.
+            </h2>
+
+
             <p>
                 Explore opportunities to work with students who share
                 your interests and complement your strengths.
             </p>
+
         </div>
-        <a class="primary-button" href="#profile">
-            Build your profile →
+
+
+        <a class="primary-button"
+           th:href="@{/students/search}">
+
+            Find teammates
+
+            <span aria-hidden="true">
+                →
+            </span>
+
         </a>
+
+
     </section>
 
-    <section class="profile-placeholder" id="profile">
+
+
+    <!-- =====================================================
+         PROFILE
+    ====================================================== -->
+
+    <section class="profile-placeholder"
+             id="profile">
+
+
         <div>
-            <p class="eyebrow">YOUR SPACE</p>
-            <h2>Your student profile</h2>
-            <p>
-                Your skills, interests, and project contributions
-                will appear here when profile functionality is implemented.
+
+            <p class="eyebrow">
+                YOUR SPACE
             </p>
+
+
+            <h2>
+                Your student profile
+            </h2>
+
+
+            <p>
+                Keep your profile updated with your interests,
+                background, and skills so other students can
+                discover what you bring to a team.
+            </p>
+
         </div>
-        <span class="profile-badge">Profile preview</span>
+
+
+        <a class="profile-badge"
+           th:href="@{/profile}">
+
+            View my profile
+
+        </a>
+
+
     </section>
+
 
 </main>
 
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
 <footer class="dashboard-footer">
-    <a class="brand" th:href="@{/dashboard}">
-        <span class="brand-mark">S</span>
-        <span>SkillForge</span>
+
+    <a class="brand"
+       th:href="@{/dashboard}">
+
+        <span class="brand-mark">
+            S
+        </span>
+
+        <span>
+            SkillForge
+        </span>
+
     </a>
-    <p>Find your people. Build your idea.</p>
+
+
+    <p>
+        Find your people. Build your idea.
+    </p>
+
 </footer>
+
 
 </body>
 </html>
+```
