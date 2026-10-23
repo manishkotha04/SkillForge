@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
+    <title>Sign in | SkillForge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-aside" aria-labelledby="brand-heading">
+        <a class="brand brand-light" th:href="@{/login}">
+            <span class="brand-mark" aria-hidden="true">S</span><span>SkillForge</span>
+        </a>
+        <div class="auth-aside-copy">
+            <p class="eyebrow eyebrow-light">Your next great project starts here</p>
+            <h1 id="brand-heading">Find your people.<br><span>Build your idea.</span></h1>
+            <p>Bring skills together, turn coursework into collaboration, and keep your team's work moving.</p>
+        </div>
+        <div class="aside-decoration" aria-hidden="true">
+            <span class="orbit orbit-one"></span><span class="orbit orbit-two"></span>
+            <span class="orbit-dot dot-one"></span><span class="orbit-dot dot-two"></span>
+            <span class="orbit-dot dot-three"></span>
+        </div>
+        <p class="aside-footnote">Student Project &amp; Team Collaboration Platform</p>
+    </section>
+
+    <section class="auth-main">
+        <div class="auth-card">
+            <div class="auth-mobile-brand">
+                <a class="brand" th:href="@{/login}">
+                    <span class="brand-mark" aria-hidden="true">S</span><span>SkillForge</span>
+                </a>
+            </div>
+            <p class="eyebrow">Welcome back</p>
+            <h2>Sign in to SkillForge</h2>
+            <p class="auth-subtitle">Pick up where your team left off.</p>
+
+            <div th:replace="~{fragments/messages :: messages}"></div>
+            <div class="alert alert-error" role="alert" th:if="${param.error}">
+                The identifier or password was not recognized. Please try again.
+            </div>
+            <div class="alert alert-success" role="status" th:if="${param.logout}">
+                You have been signed out.
+            </div>
+
+            <form th:action="@{/login}" method="post" class="form-stack">
+                <div class="form-field">
+                    <label for="username">Email or username</label>
+                    <input id="username" name="username" type="text" autocomplete="username"
+                           placeholder="you@example.com or your username" required maxlength="120">
+                    <small class="field-hint">Use the email address or username linked to your account.</small>
+                </div>
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <div class="password-wrap">
+                        <input id="password" name="password" type="password" autocomplete="current-password"
+                               placeholder="Enter your password" required>
+                        <button class="password-toggle" type="button" data-password-toggle="password"
+                                aria-label="Show password" aria-pressed="false">Show</button>
+                    </div>
+                </div>
+                <button class="button button-primary button-wide" type="submit">
+                    Sign in <span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <p class="auth-switch">New to SkillForge? <a th:href="@{/register}">Create an account</a></p>
+            <p class="auth-disclaimer">Account access is protected by the application server.</p>
+        </div>
+    </section>
+</main>
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>

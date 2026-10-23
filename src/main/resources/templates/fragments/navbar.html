@@ -1,0 +1,12 @@
+<nav xmlns:th="http://www.thymeleaf.org" th:fragment="navbar" class="site-nav">
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark" aria-hidden="true">S</span><span>SkillForge</span>
+    </a>
+    <div class="nav-links">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/register}">Create account</a>
+        <form th:action="@{/logout}" method="post" class="inline-form">
+            <button class="button button-outline button-small" type="submit">Sign out</button>
+        </form>
+    </div>
+</nav>

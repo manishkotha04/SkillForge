@@ -1,0 +1,470 @@
+
+/* SkillForge dashboard */
+
+.dashboard-page {
+    min-height: 100vh;
+    background: #f7f8fc;
+    color: #192653;
+}
+
+.dashboard-page * {
+    box-sizing: border-box;
+}
+
+.dashboard-page a {
+    text-decoration: none;
+}
+
+.dashboard-header {
+    min-height: 88px;
+    padding: 18px 6%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: #fff;
+    border-bottom: 1px solid #e9edf5;
+}
+
+.dashboard-header .brand,
+.dashboard-footer .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: #192653;
+    font-size: 1.55rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.brand-mark {
+    width: 46px;
+    height: 46px;
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 15px;
+    color: #fff;
+    background: linear-gradient(140deg, #6575f5, #3949c6);
+    font-size: 1.4rem;
+    font-weight: 800;
+    box-shadow: 0 8px 22px #4355d51c;
+}
+
+.dashboard-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 26px;
+}
+
+.dashboard-nav a {
+    color: #65718c;
+    font-size: .9rem;
+    font-weight: 650;
+    transition: color .2s ease;
+}
+
+.dashboard-nav a:hover,
+.dashboard-nav a.active {
+    color: #4054dc;
+}
+
+.header-action {
+    padding: 11px 17px;
+    border: 1px solid #dce2f0;
+    border-radius: 10px;
+    color: #3545bb;
+    font-size: .9rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.dashboard-container {
+    width: min(1180px, 88%);
+    margin: 0 auto;
+    padding: 48px 0 70px;
+}
+
+.welcome-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    padding: 48px;
+    border-radius: 25px;
+    background:
+        radial-gradient(ellipse at 95% 5%, #7584ff38, transparent 40%),
+        linear-gradient(125deg, #fff, #f0f2ff);
+    border: 1px solid #e6e9fb;
+}
+
+.eyebrow {
+    margin: 0 0 12px;
+    color: #5969e6;
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+}
+
+.welcome-section h1 {
+    margin: 0;
+    font-size: clamp(2.2rem, 4vw, 3.7rem);
+    letter-spacing: -.055em;
+    line-height: 1.12;
+}
+
+.welcome-section h1 span {
+    color: #5264e8;
+}
+
+.welcome-description {
+    max-width: 560px;
+    margin: 20px 0 0;
+    color: #68738d;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 13px;
+    padding: 15px 22px;
+    border-radius: 12px;
+    background: #4055dc;
+    color: #fff;
+    font-size: .94rem;
+    font-weight: 750;
+    white-space: nowrap;
+    box-shadow: 0 9px 24px #4055dc20;
+    transition: background .2s ease, transform .2s ease;
+}
+
+.primary-button:hover {
+    background: #3044c5;
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 30px;
+}
+
+.stat-card {
+    padding: 25px;
+    border: 1px solid #e8ebf4;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.stat-icon {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 13px;
+    background: #eef0ff;
+    color: #5264e8;
+    font-size: 1.35rem;
+}
+
+.stat-card p {
+    margin: 20px 0 5px;
+    color: #7a849c;
+    font-size: .88rem;
+}
+
+.stat-card h2 {
+    margin: 0;
+    font-size: 1.28rem;
+}
+
+.stat-description {
+    display: block;
+    margin-top: 10px;
+    color: #818ba2;
+    font-size: .85rem;
+    line-height: 1.6;
+}
+
+.content-section {
+    padding-top: 65px;
+    scroll-margin-top: 25px;
+}
+
+.section-heading {
+    margin-bottom: 25px;
+}
+
+.section-heading h2,
+.profile-placeholder h2,
+.collaboration-section h2 {
+    margin: 0;
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+    letter-spacing: -.035em;
+}
+
+.section-heading > div > p:last-child {
+    margin: 10px 0 0;
+    color: #707b94;
+    line-height: 1.7;
+}
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.project-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 25px;
+    border: 1px solid #e6eaf3;
+    border-radius: 18px;
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 34px #202b5010;
+}
+
+.project-card-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.project-category {
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: #f0f1ff;
+    color: #4e5ed0;
+    font-size: .72rem;
+    font-weight: 750;
+}
+
+.project-symbol {
+    color: #b2b9cd;
+    font-size: .85rem;
+    font-weight: 800;
+}
+
+.project-card h3 {
+    margin: 25px 0 10px;
+    font-size: 1.25rem;
+}
+
+.project-card > p {
+    margin: 0;
+    color: #707b94;
+    font-size: .91rem;
+    line-height: 1.8;
+}
+
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0;
+}
+
+.skill-list span {
+    padding: 7px 9px;
+    border: 1px solid #e5e9f3;
+    border-radius: 8px;
+    color: #606b84;
+    font-size: .75rem;
+}
+
+.text-link {
+    margin-top: auto;
+    padding-top: 8px;
+    color: #4055dc;
+    font-size: .88rem;
+    font-weight: 750;
+}
+
+.text-link:hover {
+    color: #2639b8;
+}
+
+.demo-notice {
+    margin-top: 20px;
+    color: #7c879e;
+    font-size: .82rem;
+    line-height: 1.7;
+}
+
+.collaboration-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 55px;
+    padding: 36px;
+    border-radius: 20px;
+    background: #192653;
+    color: #fff;
+    scroll-margin-top: 25px;
+}
+
+.collaboration-section .eyebrow {
+    color: #b7c1ff;
+}
+
+.collaboration-section h2 {
+    max-width: 560px;
+}
+
+.collaboration-section > div > p:last-child {
+    max-width: 600px;
+    margin: 14px 0 0;
+    color: #c7cee5;
+    line-height: 1.8;
+}
+
+.collaboration-section .primary-button {
+    flex-shrink: 0;
+    background: #6475f5;
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 28px;
+    padding: 30px;
+    border: 1px solid #e5e9f3;
+    border-radius: 18px;
+    background: #fff;
+    scroll-margin-top: 25px;
+}
+
+.profile-placeholder > div > p:last-child {
+    max-width: 650px;
+    margin: 12px 0 0;
+    color: #707b94;
+    line-height: 1.8;
+}
+
+.profile-badge {
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: #eef0ff;
+    color: #4c5ed5;
+    font-size: .8rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.dashboard-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 28px 6%;
+    border-top: 1px solid #e6eaf3;
+    background: #fff;
+}
+
+.dashboard-footer .brand-mark {
+    width: 35px;
+    height: 35px;
+    border-radius: 11px;
+    font-size: 1.05rem;
+}
+
+.dashboard-footer .brand {
+    font-size: 1.15rem;
+}
+
+.dashboard-footer > p {
+    color: #7c879e;
+    font-size: .85rem;
+}
+
+@media (max-width: 1000px) {
+    .dashboard-header {
+        flex-wrap: wrap;
+    }
+
+    .dashboard-nav {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 18px;
+    }
+
+    .project-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .welcome-section {
+        padding: 35px;
+    }
+}
+
+@media (max-width: 650px) {
+    .dashboard-header {
+        padding: 15px 5%;
+    }
+
+    .dashboard-nav {
+        gap: 14px;
+    }
+
+    .dashboard-nav a {
+        font-size: .82rem;
+    }
+
+    .dashboard-container {
+        width: 90%;
+        padding-top: 25px;
+    }
+
+    .welcome-section {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 28px 23px;
+    }
+
+    .dashboard-stats,
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .content-section {
+        padding-top: 45px;
+    }
+
+    .collaboration-section {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 27px 23px;
+    }
+
+    .profile-placeholder {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 24px;
+    }
+
+    .dashboard-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 25px 5%;
+    }
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
+    <title>Create account | SkillForge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body class="auth-page">
+<main class="auth-shell">
+    <section class="auth-aside" aria-labelledby="brand-heading">
+        <a class="brand brand-light" th:href="@{/register}">
+            <span class="brand-mark" aria-hidden="true">S</span><span>SkillForge</span>
+        </a>
+        <div class="auth-aside-copy">
+            <p class="eyebrow eyebrow-light">Make your next move</p>
+            <h1 id="brand-heading">Good ideas<br><span>need good teams.</span></h1>
+            <p>Create your profile, share your strengths, and find collaborators for academic projects and hackathons.</p>
+        </div>
+        <div class="auth-stat-row" aria-label="Platform focus">
+            <div><strong>Discover</strong><span>people and skills</span></div>
+            <div><strong>Collaborate</strong><span>on real projects</span></div>
+            <div><strong>Showcase</strong><span>what you build</span></div>
+        </div>
+        <p class="aside-footnote">Start with a profile. Grow with a team.</p>
+    </section>
+
+    <section class="auth-main">
+        <div class="auth-card">
+            <div class="auth-mobile-brand">
+                <a class="brand" th:href="@{/register}">
+                    <span class="brand-mark" aria-hidden="true">S</span><span>SkillForge</span>
+                </a>
+            </div>
+            <p class="eyebrow">Create your account</p>
+            <h2>Join SkillForge</h2>
+            <p class="auth-subtitle">A few details, then you're ready to get started.</p>
+
+            <div th:replace="~{fragments/messages :: messages}"></div>
+            <div class="alert alert-error" role="alert" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+            <div class="alert alert-success" role="status" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+            <form th:action="@{/register}" th:object="${registrationForm}" method="post"
+                  class="form-stack" data-validate-form>
+                <div class="form-field">
+                    <label for="fullName">Full name</label>
+                    <input id="fullName" th:field="*{fullName}" type="text" autocomplete="name"
+                           placeholder="e.g. Sam Kumar" required maxlength="100">
+                </div>
+                <div class="form-field">
+                    <label for="email">Email address</label>
+                    <input id="email" th:field="*{email}" type="email" autocomplete="email"
+                           placeholder="you@example.com" required maxlength="254">
+                </div>
+                <div class="form-field">
+                    <label for="username">Username</label>
+                    <input id="username" th:field="*{username}" type="text" autocomplete="username"
+                           placeholder="Choose a username" required minlength="3" maxlength="40">
+                </div>
+                <div class="form-field">
+                    <label for="password">Password</label>
+                    <div class="password-wrap">
+                        <input id="password" th:field="*{password}" type="password" autocomplete="new-password"
+                               placeholder="Create a password" required minlength="8" maxlength="100">
+                        <button class="password-toggle" type="button" data-password-toggle="password"
+                                aria-label="Show password" aria-pressed="false">Show</button>
+                    </div>
+                    <small class="field-hint">Use at least 8 characters.</small>
+                </div>
+                <button class="button button-primary button-wide" type="submit">
+                    Create account <span aria-hidden="true">→</span>
+                </button>
+            </form>
+
+            <p class="auth-switch">Already have an account? <a th:href="@{/login}">Sign in</a></p>
+            <p class="auth-disclaimer">Your account details are submitted to the application server.</p>
+        </div>
+    </section>
+</main>
+<script th:src="@{/js/app.js}" defer></script>
+</body>
+</html>
