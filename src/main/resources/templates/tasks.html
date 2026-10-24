@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Project Tasks | SkillForge</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="app-header">
+    <div class="container site-nav">
+        <a class="brand"
+           th:href="@{/dashboard}">
+            <span class="brand-mark">S</span>
+            <span>SkillForge</span>
+        </a>
+
+        <nav class="nav-links">
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/projects}">Projects</a>
+            <a th:href="@{/profile}">Profile</a>
+        </nav>
+    </div>
+</header>
+
+<main class="page-main">
+    <div class="container">
+
+        <div style="display: flex; justify-content: space-between;
+                    align-items: center; gap: 16px;
+                    flex-wrap: wrap; margin-bottom: 28px;">
+
+            <div>
+                <h1>Project Tasks</h1>
+                <p style="color: var(--muted); margin-bottom: 0;">
+                    Manage tasks and track project progress.
+                </p>
+            </div>
+
+            <a class="button button-primary"
+               th:href="@{/tasks/new(projectId=${projectId})}">
+                Create Task
+            </a>
+
+        </div>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(tasks)}"
+             style="padding: 40px; text-align: center;
+                    background: white; border: 1px solid var(--line);
+                    border-radius: var(--radius);">
+
+            <h2>No tasks yet</h2>
+
+            <p style="color: var(--muted);">
+                Create the first task for this project.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/tasks/new(projectId=${projectId})}">
+                Create Task
+            </a>
+        </div>
+
+        <!-- Task list -->
+        <div th:unless="${#lists.isEmpty(tasks)}"
+             style="display: grid; gap: 16px;">
+
+            <article th:each="task : ${tasks}"
+                     style="background: white;
+                            border: 1px solid var(--line);
+                            border-radius: var(--radius);
+                            padding: 22px;
+                            box-shadow: var(--shadow);">
+
+                <div style="display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            gap: 16px;
+                            flex-wrap: wrap;">
+
+                    <div style="min-width: 0;">
+
+                        <h2 th:text="${task.title}"
+                            style="margin-top: 0;">
+                            Task title
+                        </h2>
+
+                        <p th:if="${task.description != null
+                                  and !#strings.isEmpty(task.description)}"
+                           th:text="${task.description}"
+                           style="color: var(--muted);">
+                            Task description
+                        </p>
+
+                    </div>
+
+                    <span th:text="${task.status}"
+                          style="padding: 6px 10px;
+                                 border-radius: 999px;
+                                 background: var(--surface-soft);
+                                 color: var(--navy);
+                                 font-size: .8rem;
+                                 font-weight: 700;">
+                        TODO
+                    </span>
+
+                </div>
+
+                <div style="display: grid;
+                            gap: 8px;
+                            margin-top: 18px;
+                            color: var(--muted);
+                            font-size: .9rem;">
+
+                    <div>
+                        <strong>Due date:</strong>
+                        <span th:if="${task.dueDate != null}"
+                              th:text="${task.dueDate}">
+                            —
+                        </span>
+                        <span th:unless="${task.dueDate != null}">
+                            No due date
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>Assigned to:</strong>
+                        <span th:if="${task.assignee != null}"
+                              th:text="${task.assignee.fullName}">
+                            —
+                        </span>
+                        <span th:unless="${task.assignee != null}">
+                            Unassigned
+                        </span>
+                    </div>
+
+                </div>
+
+                <div style="display: flex;
+                            gap: 10px;
+                            flex-wrap: wrap;
+                            margin-top: 20px;">
+
+                    <a class="button button-secondary button-small"
+                       th:href="@{/tasks/{id}/edit(id=${task.id})}">
+                        Edit
+                    </a>
+
+                    <form th:action="@{/tasks/{id}/status(id=${task.id})}"
+                          method="post"
+                          style="display: flex;
+                                 gap: 8px;
+                                 align-items: center;">
+
+                        <select name="status"
+                                style="min-height: 36px;
+                                       padding: 6px 10px;
+                                       border: 1px solid #dce2ed;
+                                       border-radius: 9px;
+                                       background: white;
+                                       font: inherit;
+                                       font-size: .82rem;">
+
+                            <option th:each="statusOption :
+                                    ${T(com.skillforge.skillforge.enums.TaskStatus).values()}"
+                                    th:value="${statusOption}"
+                                    th:text="${statusOption}"
+                                    th:selected="${statusOption == task.status}">
+                                TODO
+                            </option>
+
+                        </select>
+
+                        <button type="submit"
+                                class="button button-primary button-small">
+                            Update Status
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

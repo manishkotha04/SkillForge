@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Portfolio | SkillForge</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="app-header">
+    <div class="container site-nav">
+
+        <a class="brand"
+           th:href="@{/dashboard}">
+            <span class="brand-mark">S</span>
+            <span>SkillForge</span>
+        </a>
+
+        <nav class="nav-links">
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/projects}">Projects</a>
+            <a th:href="@{/profile}">Profile</a>
+        </nav>
+
+    </div>
+</header>
+
+<main class="page-main">
+    <div class="container">
+
+        <div style="display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 16px;
+                    flex-wrap: wrap;
+                    margin-bottom: 28px;">
+
+            <div>
+                <h1>My Portfolio</h1>
+
+                <p style="color: var(--muted);
+                          margin-bottom: 0;">
+                    Showcase your projects, work, and achievements.
+                </p>
+            </div>
+
+            <a class="button button-primary"
+               th:href="@{/portfolio/new}">
+                Add Portfolio Item
+            </a>
+
+        </div>
+
+        <div th:if="${#lists.isEmpty(items)}"
+             style="padding: 40px;
+                    text-align: center;
+                    background: white;
+                    border: 1px solid var(--line);
+                    border-radius: var(--radius);">
+
+            <h2>Your portfolio is empty</h2>
+
+            <p style="color: var(--muted);">
+                Add your first portfolio item to showcase your work.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/portfolio/new}">
+                Add Portfolio Item
+            </a>
+
+        </div>
+
+        <div th:unless="${#lists.isEmpty(items)}"
+             style="display: grid;
+                    gap: 16px;">
+
+            <article th:each="item : ${items}"
+                     style="background: white;
+                            border: 1px solid var(--line);
+                            border-radius: var(--radius);
+                            padding: 22px;
+                            box-shadow: var(--shadow);">
+
+                <h2 th:text="${item.title}"
+                    style="margin-top: 0;">
+                    Portfolio Item
+                </h2>
+
+                <p th:if="${item.description != null
+                           and !#strings.isEmpty(item.description)}"
+                   th:text="${item.description}"
+                   style="color: var(--muted);">
+                    Description
+                </p>
+
+                <div th:if="${item.project != null}"
+                     style="margin-top: 14px;
+                            color: var(--muted);
+                            font-size: .9rem;">
+
+                    <strong>Project:</strong>
+                    <span th:text="${item.project.name}">
+                        Project name
+                    </span>
+
+                </div>
+
+                <div th:if="${item.externalUrl != null
+                            and !#strings.isEmpty(item.externalUrl)}"
+                     style="margin-top: 12px;">
+
+                    <a th:href="${item.externalUrl}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="button button-secondary button-small">
+                        View External Link
+                    </a>
+
+                </div>
+
+                <div style="display: flex;
+                            gap: 10px;
+                            flex-wrap: wrap;
+                            margin-top: 20px;">
+
+                    <a class="button button-secondary button-small"
+                       th:href="@{/portfolio/{id}/edit(id=${item.id})}">
+                        Edit
+                    </a>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Portfolio Item | SkillForge</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<header class="app-header">
+    <div class="container site-nav">
+
+        <a class="brand"
+           th:href="@{/dashboard}">
+            <span class="brand-mark">S</span>
+            <span>SkillForge</span>
+        </a>
+
+        <nav class="nav-links">
+            <a th:href="@{/dashboard}">Dashboard</a>
+            <a th:href="@{/projects}">Projects</a>
+            <a th:href="@{/profile}">Profile</a>
+        </nav>
+
+    </div>
+</header>
+
+<main class="page-main">
+    <div class="container">
+
+        <div style="margin-bottom: 28px;">
+            <h1>Add Portfolio Item</h1>
+
+            <p style="color: var(--muted);">
+                Showcase a project, achievement, or piece of work.
+            </p>
+        </div>
+
+        <form th:action="@{/portfolio}"
+              th:object="${item}"
+              method="post"
+              class="form-stack">
+
+            <div class="form-field">
+                <label for="title">Title</label>
+
+                <input id="title"
+                       type="text"
+                       th:field="*{title}"
+                       maxlength="150"
+                       required
+                       th:attr="aria-invalid=${#fields.hasErrors('title')}">
+
+                <p class="field-error"
+                   th:if="${#fields.hasErrors('title')}"
+                   th:errors="*{title}">
+                </p>
+            </div>
+
+            <div class="form-field">
+                <label for="description">Description</label>
+
+                <textarea id="description"
+                          th:field="*{description}"
+                          rows="6"
+                          placeholder="Describe your work, contribution, or achievement."></textarea>
+            </div>
+            <div class="form-field">
+    <label for="projectId">Project</label>
+
+    <select id="projectId"
+            th:field="*{projectId}">
+
+        <option value="">No project</option>
+
+        <option th:each="project : ${projects}"
+                th:value="${project.id}"
+                th:text="${project.name}">
+        </option>
+
+    </select>
+
+    <p class="field-hint">
+        Optionally associate this portfolio item with one of your projects.
+    </p>
+</div>
+            <div class="form-field">
+                <label for="externalUrl">External link</label>
+
+                <input id="externalUrl"
+                       type="url"
+                       th:field="*{externalUrl}"
+                       maxlength="500"
+                       placeholder="https://example.com">
+
+                <p class="field-hint">
+                    Optional link to a repository, demo, or other public work.
+                </p>
+
+                <p class="field-error"
+                   th:if="${#fields.hasErrors('externalUrl')}"
+                   th:errors="*{externalUrl}">
+                </p>
+            </div>
+
+            <div style="display: flex;
+                        gap: 12px;
+                        flex-wrap: wrap;">
+
+                <button type="submit"
+                        class="button button-primary">
+                    Add to Portfolio
+                </button>
+
+                <a class="button button-secondary"
+                   th:href="@{/portfolio}">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+</main>
+
+</body>
+</html>
