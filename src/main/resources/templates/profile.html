@@ -1,486 +1,597 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
 
-    <title>My Profile - SkillForge</title>
+    <title>My Profile | SkillForge</title>
 
+    <!-- Same shared stylesheets as the dashboard: header, nav, footer and buttons come from here -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <!-- Profile-only styles (all prefixed with "profile-" so nothing clashes with dashboard.css) -->
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* Same nav position as the home page, with the content pulled closer to it */
+        body.dashboard-page {
+            padding-top: 32px;
         }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f7fb;
-            color: #172554;
-            min-height: 100vh;
+        main.dashboard-container {
+            margin-top: 0;
+            padding-top: 28px;
         }
 
-        /* ---------- NAVBAR ---------- */
-
-        .navbar {
-            height: 78px;
-            background: #172554;
-            color: white;
-            padding: 0 7%;
+        .profile-hero {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            text-decoration: none;
-            font-size: 26px;
-            font-weight: 700;
-        }
-
-        .brand-mark {
-            width: 42px;
-            height: 42px;
-            border-radius: 11px;
-            background: #4f7df3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 800;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-link {
-            color: #e2e8f0;
-            text-decoration: none;
-            padding: 11px 16px;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: 0.2s;
-        }
-
-        .nav-link:hover {
-            background: rgba(255, 255, 255, 0.10);
-            color: white;
-        }
-
-        .nav-link.active {
-            background: rgba(255, 255, 255, 0.14);
-            color: white;
-        }
-
-        /* ---------- PAGE ---------- */
-
-        .page {
-            width: min(1000px, 90%);
-            margin: 48px auto 70px;
-        }
-
-        .page-intro {
-            margin-bottom: 28px;
-        }
-
-        .eyebrow {
-            color: #52709f;
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .page-intro h1 {
-            font-size: 42px;
+        .profile-hero h1 {
+            font-size: 36px;
             line-height: 1.15;
-            margin-bottom: 12px;
             color: #172554;
+            margin-bottom: 8px;
         }
 
-        .page-intro p {
+        .profile-hero h1 span {
+            color: #4f5fe8;
+        }
+
+        .profile-hero p.profile-lead {
             color: #64748b;
             font-size: 17px;
             line-height: 1.6;
-            max-width: 700px;
+            max-width: 620px;
         }
 
-        /* ---------- PROFILE CARD ---------- */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
 
-        .profile-card {
-            background: white;
-            border-radius: 22px;
-            overflow: hidden;
+        .profile-card,
+        .profile-side {
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.08);
+            border-radius: 22px;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.06);
         }
 
-        .profile-header {
-            padding: 42px;
-            background: linear-gradient(135deg, #1d4ed8, #3730a3);
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 22px;
+        /* ---------- Identity card ---------- */
+
+        .profile-side {
+            overflow: hidden;
+            position: sticky;
+            top: 24px;
         }
 
-        .avatar {
-            width: 76px;
-            height: 76px;
-            flex-shrink: 0;
-            border-radius: 20px;
+        .profile-side-top {
+            padding: 36px 28px 28px;
+            text-align: center;
+            background: linear-gradient(135deg, #4f5fe8, #3730a3);
+            color: #ffffff;
+        }
+
+        .profile-avatar {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 16px;
+            border-radius: 24px;
             background: rgba(255, 255, 255, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.28);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 38px;
             font-weight: 800;
         }
 
-        .profile-header h2 {
-            font-size: 30px;
-            margin-bottom: 7px;
+        .profile-side-top h2 {
+            font-size: 24px;
+            margin-bottom: 6px;
+            word-break: break-word;
         }
 
-        .profile-header p {
-            color: #dbeafe;
+        .profile-side-top p {
+            color: #dbe4ff;
+            font-size: 14px;
+        }
+
+        .profile-side-body {
+            padding: 24px 28px 28px;
+        }
+
+        .profile-stat {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .profile-stat strong {
+            color: #172554;
             font-size: 15px;
         }
 
-        .profile-content {
-            padding: 42px;
+        .profile-side-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 22px;
         }
 
-        /* ---------- SECTIONS ---------- */
-
-        .section {
-            padding-bottom: 30px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #e2e8f0;
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
         }
 
-        .section:last-of-type {
-            border-bottom: none;
-            margin-bottom: 0;
+        .profile-btn.primary {
+            background: #4f5fe8;
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(79, 95, 232, 0.2);
         }
 
-        .section-title {
-            color: #52709f;
-            font-size: 13px;
+        .profile-btn.primary:hover {
+            background: #4054e8;
+            transform: translateY(-1px);
+        }
+
+        .profile-btn.secondary {
+            background: #f8fafc;
+            color: #3046c8;
+            border: 1px solid #dbe2ef;
+        }
+
+        .profile-btn.secondary:hover {
+            background: #eef2ff;
+        }
+
+        /* ---------- Detail cards ---------- */
+
+        .profile-details {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .profile-card {
+            padding: 30px 32px;
+        }
+
+        .profile-card-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .profile-card-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #eef2ff;
+            color: #4f5fe8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
             font-weight: 800;
-            letter-spacing: 1.4px;
-            text-transform: uppercase;
-            margin-bottom: 11px;
         }
 
-        .section-content {
+        .profile-card-head h3 {
+            font-size: 19px;
+            color: #172554;
+        }
+
+        .profile-text {
             color: #334155;
             font-size: 16px;
             line-height: 1.75;
             white-space: pre-line;
         }
 
-        .empty-text {
+        .profile-empty {
             color: #94a3b8;
             font-style: italic;
         }
 
-        /* ---------- SKILLS ---------- */
-
-        .skills {
+        .profile-skills {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
 
-        .skill {
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #dbeafe;
-            padding: 8px 14px;
+        .profile-skills span {
+            background: #eef2ff;
+            color: #3046c8;
+            border: 1px solid #dbe2ef;
+            padding: 8px 15px;
             border-radius: 999px;
             font-size: 14px;
             font-weight: 700;
         }
 
-        /* ---------- ACTIONS ---------- */
+        /* ---------- Bottom call to action (mirrors dashboard bands) ---------- */
 
-        .actions {
+        .profile-cta {
+            margin-top: 28px;
+            padding: 32px 36px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #172554, #1d2f7a);
+            color: #ffffff;
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 35px;
-        }
-
-        .button {
-            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 12px 20px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 700;
-            transition: 0.2s;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        .primary {
-            background: #2563eb;
-            color: white;
+        .profile-cta h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
         }
 
-        .primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
+        .profile-cta p {
+            color: #cbd5f5;
+            line-height: 1.6;
+            max-width: 560px;
         }
 
-        .secondary {
-            background: white;
-            color: #334155;
-            border: 1px solid #cbd5e1;
+        .profile-cta .profile-btn {
+            background: #ffffff;
+            color: #172554;
+            padding: 14px 24px;
+            white-space: nowrap;
         }
 
-        .secondary:hover {
-            background: #f8fafc;
+        .profile-cta .profile-btn:hover {
+            background: #eef2ff;
         }
 
-        /* ---------- FOOTER ---------- */
+        /* ---------- Responsive ---------- */
 
-        footer {
-            text-align: center;
-            color: #94a3b8;
-            font-size: 13px;
-            padding: 0 20px 30px;
-        }
-
-        /* ---------- RESPONSIVE ---------- */
-
-        @media (max-width: 750px) {
-
-            .navbar {
-                height: auto;
-                padding: 16px 5%;
-                gap: 15px;
-                flex-direction: column;
+        @media (max-width: 900px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
             }
 
-            .nav-links {
-                width: 100%;
-                justify-content: center;
-                flex-wrap: wrap;
+            .profile-side {
+                position: static;
             }
+        }
 
-            .page {
-                width: 94%;
-                margin-top: 30px;
-            }
-
-            .page-intro h1 {
+        @media (max-width: 600px) {
+            .profile-hero h1 {
                 font-size: 34px;
             }
 
-            .profile-header {
-                padding: 30px;
+            .profile-card {
+                padding: 24px 22px;
             }
 
-            .profile-content {
-                padding: 30px;
-            }
-        }
-
-        @media (max-width: 500px) {
-
-            .brand {
-                font-size: 23px;
-            }
-
-            .profile-header {
-                align-items: flex-start;
-            }
-
-            .avatar {
-                width: 62px;
-                height: 62px;
-                font-size: 26px;
-            }
-
-            .profile-header h2 {
-                font-size: 24px;
-            }
-
-            .nav-link {
-                padding: 9px 11px;
-                font-size: 13px;
+            .profile-cta {
+                padding: 26px 22px;
             }
         }
     </style>
 </head>
 
-<body>
 
-<nav class="navbar">
+<body class="dashboard-page">
+
+
+<!-- =========================================================
+     NAVIGATION (identical to dashboard; only "active" differs)
+========================================================= -->
+
+<header class="dashboard-header">
 
     <a class="brand" th:href="@{/dashboard}">
         <span class="brand-mark">S</span>
         <span>SkillForge</span>
     </a>
 
-    <div class="nav-links">
 
-        <a class="nav-link"
-           th:href="@{/dashboard}">
+    <nav class="dashboard-nav" aria-label="Main navigation">
+
+        <a th:href="@{/dashboard}">
             Dashboard
         </a>
 
-        <a class="nav-link"
-           th:href="@{/students/search}">
+        <a th:href="@{/dashboard#projects}">
+            Explore projects
+        </a>
+
+        <a th:href="@{/students/search}">
             Find teammates
         </a>
 
-        <a class="nav-link active"
+        <a class="active"
            th:href="@{/profile}">
-            My Profile
+            My profile
         </a>
 
-    </div>
+    </nav>
 
-</nav>
 
-<main class="page">
+    <form th:action="@{/logout}"
+          method="post"
+          class="logout-form">
 
-    <div class="page-intro">
-        <div class="eyebrow">Your SkillForge identity</div>
+        <button type="submit"
+                class="header-action">
+            Sign out
+        </button>
 
-        <h1>My Profile</h1>
+    </form>
 
-        <p>
-            Keep your profile up to date so other students can understand
-            your interests, background, and skills.
-        </p>
-    </div>
+</header>
 
-    <section class="profile-card">
 
-        <header class="profile-header">
 
-            <div class="avatar"
-                 th:text="${#strings.substring(profile.displayName, 0, 1).toUpperCase()}">
-                S
-            </div>
+<!-- =========================================================
+     MAIN
+========================================================= -->
 
-            <div>
+<main class="dashboard-container">
+
+
+    <!-- ================= INTRO ================= -->
+
+    <section class="profile-hero">
+
+        <div>
+
+            <p class="eyebrow">
+                YOUR SKILLFORGE IDENTITY
+            </p>
+
+            <h1>
+                My <span>profile.</span>
+            </h1>
+
+            <p class="profile-lead">
+                Keep your profile up to date so other students can
+                understand your interests, background, and skills.
+            </p>
+
+        </div>
+
+
+        <a class="primary-button"
+           th:href="@{/profile/edit}">
+
+            Edit my profile
+
+            <span aria-hidden="true">
+                →
+            </span>
+
+        </a>
+
+    </section>
+
+
+
+    <!-- ================= PROFILE ================= -->
+
+    <section class="profile-layout">
+
+
+        <!-- ---------- Identity ---------- -->
+
+        <aside class="profile-side">
+
+            <div class="profile-side-top">
+
+                <div class="profile-avatar"
+                     th:text="${#strings.substring(profile.displayName, 0, 1).toUpperCase()}">
+                    S
+                </div>
+
                 <h2 th:text="${profile.displayName}">
                     Student Name
                 </h2>
 
                 <p>SkillForge student</p>
+
             </div>
 
-        </header>
 
-        <div class="profile-content">
+            <div class="profile-side-body">
 
-            <section class="section">
-
-                <div class="section-title">
-                    About Me
+                <div class="profile-stat">
+                    <span>Skills listed</span>
+                    <strong th:text="${profile.skills != null ? profile.skills.size() : 0}">0</strong>
                 </div>
 
-                <p class="section-content"
+                <div class="profile-stat">
+                    <span>Bio</span>
+                    <strong th:text="${profile.bio != null and !#strings.isEmpty(profile.bio)} ? 'Added' : 'Missing'">Added</strong>
+                </div>
+
+                <div class="profile-stat">
+                    <span>Interests</span>
+                    <strong th:text="${profile.interests != null and !#strings.isEmpty(profile.interests)} ? 'Added' : 'Missing'">Added</strong>
+                </div>
+
+
+                <div class="profile-side-actions">
+
+                    <a class="profile-btn primary"
+                       th:href="@{/profile/edit}">
+                        Edit my profile
+                    </a>
+
+                    <a class="profile-btn secondary"
+                       th:href="@{/students/search}">
+                        Find teammates
+                    </a>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ---------- Details ---------- -->
+
+        <div class="profile-details">
+
+
+            <!-- About -->
+
+            <article class="profile-card">
+
+                <div class="profile-card-head">
+                    <span class="profile-card-icon" aria-hidden="true">✦</span>
+                    <h3>About me</h3>
+                </div>
+
+                <p class="profile-text"
                    th:if="${profile.bio != null and !#strings.isEmpty(profile.bio)}"
                    th:text="${profile.bio}">
                     Tell other students about yourself.
                 </p>
 
-                <p class="section-content empty-text"
+                <p class="profile-text profile-empty"
                    th:if="${profile.bio == null or #strings.isEmpty(profile.bio)}">
                     No bio added yet.
                 </p>
 
-            </section>
+            </article>
 
-            <section class="section">
 
-                <div class="section-title">
-                    Interests
+            <!-- Interests -->
+
+            <article class="profile-card">
+
+                <div class="profile-card-head">
+                    <span class="profile-card-icon" aria-hidden="true">♧</span>
+                    <h3>Interests</h3>
                 </div>
 
-                <p class="section-content"
+                <p class="profile-text"
                    th:if="${profile.interests != null and !#strings.isEmpty(profile.interests)}"
                    th:text="${profile.interests}">
                     Your interests.
                 </p>
 
-                <p class="section-content empty-text"
+                <p class="profile-text profile-empty"
                    th:if="${profile.interests == null or #strings.isEmpty(profile.interests)}">
                     No interests added yet.
                 </p>
 
-            </section>
+            </article>
 
-            <section class="section">
 
-                <div class="section-title">
-                    Skills
+            <!-- Skills -->
+
+            <article class="profile-card">
+
+                <div class="profile-card-head">
+                    <span class="profile-card-icon" aria-hidden="true">↗</span>
+                    <h3>Skills</h3>
                 </div>
 
-                <div class="skills"
+                <div class="profile-skills"
                      th:if="${profile.skills != null and !profile.skills.isEmpty()}">
 
-                    <span class="skill"
-                          th:each="skill : ${profile.skills}"
+                    <span th:each="skill : ${profile.skills}"
                           th:text="${skill}">
                         Java
                     </span>
 
                 </div>
 
-                <p class="section-content empty-text"
+                <p class="profile-text profile-empty"
                    th:if="${profile.skills == null or profile.skills.isEmpty()}">
                     No skills added yet.
                 </p>
 
-            </section>
+            </article>
 
-            <div class="actions">
-
-                <a class="button primary"
-                   th:href="@{/profile/edit}">
-                    Edit My Profile
-                </a>
-
-                <a class="button secondary"
-                   th:href="@{/students/search}">
-                    Find Teammates
-                </a>
-
-                <a class="button secondary"
-                   th:href="@{/dashboard}">
-                    Back to Dashboard
-                </a>
-
-            </div>
 
         </div>
 
     </section>
 
+
+
+    <!-- ================= CTA ================= -->
+
+    <section class="profile-cta">
+
+        <div>
+
+            <h2>Your skills deserve the right team.</h2>
+
+            <p>
+                A complete profile makes it easier for other students
+                to find you and see what you bring to a project.
+            </p>
+
+        </div>
+
+        <a class="profile-btn"
+           th:href="@{/students/search}">
+            Find teammates →
+        </a>
+
+    </section>
+
+
 </main>
 
-<footer>
-    SkillForge · Build skills. Find teammates. Build together.
+
+
+<!-- =========================================================
+     FOOTER (identical to dashboard)
+========================================================= -->
+
+<footer class="dashboard-footer">
+
+    <a class="brand"
+       th:href="@{/dashboard}">
+
+        <span class="brand-mark">
+            S
+        </span>
+
+        <span>
+            SkillForge
+        </span>
+
+    </a>
+
+
+    <p>
+        Find your people. Build your idea.
+    </p>
+
 </footer>
+
 
 </body>
 </html>

@@ -71,13 +71,22 @@ public class StudentDiscoveryService {
 
     private StudentSummaryDto toDto(StudentProfile profile) {
 
-        StudentSummaryDto dto = new StudentSummaryDto();
+    StudentSummaryDto dto = new StudentSummaryDto();
 
-        dto.setId(profile.getId());
-        dto.setDisplayName(profile.getDisplayName());
-        dto.setBio(profile.getBio());
-        dto.setInterests(profile.getInterests());
+    dto.setId(profile.getId());
+    dto.setDisplayName(profile.getDisplayName());
+    dto.setBio(profile.getBio());
+    dto.setInterests(profile.getInterests());
 
-        return dto;
-    }
+    List<String> skillNames = studentSkillRepository
+            .findByStudentProfileId(profile.getId())
+            .stream()
+            .map(StudentSkill::getSkill)
+            .map(skill -> skill.getName())
+            .toList();
+
+    dto.setSkills(skillNames);
+
+    return dto;
+}
 }

@@ -3,590 +3,452 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#172554">
 
     <title>Find Teammates | SkillForge</title>
 
+    <!-- Same shared stylesheets as the dashboard and profile page -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <!-- Page-only styles (prefixed "find-" so nothing clashes with dashboard.css) -->
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* Same nav position as the home page, with the content pulled closer to it */
+        body.dashboard-page {
+            padding-top: 32px;
         }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background:
-                linear-gradient(180deg, #eef4ff 0%, #f8fafc 42%, #f4f7fb 100%);
-            color: #1f2937;
-            min-height: 100vh;
+        main.dashboard-container {
+            margin-top: 0;
+            padding-top: 28px;
         }
 
-        /* =========================================================
-           NAVBAR
-           ========================================================= */
-
-        .navbar {
-            background: #172554;
-            color: white;
-            padding: 17px 7%;
+        .find-hero {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            gap: 30px;
-            box-shadow: 0 4px 18px rgba(15, 23, 42, 0.14);
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-size: 23px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .brand-mark {
-            width: 36px;
-            height: 36px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #3b82f6, #6366f1);
-            color: white;
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
+            gap: 24px;
             flex-wrap: wrap;
+            margin-bottom: 22px;
         }
 
-        .nav-link {
-            color: rgba(255, 255, 255, 0.88);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 9px 14px;
-            border-radius: 8px;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        .nav-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.10);
-        }
-
-        .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.14);
-        }
-
-        /* =========================================================
-           MAIN CONTAINER
-           ========================================================= */
-
-        .container {
-            width: min(1100px, 90%);
-            margin: 55px auto 70px;
-        }
-
-        /* =========================================================
-           PAGE HEADER
-           ========================================================= */
-
-        .page-header {
-            margin-bottom: 28px;
-        }
-
-        .eyebrow {
-            color: #2563eb;
-            font-size: 12px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            margin-bottom: 9px;
-        }
-
-        .page-header h1 {
+        .find-hero h1 {
+            font-size: 36px;
+            line-height: 1.15;
             color: #172554;
-            font-size: clamp(32px, 4vw, 46px);
-            line-height: 1.1;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
-        .page-header h1 span {
-            color: #2563eb;
+        .find-hero h1 span {
+            color: #4f5fe8;
         }
 
-        .page-header p {
+        .find-lead {
             color: #64748b;
-            font-size: 16px;
-            line-height: 1.7;
-            max-width: 650px;
+            font-size: 17px;
+            line-height: 1.6;
+            max-width: 620px;
         }
 
-        /* =========================================================
-           SEARCH CARD
-           ========================================================= */
+        /* ---------- Search ---------- */
 
-        .search-card {
-            background: white;
-            padding: 28px;
-            border-radius: 20px;
+        .find-search {
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
-            margin-bottom: 34px;
+            border-radius: 22px;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.06);
+            padding: 30px 32px;
+            margin-bottom: 40px;
         }
 
-        .search-heading {
+        .find-search h2 {
+            font-size: 20px;
+            color: #172554;
+            margin-bottom: 6px;
+        }
+
+        .find-search > p {
+            color: #64748b;
+            font-size: 14px;
             margin-bottom: 18px;
         }
 
-        .search-heading h2 {
-            color: #172554;
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-
-        .search-heading p {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .search-form {
+        .find-form {
             display: flex;
             gap: 12px;
         }
 
-        .search-input {
+        .find-input {
             flex: 1;
             min-width: 0;
-            padding: 14px 17px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
+            padding: 15px 18px;
+            border: 1px solid #dbe2ef;
+            border-radius: 12px;
             background: #f8fafc;
             font-family: inherit;
             font-size: 15px;
-            color: #1f2937;
+            color: #172554;
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         }
 
-        .search-input::placeholder {
+        .find-input::placeholder {
             color: #94a3b8;
         }
 
-        .search-input:focus {
-            background: white;
-            border-color: #2563eb;
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        .find-input:focus {
+            background: #ffffff;
+            border-color: #4f5fe8;
+            box-shadow: 0 0 0 4px rgba(79, 95, 232, 0.12);
         }
 
-        .search-button {
+        .find-button {
             border: none;
-            border-radius: 10px;
-            padding: 0 26px;
-            background: #2563eb;
-            color: white;
+            border-radius: 12px;
+            padding: 0 30px;
+            background: #4f5fe8;
+            color: #ffffff;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
+            box-shadow: 0 8px 20px rgba(79, 95, 232, 0.2);
             transition: background 0.2s, transform 0.2s;
         }
 
-        .search-button:hover {
-            background: #1d4ed8;
+        .find-button:hover {
+            background: #4054e8;
             transform: translateY(-1px);
         }
 
-        /* =========================================================
-           RESULTS HEADER
-           ========================================================= */
+        /* ---------- Results ---------- */
 
-        .results-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-            gap: 20px;
-            margin-bottom: 18px;
+        .find-results-head {
+            margin-bottom: 20px;
         }
 
-        .results-heading h2 {
+        .find-results-head h2 {
+            font-size: 24px;
             color: #172554;
-            font-size: 22px;
         }
 
-        .results-heading p {
+        .find-results-head p {
             color: #64748b;
             font-size: 14px;
             margin-top: 4px;
         }
 
-        /* =========================================================
-           STUDENT CARDS
-           ========================================================= */
-
-        .results {
+        .find-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 22px;
         }
 
-        .student-card {
-            position: relative;
-            background: white;
+        .find-card {
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.06);
+            border-radius: 22px;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.06);
+            padding: 26px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .student-card:hover {
+        .find-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 15px 32px rgba(15, 23, 42, 0.10);
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.10);
         }
 
-        .student-top {
+        .find-card-top {
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 18px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
         }
 
-        .student-avatar {
-            width: 48px;
-            height: 48px;
+        .find-avatar {
+            width: 52px;
+            height: 52px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #dbeafe, #e0e7ff);
-            color: #1d4ed8;
-            font-size: 18px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #4f5fe8, #3730a3);
+            color: #ffffff;
+            font-size: 21px;
             font-weight: 800;
         }
 
-        .student-name {
-            color: #172554;
-            font-size: 20px;
+        .find-name {
+            font-size: 19px;
             line-height: 1.2;
-        }
-
-        .student-role {
-            color: #94a3b8;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .label {
-            color: #64748b;
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-top: 17px;
-            margin-bottom: 6px;
-        }
-
-        .student-text {
-            color: #475569;
-            font-size: 14px;
-            line-height: 1.65;
+            color: #172554;
             word-break: break-word;
         }
 
-        .student-text:empty::after {
+        .find-role {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .find-label {
+            color: #52709f;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            margin: 18px 0 7px;
+        }
+
+        .find-text {
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.7;
+            white-space: pre-line;
+            word-break: break-word;
+        }
+
+        .find-text:empty::after {
             content: "Not added yet";
             color: #94a3b8;
             font-style: italic;
         }
 
-        /* =========================================================
-           EMPTY STATE
-           ========================================================= */
+        /* ---------- Empty state ---------- */
 
-        .empty-state {
-            background: white;
+        .find-empty {
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 55px 30px;
+            border-radius: 22px;
+            box-shadow: 0 15px 45px rgba(15, 23, 42, 0.06);
+            padding: 56px 30px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
         }
 
-        .empty-icon {
-            width: 58px;
-            height: 58px;
+        .find-empty-icon {
+            width: 60px;
+            height: 60px;
             margin: 0 auto 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 16px;
-            background: #eff6ff;
-            color: #2563eb;
-            font-size: 25px;
+            border-radius: 17px;
+            background: #eef2ff;
+            color: #4f5fe8;
+            font-size: 26px;
+            font-weight: 800;
         }
 
-        .empty-state h2 {
-            color: #172554;
+        .find-empty h2 {
             font-size: 22px;
+            color: #172554;
             margin-bottom: 8px;
         }
 
-        .empty-state p {
+        .find-empty p {
             color: #64748b;
             line-height: 1.6;
         }
 
-        /* =========================================================
-           BOTTOM NAVIGATION
-           ========================================================= */
+        /* ---------- Bottom band (mirrors profile + dashboard bands) ---------- */
 
-        .bottom-actions {
+        .find-cta {
+            margin-top: 40px;
+            padding: 32px 36px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #172554, #1d2f7a);
+            color: #ffffff;
             display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 38px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
         }
 
-        .action-link {
+        .find-cta h2 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .find-cta p {
+            color: #cbd5f5;
+            line-height: 1.6;
+            max-width: 560px;
+        }
+
+        .find-cta a {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 11px 18px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 700;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .action-primary {
-            background: #2563eb;
-            color: white;
-        }
-
-        .action-primary:hover {
-            background: #1d4ed8;
-            transform: translateY(-1px);
-        }
-
-        .action-secondary {
-            background: white;
-            color: #334155;
-            border: 1px solid #cbd5e1;
-        }
-
-        .action-secondary:hover {
-            background: #f8fafc;
-        }
-
-        /* =========================================================
-           FOOTER
-           ========================================================= */
-
-        .footer {
-            padding: 28px 7%;
-            border-top: 1px solid #e2e8f0;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .footer .brand {
+            padding: 14px 24px;
+            border-radius: 12px;
+            background: #ffffff;
             color: #172554;
-            font-size: 18px;
-        }
-
-        .footer .brand-mark {
-            width: 30px;
-            height: 30px;
             font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: 0.2s;
         }
 
-        .footer p {
-            color: #94a3b8;
-            font-size: 13px;
+        .find-cta a:hover {
+            background: #eef2ff;
         }
 
-        /* =========================================================
-           MOBILE
-           ========================================================= */
+        /* ---------- Responsive ---------- */
 
-        @media (max-width: 760px) {
-
-            .navbar {
-                padding: 15px 5%;
-                align-items: flex-start;
-                flex-direction: column;
-                gap: 14px;
+        @media (max-width: 700px) {
+            .find-hero h1 {
+                font-size: 34px;
             }
 
-            .nav-links {
-                width: 100%;
-                justify-content: flex-start;
+            .find-search {
+                padding: 24px 22px;
             }
 
-            .container {
-                width: 92%;
-                margin: 35px auto 55px;
-            }
-
-            .search-card {
-                padding: 21px;
-            }
-
-            .search-form {
+            .find-form {
                 flex-direction: column;
             }
 
-            .search-button {
-                padding: 13px;
+            .find-button {
+                padding: 14px;
             }
 
-            .results-heading {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .bottom-actions {
-                flex-direction: column;
-            }
-
-            .action-link {
-                width: 100%;
-            }
-
-            .footer {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 25px 5%;
+            .find-cta {
+                padding: 26px 22px;
             }
         }
     </style>
 </head>
 
 
-<body>
+<body class="dashboard-page">
 
 
-<!-- =============================================================
-     NAVIGATION
-     ============================================================= -->
+<!-- =========================================================
+     NAVIGATION (identical to dashboard; only "active" differs)
+========================================================= -->
 
-<nav class="navbar">
+<header class="dashboard-header">
 
     <a class="brand" th:href="@{/dashboard}">
-
-        <span class="brand-mark">
-            S
-        </span>
-
-        <span>
-            SkillForge
-        </span>
-
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
     </a>
 
 
-    <div class="nav-links">
+    <nav class="dashboard-nav" aria-label="Main navigation">
 
-        <!-- Dashboard -->
-        <a class="nav-link"
-           th:href="@{/dashboard}">
+        <a th:href="@{/dashboard}">
             Dashboard
         </a>
 
-        <!-- Current page -->
-        <a class="nav-link active"
+        <a th:href="@{/dashboard#projects}">
+            Explore projects
+        </a>
+
+        <a class="active"
            th:href="@{/students/search}">
             Find teammates
         </a>
 
-        <!-- Profile -->
-        <a class="nav-link"
-           th:href="@{/profile}">
-            My Profile
+        <a th:href="@{/profile}">
+            My profile
         </a>
 
-    </div>
-
-</nav>
+    </nav>
 
 
-<!-- =============================================================
-     MAIN CONTENT
-     ============================================================= -->
+    <form th:action="@{/logout}"
+          method="post"
+          class="logout-form">
 
-<main class="container">
+        <button type="submit"
+                class="header-action">
+            Sign out
+        </button>
 
+    </form>
 
-    <!-- Page heading -->
-
-    <header class="page-header">
-
-        <p class="eyebrow">
-            BUILD YOUR NETWORK
-        </p>
-
-        <h1>
-            Find the right <span>teammates.</span>
-        </h1>
-
-        <p>
-            Search for students by name, interests, or skills
-            and discover people who could be a great fit for your team.
-        </p>
-
-    </header>
+</header>
 
 
-    <!-- =========================================================
-         SEARCH
-         ========================================================= -->
 
-    <section class="search-card">
+<!-- =========================================================
+     MAIN
+========================================================= -->
 
-        <div class="search-heading">
+<main class="dashboard-container">
 
-            <h2>
-                Discover students
-            </h2>
 
-            <p>
-                Try a name, skill, or interest such as Java, design, AI, or web development.
+    <!-- ================= INTRO ================= -->
+
+    <section class="find-hero">
+
+        <div>
+
+            <p class="eyebrow">
+                BUILD YOUR NETWORK
+            </p>
+
+            <h1>
+                Find the right <span>teammates.</span>
+            </h1>
+
+            <p class="find-lead">
+                Search for students by name, interests, or skills
+                and discover people who could be a great fit for your team.
             </p>
 
         </div>
 
 
-        <form class="search-form"
+        <a class="primary-button"
+           th:href="@{/profile}">
+
+            View my profile
+
+            <span aria-hidden="true">
+                →
+            </span>
+
+        </a>
+
+    </section>
+
+
+
+    <!-- ================= SEARCH ================= -->
+
+    <section class="find-search">
+
+        <h2>
+            Discover students
+        </h2>
+
+        <p>
+            Try a name, skill, or interest such as Java, design, AI, or web development.
+        </p>
+
+
+        <form class="find-form"
               th:action="@{/students/search}"
               th:object="${search}"
               method="get">
 
             <input
-                class="search-input"
+                class="find-input"
                 type="text"
                 th:field="*{query}"
                 placeholder="Search by name, interest, or skill"
                 autocomplete="off">
 
             <button
-                class="search-button"
+                class="find-button"
                 type="submit">
                 Search
             </button>
@@ -596,60 +458,46 @@
     </section>
 
 
-    <!-- =========================================================
-         RESULTS
-         ========================================================= -->
+
+    <!-- ================= RESULTS ================= -->
 
     <section
         th:if="${students != null and !students.isEmpty()}">
 
-        <div class="results-heading">
+        <div class="find-results-head">
 
-            <div>
+            <h2>
+                Students
+            </h2>
 
-                <h2>
-                    Students
-                </h2>
-
-                <p>
-                    Students matching your search
-                </p>
-
-            </div>
+            <p>
+                Students matching your search
+            </p>
 
         </div>
 
 
-        <div class="results">
+        <div class="find-grid">
 
             <article
-                class="student-card"
+                class="find-card"
                 th:each="student : ${students}">
 
-                <div class="student-top">
+                <div class="find-card-top">
 
-                    <div class="student-avatar">
-
-                        <span
-                            th:text="${#strings.substring(
-                                student.displayName,
-                                0,
-                                1
-                            ).toUpperCase()}">
-                            S
-                        </span>
-
+                    <div class="find-avatar"
+                         th:text="${#strings.substring(student.displayName, 0, 1).toUpperCase()}">
+                        S
                     </div>
 
                     <div>
 
-                        <h2
-                            class="student-name"
+                        <h3 class="find-name"
                             th:text="${student.displayName}">
                             Student Name
-                        </h2>
+                        </h3>
 
-                        <p class="student-role">
+                        <p class="find-role">
                             SkillForge student
                         </p>
 
@@ -658,38 +506,44 @@
                 </div>
 
 
-                <!-- Bio -->
+                <div class="find-label">
+                    About
+                </div>
 
-                <div>
+                <p class="find-text"
+                   th:text="${student.bio}">
+                    Student bio
+                </p>
 
-                    <div class="label">
-                        About
-                    </div>
 
-                    <p
-                        class="student-text"
-                        th:text="${student.bio}">
-                        Student bio
-                    </p>
+                <div class="find-label">
+                    Interests
+                </div>
+
+                <p class="find-text"
+                   th:text="${student.interests}">
+                    Student interests
+                </p>
+
+
+                <div class="find-label">
+                    Skills
+                </div>
+
+                <div class="skill-list"
+                     th:if="${student.skills != null and !student.skills.isEmpty()}">
+
+                    <span th:each="skill : ${student.skills}"
+                          th:text="${skill}">
+                        Java
+                    </span>
 
                 </div>
 
-
-                <!-- Interests -->
-
-                <div>
-
-                    <div class="label">
-                        Interests
-                    </div>
-
-                    <p
-                        class="student-text"
-                        th:text="${student.interests}">
-                        Student interests
-                    </p>
-
-                </div>
+                <p class="find-text"
+                   th:if="${student.skills == null or student.skills.isEmpty()}">
+                    No skills added yet
+                </p>
 
             </article>
 
@@ -698,15 +552,14 @@
     </section>
 
 
-    <!-- =========================================================
-         EMPTY STATE
-         ========================================================= -->
+
+    <!-- ================= EMPTY STATE ================= -->
 
     <section
-        class="empty-state"
+        class="find-empty"
         th:if="${students == null or students.isEmpty()}">
 
-        <div class="empty-icon">
+        <div class="find-empty-icon" aria-hidden="true">
             ✦
         </div>
 
@@ -721,37 +574,41 @@
     </section>
 
 
-    <!-- =========================================================
-         BOTTOM ACTIONS
-         ========================================================= -->
 
-    <div class="bottom-actions">
+    <!-- ================= CTA ================= -->
 
-        <a
-            class="action-link action-primary"
-            th:href="@{/profile}">
-            View my profile
+    <section class="find-cta">
+
+        <div>
+
+            <h2>Want to be found too?</h2>
+
+            <p>
+                Keep your bio, interests and skills up to date so other
+                students can see what you bring to a team.
+            </p>
+
+        </div>
+
+        <a th:href="@{/profile}">
+            Update my profile →
         </a>
 
-        <a
-            class="action-link action-secondary"
-            th:href="@{/dashboard}">
-            ← Back to dashboard
-        </a>
-
-    </div>
+    </section>
 
 
 </main>
 
 
-<!-- =============================================================
-     FOOTER
-     ============================================================= -->
 
-<footer class="footer">
+<!-- =========================================================
+     FOOTER (identical to dashboard)
+========================================================= -->
 
-    <a class="brand" th:href="@{/dashboard}">
+<footer class="dashboard-footer">
+
+    <a class="brand"
+       th:href="@{/dashboard}">
 
         <span class="brand-mark">
             S
@@ -762,6 +619,7 @@
         </span>
 
     </a>
+
 
     <p>
         Find your people. Build your idea.

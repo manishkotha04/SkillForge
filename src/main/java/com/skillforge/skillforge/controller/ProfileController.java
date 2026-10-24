@@ -19,7 +19,9 @@ public class ProfileController {
 
     @GetMapping
     public String viewProfile(Model model) {
-        ProfileViewDto profile = profileService.getCurrentProfile();
+
+        ProfileViewDto profile =
+                profileService.getCurrentProfile();
 
         model.addAttribute("profile", profile);
 
@@ -27,18 +29,21 @@ public class ProfileController {
     }
 
     @GetMapping("/edit")
-    public String editProfile(Model model) {
-        ProfileViewDto profile = profileService.getCurrentProfile();
+public String editProfile(Model model) {
 
-        ProfileUpdateRequest request = new ProfileUpdateRequest();
-        request.setDisplayName(profile.getDisplayName());
-        request.setBio(profile.getBio());
-        request.setInterests(profile.getInterests());
+    ProfileViewDto profile = profileService.getCurrentProfile();
 
-        model.addAttribute("profile", request);
+    ProfileUpdateRequest request = new ProfileUpdateRequest();
 
-        return "profile-edit";
-    }
+    request.setDisplayName(profile.getDisplayName());
+    request.setBio(profile.getBio());
+    request.setInterests(profile.getInterests());
+    request.setSkills(profile.getSkills());
+
+    model.addAttribute("profile", request);
+
+    return "profile-edit";
+}
 
     @PostMapping("/edit")
     public String updateProfile(
