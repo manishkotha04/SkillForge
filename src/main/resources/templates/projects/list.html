@@ -1,0 +1,101 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Projects | SkillForge</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            color: #222;
+            background: #f7f8fc;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #3157d5;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .project {
+            background: white;
+            border: 1px solid #e2e5ee;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+        .message {
+            padding: 12px;
+            background: #e8f7ed;
+            border-radius: 6px;
+        }
+        .error {
+            background: #fdecec;
+        }
+        .muted {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div>
+            <h1>My Projects</h1>
+            <p class="muted">Manage the projects you own or belong to.</p>
+        </div>
+        <a class="button" th:href="@{/projects/new}">Create Project</a>
+    </div>
+
+    <p class="message"
+       th:if="${successMessage}"
+       th:text="${successMessage}"></p>
+
+    <p class="message error"
+       th:if="${errorMessage}"
+       th:text="${errorMessage}"></p>
+
+    <div th:if="${projects == null or #lists.isEmpty(projects)}">
+        <div class="project">
+            <h2>No projects yet</h2>
+            <p class="muted">Create your first project to get started.</p>
+            <a class="button" th:href="@{/projects/new}">Create your first project</a>
+        </div>
+    </div>
+
+    <div th:unless="${projects == null or #lists.isEmpty(projects)}">
+        <div class="project" th:each="project : ${projects}">
+            <h2 th:text="${project.name}">Project name</h2>
+
+            <p th:if="${project.description != null and !#strings.isEmpty(project.description)}"
+               th:text="${project.description}"></p>
+
+            <p th:if="${project.requiredSkillsText != null and !#strings.isEmpty(project.requiredSkillsText)}">
+                <strong>Required skills:</strong>
+                <span th:text="${project.requiredSkillsText}"></span>
+            </p>
+
+            <p>
+                <strong>Maximum team size:</strong>
+                <span th:text="${project.maxTeamSize != null ? project.maxTeamSize : 'Not specified'}"></span>
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                <span th:text="${project.archived ? 'Archived' : 'Active'}"></span>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

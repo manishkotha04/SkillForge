@@ -21,6 +21,12 @@ public class Project {
     @Column(name = "required_skills_text", columnDefinition = "TEXT")
     private String requiredSkillsText;
 
+    @Column(name = "max_team_size")
+    private Integer maxTeamSize;
+
+    @Column(nullable = false)
+    private boolean archived = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -31,13 +37,14 @@ public class Project {
     protected Project() {
     }
 
-    public Project(String name, String description,
-                   String requiredSkillsText, AppUser owner) {
-        this.name = name;
-        this.description = description;
-        this.requiredSkillsText = requiredSkillsText;
-        this.owner = owner;
-    }
+public Project(String name, String description,
+               String requiredSkillsText, AppUser owner) {
+    this.name = name;
+    this.description = description;
+    this.requiredSkillsText = requiredSkillsText;
+    this.owner = owner;
+    this.archived = false;
+}
 
     @PrePersist
     protected void onCreate() {
@@ -84,5 +91,21 @@ public class Project {
 
     public void setOwner(AppUser owner) {
         this.owner = owner;
+    }
+    
+    public Integer getMaxTeamSize() {
+        return maxTeamSize;
+    }
+
+    public void setMaxTeamSize(Integer maxTeamSize) {
+        this.maxTeamSize = maxTeamSize;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
     }
 }
