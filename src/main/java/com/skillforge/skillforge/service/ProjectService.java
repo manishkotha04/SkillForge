@@ -12,9 +12,10 @@ import com.skillforge.skillforge.enums.ProjectMemberRole;
 import com.skillforge.skillforge.repository.ProjectInvitationRepository;
 import com.skillforge.skillforge.repository.ProjectMemberRepository;
 import com.skillforge.skillforge.repository.ProjectRepository;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -77,17 +78,62 @@ public class ProjectService {
         return savedProject;
     }
 
-    @Transactional(readOnly = true)
-    public List<Project> getMyProjects() {
-        AppUser currentUser = currentUserService.getCurrentUser();
-        return projectRepository.findByOwner_Id(currentUser.getId());
+
+@Transactional(readOnly = true)
+public List<Project> getMyProjects() {
+    AppUser currentUser = currentUserService.getCurrentUser();
+
+    List<Project> ownedProjects =
+            projectRepository.findByOwner_Id(currentUser.getId());
+
+    List<ProjectMember> memberships =
+            projectMemberRepository.findByUser_Id(currentUser.getId());
+
+    List<Project> myProjects = new ArrayList<>(ownedProjects);
+
+    for (ProjectMember membership : memberships) {
+        Project project = membership.getProject();
+
+        boolean alreadyIncluded = myProjects.stream()
+                .anyMatch(existing ->
+                        existing.getId().equals(project.getId()));
+
+        if (!alreadyIncluded) {
+            myProjects.add(project);
+        }
     }
+
+    return myProjects;
+}
+
 
     @Transactional(readOnly = true)
     public Project getProjectById(Long projectId) {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
     }
+
+    @Transactional(readOnly = true)
+        public Project getProjectForCurrentUser(Long projectId) {
+                AppUser currentUser = currentUserService.getCurrentUser();
+
+                Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+                boolean isOwner = project.getOwner().getId()
+            .equals(currentUser.getId());
+
+                 boolean isMember =
+            projectMemberRepository.existsByProject_IdAndUser_Id(
+                    projectId, currentUser.getId());
+
+         if (!isOwner && !isMember) {
+        throw new AccessDeniedException(
+                "You are not authorized to view this project.");
+    }
+
+    return project;
+}
 
     @Transactional
     public ProjectInvitation inviteUser(Long projectId, Long invitedUserId) {
@@ -110,6 +156,41 @@ public class ProjectService {
             throw new AccessDeniedException(
                     "Only the project owner can invite users.");
         }
+
+
+if (!project.getOwner().getId().equals(currentUser.getId())) {
+    throw new AccessDeniedException(
+            "Only the project owner can invite users.");
+}
+
+// CHECK TEAM CAPACITY BEFORE SENDING AN INVITATION
+Integer maxTeamSize = project.getMaxTeamSize();
+
+if (maxTeamSize != null) {
+    long currentMemberCount =
+            projectMemberRepository.countByProject_Id(projectId);
+
+    long pendingInvitationCount =
+            projectInvitationRepository
+                    .countByProject_IdAndStatusAndExpiresAtAfter(
+                            projectId,
+                            InvitationStatus.PENDING,
+                            LocalDateTime.now());
+
+    if (currentMemberCount + pendingInvitationCount >= maxTeamSize) {
+        throw new IllegalArgumentException(
+                "The team is full or all available team slots "
+                + "are reserved by pending invitations. "
+                + "No more invitations can be sent.");
+    }
+}
+
+// YOUR EXISTING CODE CONTINUES BELOW
+if (currentUser.getId().equals(invitedUserId)) {
+    throw new IllegalArgumentException(
+            "You cannot invite yourself to your own project.");
+}
+
 
         if (currentUser.getId().equals(invitedUserId)) {
             throw new IllegalArgumentException(
@@ -226,4 +307,39 @@ public class ProjectService {
         invitation.setStatus(InvitationStatus.REJECTED);
         return invitation;
     }
+
+@Transactional(readOnly = true)
+public boolean isProjectOwner(Long projectId) {
+    AppUser currentUser = currentUserService.getCurrentUser();
+
+    Project project = projectRepository.findById(projectId)
+            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+    return project.getOwner().getId().equals(currentUser.getId());
+}
+
+@Transactional(readOnly = true)
+public List<ProjectTeamSummary> getMyProjectTeamSummaries() {
+    List<Project> projects = getMyProjects();
+
+    return projects.stream()
+            .map(project -> {
+                List<ProjectMember> members =
+                        projectMemberRepository.findByProject_Id(
+                                project.getId());
+
+                List<String> names = members.stream()
+                        .map(ProjectMember::getUser)
+                        .map(AppUser::getFullName)
+                        .toList();
+
+                return new ProjectTeamSummary(
+                        project.getId(),
+                        members.size(),
+                        names
+                );
+            })
+            .toList();
+}
+
 }

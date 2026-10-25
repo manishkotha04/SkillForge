@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -29,6 +29,26 @@
             text-decoration: none;
             border-radius: 6px;
         }
+        
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.button-home {
+    background: #ffffff;
+    color: #3157d5;
+    border: 1px solid #3157d5;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.button-home:hover {
+    background: #3157d5;
+    color: #ffffff;
+}
+
         .project {
             background: white;
             border: 1px solid #e2e5ee;
@@ -50,13 +70,23 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h1>My Projects</h1>
-            <p class="muted">Manage the projects you own or belong to.</p>
-        </div>
-        <a class="button" th:href="@{/projects/new}">Create Project</a>
+
+<div class="header">
+    <div>
+        <h1>My Projects</h1>
+        <p class="muted">Manage the projects you own or belong to.</p>
     </div>
+
+    <div class="header-actions">
+        <a class="button button-home" th:href="@{/dashboard}">
+            &larr; Back to Home
+        </a>
+        <a class="button" th:href="@{/projects/new}">
+            Create Project
+        </a>
+    </div>
+</div>
+
 
     <p class="message"
        th:if="${successMessage}"
@@ -76,7 +106,12 @@
 
     <div th:unless="${projects == null or #lists.isEmpty(projects)}">
         <div class="project" th:each="project : ${projects}">
-            <h2 th:text="${project.name}">Project name</h2>
+            <h2>
+                <a th:href="@{/projects/{id}(id=${project.id})}"
+                th:text="${project.name}">
+                 Project name
+                </a>
+            </h2>
 
             <p th:if="${project.description != null and !#strings.isEmpty(project.description)}"
                th:text="${project.description}"></p>
@@ -86,15 +121,34 @@
                 <span th:text="${project.requiredSkillsText}"></span>
             </p>
 
-            <p>
-                <strong>Maximum team size:</strong>
-                <span th:text="${project.maxTeamSize != null ? project.maxTeamSize : 'Not specified'}"></span>
-            </p>
 
-            <p>
-                <strong>Status:</strong>
-                <span th:text="${project.archived ? 'Archived' : 'Active'}"></span>
-            </p>
+<p>
+    <strong>Maximum team size:</strong>
+    <span th:text="${project.maxTeamSize != null ? project.maxTeamSize : 'Not specified'}"></span>
+</p>
+
+<!-- Teammate count and names -->
+<div th:each="team : ${teamSummaries}"
+     th:if="${team.projectId == project.id}">
+    <p>
+        <strong>Teammates:</strong>
+        <span th:text="${team.teammateCount}">0</span>
+    </p>
+
+    <p>
+        <strong>Team members:</strong>
+        <span th:each="name, iter : ${team.teammateNames}">
+            <span th:text="${name}">Member name</span><span
+                th:if="${!iter.last}">, </span>
+        </span>
+    </p>
+</div>
+
+<p>
+    <strong>Status:</strong>
+    <span th:text="${project.archived ? 'Archived' : 'Active'}"></span>
+</p>
+
         </div>
     </div>
 </body>

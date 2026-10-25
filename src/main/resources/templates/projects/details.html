@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Details | SkillForge</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6fb;
+            color: #263248;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            margin-bottom: 25px;
+        }
+
+        .brand {
+            color: #3157d5;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            margin: 0;
+            color: #18243b;
+            font-size: clamp(28px, 5vw, 38px);
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+        }
+
+        .project-card,
+        .invite-card {
+            background: #ffffff;
+            border: 1px solid #e4e8f1;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 25px rgba(30, 45, 80, 0.05);
+        }
+
+        .section-heading {
+            margin: 0 0 22px;
+            color: #202d48;
+            font-size: 22px;
+        }
+
+        .project-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .info-item {
+            padding: 16px;
+            background: #f8f9fd;
+            border: 1px solid #edf0f7;
+            border-radius: 10px;
+            min-width: 0;
+        }
+
+        .info-item.description {
+            grid-column: 1 / -1;
+        }
+
+        .info-label {
+            display: block;
+            margin-bottom: 6px;
+            color: #758099;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+        }
+
+        .info-value {
+            color: #263248;
+            font-size: 15px;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-active {
+            background: #e2f8eb;
+            color: #167344;
+        }
+
+        .status-archived {
+            background: #edf0f5;
+            color: #626d80;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+
+        .button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 11px 17px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s ease,
+                        color 0.2s ease,
+                        transform 0.2s ease;
+        }
+
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        .button-secondary {
+            background: #ffffff;
+            color: #3157d5;
+            border-color: #d5ddf5;
+        }
+
+        .button-secondary:hover {
+            background: #edf1ff;
+        }
+
+        .button-primary {
+            background: #3157d5;
+            color: #ffffff;
+        }
+
+        .button-primary:hover {
+            background: #2446b8;
+        }
+
+        .invite-description {
+            margin: -12px 0 22px;
+            color: #758099;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #35415a;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #d7ddeb;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #263248;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s ease,
+                        box-shadow 0.2s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #3157d5;
+            box-shadow: 0 0 0 3px rgba(49, 87, 213, 0.12);
+        }
+
+        .alert {
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            border-radius: 9px;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .alert-success {
+            color: #176b42;
+            background: #e7f8ee;
+            border: 1px solid #b9ebcd;
+        }
+
+        .alert-error {
+            color: #a12632;
+            background: #fff0f0;
+            border: 1px solid #f4c5c8;
+        }
+
+        .archived-notice {
+            padding: 16px;
+            color: #626d80;
+            background: #f0f2f6;
+            border-radius: 9px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 25px 14px;
+            }
+
+            .project-card,
+            .invite-card {
+                padding: 20px;
+            }
+
+            .project-info {
+                grid-template-columns: 1fr;
+            }
+
+            .info-item.description {
+                grid-column: auto;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .navigation .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header class="page-header">
+        <div class="brand">SkillForge</div>
+        <h1 th:text="${project.name}">Project name</h1>
+    </header>
+
+    <div class="invitation-feedback">
+        <div th:if="${successMessage != null}"
+             class="alert alert-success"
+             role="status"
+             th:text="${successMessage}">
+        </div>
+
+        <div th:if="${errorMessage != null}"
+             class="alert alert-error"
+             role="alert"
+             th:text="${errorMessage}">
+        </div>
+    </div>
+
+    <section class="project-card">
+        <h2 class="section-heading">Project Overview</h2>
+
+        <div class="project-info">
+            <div class="info-item description">
+                <span class="info-label">Description</span>
+                <div class="info-value"
+                     th:text="${project.description ?: 'No description provided'}">
+                    Project description
+                </div>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Required Skills</span>
+                <div class="info-value"
+                     th:text="${project.requiredSkillsText ?: 'Not specified'}">
+                    Required skills
+                </div>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Maximum Team Size</span>
+                <div class="info-value" th:text="${project.maxTeamSize}">
+                    4
+                </div>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Project Status</span>
+                <div class="info-value">
+                    <span class="status"
+                          th:classappend="${project.archived ? 'status-archived' : 'status-active'}"
+                          th:text="${project.archived ? 'Archived' : 'Active'}">
+                        Active
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <nav class="navigation" aria-label="Project navigation">
+        <a class="button button-secondary" th:href="@{/projects}">
+            &larr; Back to My Projects
+        </a>
+
+        <a class="button button-secondary" th:href="@{/invitations}">
+            My Invitations
+        </a>
+    </nav>
+
+
+<section class="invite-card"
+         th:if="${!project.archived and isProjectOwner}">
+
+        <p class="invite-description">
+            Enter the username of the person you want to invite to this project.
+        </p>
+
+        <form th:action="@{/projects/{projectId}/invitations(projectId=${project.id})}"
+              method="post">
+
+            <div class="form-group">
+                <label for="username">Member's username</label>
+                <input type="text"
+                       id="username"
+                       name="username"
+                       placeholder="Enter their SkillForge username"
+                       autocomplete="off"
+                       required>
+            </div>
+
+            <button class="button button-primary" type="submit">
+                Send Invitation
+            </button>
+        </form>
+    </section>
+
+    <div class="archived-notice" th:if="${project.archived}">
+        This project is archived. New invitations cannot be sent.
+    </div>
+
+</div>
+</body>
+</html>

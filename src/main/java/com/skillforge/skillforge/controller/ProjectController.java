@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import com.skillforge.skillforge.entity.Project;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class ProjectController {
@@ -18,11 +20,17 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
-    @GetMapping("/projects")
-    public String listProjects(Model model) {
-        model.addAttribute("projects", projectService.getMyProjects());
-        return "projects/list";
-    }
+
+@GetMapping("/projects")
+public String listProjects(Model model) {
+    model.addAttribute("projects", projectService.getMyProjects());
+    model.addAttribute(
+            "teamSummaries",
+            projectService.getMyProjectTeamSummaries()
+    );
+    return "projects/list";
+}
+
 
     @GetMapping("/projects/new")
     public String showCreateProjectForm() {
@@ -52,4 +60,24 @@ public class ProjectController {
             return "redirect:/projects/new";
         }
     }
+
+@GetMapping("/projects/{projectId}")
+public String showProjectDetails(
+        @PathVariable Long projectId,
+        Model model) {
+
+    Project project = projectService.getProjectForCurrentUser(projectId);
+    model.addAttribute("project", project);
+
+    // Check whether the logged-in user owns this project.
+    boolean isProjectOwner = projectService.isProjectOwner(projectId);
+    model.addAttribute("isProjectOwner", isProjectOwner);
+
+    System.out.println("SUCCESS MESSAGE: "
+            + model.getAttribute("successMessage"));
+    System.out.println("ERROR MESSAGE: "
+            + model.getAttribute("errorMessage"));
+
+    return "projects/details";
+}
 }
