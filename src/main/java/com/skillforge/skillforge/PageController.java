@@ -74,6 +74,9 @@ public class PageController {
                 "pendingInvitationCount",
                 pendingInvitationCount);
 
+        // ADDED: used only for the personalised greeting
+        model.addAttribute("currentUser", currentUser);
+
         return "dashboard";
     }
 }

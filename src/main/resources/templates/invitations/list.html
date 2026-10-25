@@ -1,201 +1,365 @@
 <!DOCTYPE html>
-<html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
 
     <title>My Invitations | SkillForge</title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 
-    <link rel="stylesheet"
-          th:href="@{/css/components.css}">
+    <style>
+        /* Page-specific styles for the invitations page */
+        .inv-hero {
+            margin-bottom: 28px;
+        }
 
-    <link rel="stylesheet"
-          th:href="@{/css/dashboard.css}">
+        .inv-hero h1 {
+            margin: 0;
+            font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+            letter-spacing: -.045em;
+        }
+
+        .inv-hero p {
+            margin: 10px 0 0;
+            color: #707b94;
+            font-size: 1.02rem;
+            line-height: 1.7;
+        }
+
+        .inv-count {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #eef0ff;
+            color: #4054dc;
+            font-size: .8rem;
+            font-weight: 750;
+        }
+
+        .inv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .inv-card {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 28px;
+            padding: 26px;
+            border: 1px solid #e6eaf3;
+            border-left: 4px solid #4055dc;
+            border-radius: 18px;
+            background: #fff;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .inv-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 34px #202b5010;
+        }
+
+        .inv-body {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .inv-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .inv-badge {
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #fff4dc;
+            color: #9a6400;
+            font-size: .72rem;
+            font-weight: 750;
+        }
+
+        .inv-card h2 {
+            margin: 12px 0 8px;
+            font-size: 1.3rem;
+            overflow-wrap: anywhere;
+        }
+
+        .inv-description {
+            margin: 0 0 16px;
+            color: #707b94;
+            font-size: .93rem;
+            line-height: 1.75;
+            overflow-wrap: anywhere;
+        }
+
+        .inv-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 28px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .inv-meta li {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .inv-meta-label {
+            color: #8a94aa;
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .inv-meta-value {
+            color: #192653;
+            font-size: .92rem;
+            font-weight: 600;
+        }
+
+        .inv-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 140px;
+        }
+
+        .inv-actions form {
+            margin: 0;
+        }
+
+        .inv-actions .button {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Light empty state (intentionally not a heavy card) */
+        .inv-empty {
+            padding: 56px 24px;
+            border: 1px dashed #d5dcee;
+            border-radius: 18px;
+            background: #fbfcff;
+            text-align: center;
+        }
+
+        .inv-empty-icon {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+
+        .inv-empty h2 {
+            margin: 16px 0 8px;
+            font-size: 1.35rem;
+        }
+
+        .inv-empty p {
+            max-width: 420px;
+            margin: 0 auto 22px;
+            color: #707b94;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 650px) {
+            .inv-card {
+                flex-direction: column;
+                padding: 22px;
+            }
+
+            .inv-actions {
+                width: 100%;
+                flex-direction: row;
+            }
+
+            .inv-actions form {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body class="dashboard-page">
 
-<header class="app-header">
-    <div class="container">
-        <nav class="site-nav">
+<header th:replace="~{fragments/nav :: mainHeader('invitations')}"></header>
 
-            <a class="brand"
-               th:href="@{/dashboard}">
-                <span class="brand-mark">SF</span>
-                <span>SkillForge</span>
-            </a>
+<main class="dashboard-container">
 
-            <div class="nav-links">
+    <!-- Personalised greeting -->
+    <section class="inv-hero">
 
-                <a th:href="@{/dashboard}">
-                    Dashboard
-                </a>
+        <p class="eyebrow">PROJECT INVITATIONS</p>
 
-                <a th:href="@{/projects}">
-                    Projects
-                </a>
+        <h1>
+            Hi,
+            <span th:text="${currentUser != null ? currentUser.username : 'there'}">username</span>
+            👋
+        </h1>
 
-                <a th:href="@{/portfolio}">
-                    Portfolio
-                </a>
+        <p>Here are your project invitations.</p>
 
-            </div>
+        <span class="inv-count"
+              th:if="${invitations != null and !#lists.isEmpty(invitations)}"
+              th:text="${#lists.size(invitations)} + (${#lists.size(invitations)} == 1 ? ' pending invitation' : ' pending invitations')">
+            2 pending invitations
+        </span>
 
-        </nav>
+    </section>
+
+    <!-- Flash messages -->
+    <div class="message-stack"
+         th:if="${successMessage != null or errorMessage != null}">
+
+        <div class="alert alert-success"
+             th:if="${successMessage != null}"
+             role="status">
+
+            <span class="alert-icon">✓</span>
+
+            <span th:text="${successMessage}">
+                Invitation accepted.
+            </span>
+
+        </div>
+
+        <div class="alert alert-error"
+             th:if="${errorMessage != null}"
+             role="alert">
+
+            <span class="alert-icon">!</span>
+
+            <span th:text="${errorMessage}">
+                An error occurred.
+            </span>
+
+        </div>
+
     </div>
-</header>
 
-<main class="page-main">
+    <!-- Empty state -->
+    <section class="inv-empty"
+             th:if="${invitations == null or #lists.isEmpty(invitations)}">
 
-    <div class="container">
+        <div class="inv-empty-icon" aria-hidden="true">🎉</div>
 
-        <!-- Page heading -->
-        <div class="dashboard-header">
+        <h2>You're all caught up!</h2>
 
-            <div>
-                <p class="field-hint">Projects</p>
+        <p>You don't have any new project invitations right now.</p>
 
-                <h1>My Invitations</h1>
+        <a class="button button-primary"
+           th:href="@{/projects}">
+            View Projects
+        </a>
 
-                <p class="field-hint">
-                    Project invitations waiting for your response.
-                </p>
-            </div>
+    </section>
 
-        </div>
+    <!-- Pending invitations -->
+    <section class="inv-list"
+             aria-label="Pending project invitations"
+             th:if="${invitations != null and !#lists.isEmpty(invitations)}">
 
-        <!-- Flash messages -->
-        <div class="message-stack"
-             th:if="${successMessage != null or errorMessage != null}">
+        <article class="inv-card"
+                 th:each="invitation : ${invitations}">
 
-            <div class="alert alert-success"
-                 th:if="${successMessage != null}"
-                 role="status">
+            <div class="inv-body">
 
-                <span class="alert-icon">✓</span>
+                <div class="inv-top">
+                    <span class="inv-badge">Pending</span>
+                </div>
 
-                <span th:text="${successMessage}">
-                    Invitation accepted.
-                </span>
-
-            </div>
-
-            <div class="alert alert-error"
-                 th:if="${errorMessage != null}"
-                 role="alert">
-
-                <span class="alert-icon">!</span>
-
-                <span th:text="${errorMessage}">
-                    An error occurred.
-                </span>
-
-            </div>
-
-        </div>
-
-        <!-- Empty state -->
-        <div th:if="${#lists.isEmpty(invitations)}">
-
-            <div class="project-card">
-
-                <h3>No pending invitations</h3>
-
-                <p>
-                    You currently have no pending project invitations.
-                </p>
-
-                <a class="button button-secondary"
-                   th:href="@{/projects}">
-                    Back to Projects
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- Invitations -->
-        <div class="project-grid"
-             th:unless="${#lists.isEmpty(invitations)}">
-
-            <article class="project-card"
-                     th:each="invitation : ${invitations}">
-
-                <h3 th:text="${invitation.project.name}">
+                <h2 th:text="${invitation.project.name}">
                     Project Name
-                </h3>
+                </h2>
 
-                <p th:if="${invitation.project.description != null}"
+                <p class="inv-description"
+                   th:if="${invitation.project.description != null and !#strings.isEmpty(invitation.project.description)}"
                    th:text="${invitation.project.description}">
                     Project description
                 </p>
 
-                <p>
-                    <strong>Invited by:</strong>
-                    <span th:text="${invitation.invitedBy.fullName}">
-                        Student Name
-                    </span>
-                </p>
+                <ul class="inv-meta">
 
-                <p>
-                    <strong>Status:</strong>
-                    <span th:text="${invitation.status}">
-                        PENDING
-                    </span>
-                </p>
+                    <li>
+                        <span class="inv-meta-label">Invited by</span>
+                        <span class="inv-meta-value"
+                              th:text="${invitation.invitedBy.fullName}">
+                            Student Name
+                        </span>
+                    </li>
 
-                <p>
-                    <strong>Received:</strong>
-                    <span th:text="${invitation.createdAt}">
-                        Date
-                    </span>
-                </p>
+                    <li th:if="${invitation.createdAt != null}">
+                        <span class="inv-meta-label">Received</span>
+                        <span class="inv-meta-value"
+                              th:text="${#temporals.format(invitation.createdAt, 'dd MMM yyyy')}">
+                            01 Jan 2026
+                        </span>
+                    </li>
 
-                <p>
-                    <strong>Expires:</strong>
-                    <span th:text="${invitation.expiresAt}">
-                        Date
-                    </span>
-                </p>
+                    <li th:if="${invitation.expiresAt != null}">
+                        <span class="inv-meta-label">Expires</span>
+                        <span class="inv-meta-value"
+                              th:text="${#temporals.format(invitation.expiresAt, 'dd MMM yyyy')}">
+                            08 Jan 2026
+                        </span>
+                    </li>
 
-                <!-- Invitation actions -->
-                <div class="form-actions">
+                </ul>
 
-                    <form th:action="@{/invitations/{id}/accept(id=${invitation.id})}"
-                          method="post">
+            </div>
 
-                        <button type="submit"
-                                class="button button-primary">
-                            Accept
-                        </button>
+            <!-- Invitation actions: two separate, non-nested forms -->
+            <div class="inv-actions">
 
-                    </form>
+                <form th:action="@{/invitations/{id}/accept(id=${invitation.id})}"
+                      method="post">
 
-                    <form th:action="@{/invitations/{id}/reject(id=${invitation.id})}"
-                          method="post">
+                    <button type="submit"
+                            class="button button-primary">
+                        Accept
+                    </button>
 
-                        <button type="submit"
-                                class="button button-secondary">
-                            Reject
-                        </button>
+                </form>
 
-                    </form>
+                <form th:action="@{/invitations/{id}/reject(id=${invitation.id})}"
+                      method="post">
 
-                </div>
+                    <button type="submit"
+                            class="button button-secondary">
+                        Reject
+                    </button>
 
-            </article>
+                </form>
 
-        </div>
+            </div>
 
-    </div>
+        </article>
+
+    </section>
 
 </main>
+
+<footer class="dashboard-footer">
+
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
+    </a>
+
+    <p>Find your people. Build your idea.</p>
+
+</footer>
 
 </body>
 </html>

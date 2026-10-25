@@ -53,6 +53,9 @@ public class InvitationController {
 
         model.addAttribute("invitations", invitations);
 
+        // ADDED: used only for the personalised greeting
+        model.addAttribute("currentUser", currentUser);
+
         return "invitations/list";
     }
 

@@ -11,97 +11,156 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <style>
+        /* Personalised greeting */
+        .dashboard-greeting {
+            margin-bottom: 26px;
+        }
+
+        .dashboard-greeting h2 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2.6vw, 2rem);
+            letter-spacing: -.04em;
+        }
+
+        .dashboard-greeting p {
+            margin: 8px 0 0;
+            color: #707b94;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Invitation notification banner (shown only when count > 0) */
+        .invite-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 28px;
+            padding: 22px 26px;
+            border: 1px solid #d9defa;
+            border-left: 4px solid #4055dc;
+            border-radius: 18px;
+            background: linear-gradient(125deg, #ffffff, #eef0ff);
+            box-shadow: 0 10px 28px #4055dc14;
+        }
+
+        .invite-banner-main {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .invite-banner-icon {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #4055dc;
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        .invite-banner-count {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            background: #e5484d;
+            color: #fff;
+            font-size: .72rem;
+            font-weight: 800;
+        }
+
+        .invite-banner h2 {
+            margin: 0 0 4px;
+            font-size: 1.12rem;
+        }
+
+        .invite-banner p {
+            margin: 0;
+            color: #5f6b87;
+            font-size: .93rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 650px) {
+            .invite-banner {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-page">
 
-<header class="dashboard-header">
-
-    <a class="brand" th:href="@{/dashboard}">
-        <span class="brand-mark">S</span>
-        <span>SkillForge</span>
-    </a>
-
-    <nav class="dashboard-nav" aria-label="Main navigation">
-
-        <a class="active"
-           th:href="@{/dashboard}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/projects}">
-            Projects
-        </a>
-
-        <a th:href="@{/students/search}">
-            Find teammates
-        </a>
-
-        <a th:href="@{/profile}">
-            My profile
-        </a>
-
-    </nav>
-
-    <form th:action="@{/logout}"
-          method="post"
-          class="logout-form">
-
-        <button type="submit"
-                class="header-action">
-            Sign out
-        </button>
-
-    </form>
-
-</header>
+<header th:replace="~{fragments/nav :: mainHeader('dashboard')}"></header>
 
 <main class="dashboard-container">
-    <section class="dashboard-section">
-    <div class="section-heading">
-        <div>
-            <p class="eyebrow">Notifications</p>
-            <h2>Project Invitations</h2>
-            <p>
-                Invitations from students who want you to join their projects.
-            </p>
-        </div>
-    </div>
 
-    <div class="project-card">
+    <!-- Personalised greeting (dynamic, never hardcoded) -->
+    <section class="dashboard-greeting">
 
-        <div th:if="${pendingInvitationCount > 0}">
-            <h3>
-                You have
-                <span th:text="${pendingInvitationCount}">0</span>
-                pending invitation(s).
-            </h3>
+        <h2>
+            Hi,
+            <span th:text="${currentUser != null ? currentUser.username : 'there'}">username</span>
+            👋
+        </h2>
 
-            <p>
-                Review your project invitations and choose whether to join.
-            </p>
+        <p>Ready to find your next project or teammate?</p>
 
-            <a class="button button-primary"
-               href="/invitations">
-                View Invitations
-            </a>
-        </div>
+    </section>
 
-        <div th:if="${pendingInvitationCount == 0}">
-            <h3>No pending invitations</h3>
+    <!-- Invitation notification: rendered only when there is at least one pending invitation -->
+    <section class="invite-banner"
+             th:if="${pendingInvitationCount != null and pendingInvitationCount > 0}"
+             role="status"
+             aria-label="Project invitation notification">
 
-            <p>
-                You don't have any project invitations right now.
-            </p>
+        <div class="invite-banner-main">
 
-            <a class="button button-secondary"
-               href="/projects">
-                View Projects
-            </a>
+            <span class="invite-banner-icon" aria-hidden="true">
+                🔔
+                <span class="invite-banner-count"
+                      th:text="${pendingInvitationCount}">2</span>
+            </span>
+
+            <div>
+                <h2>New project invitations</h2>
+
+                <p>
+                    You have
+                    <strong th:text="${pendingInvitationCount}">2</strong>
+                    pending project
+                    <span th:text="${pendingInvitationCount == 1 ? 'invitation' : 'invitations'}">invitations</span>.
+                </p>
+            </div>
+
         </div>
 
-    </div>
-</section>
+        <a class="primary-button"
+           th:href="@{/invitations}">
+
+            View Invitations
+
+            <span aria-hidden="true">→</span>
+
+        </a>
+
+    </section>
 
     <!-- Welcome -->
 
@@ -136,7 +195,7 @@
         </a>
 
     </section>
-    
+
 
     <!-- Platform overview -->
 
