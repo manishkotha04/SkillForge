@@ -11,111 +11,155 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
 </head>
 
 <body>
 
 <header class="app-header">
-    <div class="container site-nav">
-        <a class="brand"
-           th:href="@{/dashboard}">
-            <span class="brand-mark">S</span>
-            <span>SkillForge</span>
-        </a>
+    <div class="container">
+        <nav class="site-nav">
 
-        <nav class="nav-links">
-            <a th:href="@{/dashboard}">Dashboard</a>
-            <a th:href="@{/projects}">Projects</a>
-            <a th:href="@{/profile}">Profile</a>
+            <a class="brand"
+               th:href="@{/dashboard}">
+                <span class="brand-mark">S</span>
+                <span>SkillForge</span>
+            </a>
+
+            <div class="nav-links">
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/projects}">Projects</a>
+                <a th:href="@{/profile}">Profile</a>
+            </div>
+
         </nav>
     </div>
 </header>
 
 <main class="page-main">
+
     <div class="container">
 
-        <div style="margin-bottom: 28px;">
+        <div class="page-header">
+
+            <p class="field-hint">Project Tasks</p>
+
             <h1>Create Task</h1>
-            <p style="color: var(--muted);">
-                Add a task to this project and optionally assign it to a project member.
+
+            <p class="field-hint">
+                Add a task to this project and optionally assign it
+                to a project member.
             </p>
+
         </div>
 
-        <form th:action="@{/tasks(projectId=${projectId})}"
-              th:object="${task}"
-              method="post"
-              class="form-stack">
+        <section class="project-card">
 
-            <div class="form-field">
-                <label for="title">Task title</label>
+            <form th:action="@{/tasks(projectId=${projectId})}"
+                  th:object="${task}"
+                  method="post"
+                  class="form-stack">
 
-                <input id="title"
-                       type="text"
-                       th:field="*{title}"
-                       maxlength="150"
-                       required
-                       th:attr="aria-invalid=${#fields.hasErrors('title')}">
+                <!-- Task title -->
+                <div class="form-field">
 
-                <p class="field-error"
-                   th:if="${#fields.hasErrors('title')}"
-                   th:errors="*{title}">
-                </p>
-            </div>
+                    <label for="title">
+                        Task title
+                    </label>
 
-            <div class="form-field">
-                <label for="description">Description</label>
+                    <input id="title"
+                           type="text"
+                           th:field="*{title}"
+                           maxlength="150"
+                           required
+                           th:attr="aria-invalid=${#fields.hasErrors('title')}">
 
-                <textarea id="description"
-                          th:field="*{description}"
-                          rows="5"
-                          style="width: 100%; padding: 12px 14px; color: var(--ink); background: white; border: 1px solid #dce2ed; border-radius: 11px; font: inherit; resize: vertical;">
-                </textarea>
-            </div>
+                    <p class="field-error"
+                       th:if="${#fields.hasErrors('title')}"
+                       th:errors="*{title}">
+                    </p>
 
-            <div class="form-field">
-                <label for="dueDate">Due date</label>
+                </div>
 
-                <input id="dueDate"
-                       type="date"
-                       th:field="*{dueDate}">
-            </div>
+                <!-- Description -->
+                <div class="form-field">
 
-            <div class="form-field">
-                <label for="assigneeId">Assign to</label>
+                    <label for="description">
+                        Description
+                    </label>
 
-                <select id="assigneeId"
-                        th:field="*{assigneeId}"
-                        style="width: 100%; min-height: 48px; padding: 12px 14px; color: var(--ink); background: white; border: 1px solid #dce2ed; border-radius: 11px; font: inherit;">
+                    <textarea id="description"
+                              th:field="*{description}"
+                              rows="5"
+                              placeholder="Describe the task and expected outcome">
+                    </textarea>
 
-                    <option value="">Unassigned</option>
+                </div>
 
-                    <option th:each="member : ${members}"
-                            th:value="${member.id}"
-                            th:text="${member.fullName}">
-                    </option>
+                <!-- Due date -->
+                <div class="form-field">
 
-                </select>
+                    <label for="dueDate">
+                        Due date
+                    </label>
 
-                <p class="field-hint">
-                    Only members of this project can be assigned to the task.
-                </p>
-            </div>
+                    <input id="dueDate"
+                           type="date"
+                           th:field="*{dueDate}">
 
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <button type="submit"
-                        class="button button-primary">
-                    Create Task
-                </button>
+                </div>
 
-                <a class="button button-secondary"
-                   th:href="@{/tasks(projectId=${projectId})}">
-                    Cancel
-                </a>
-            </div>
+                <!-- Assignee -->
+                <div class="form-field">
 
-        </form>
+                    <label for="assigneeId">
+                        Assign to
+                    </label>
+
+                    <select id="assigneeId"
+                            th:field="*{assigneeId}">
+
+                        <option value="">
+                            Unassigned
+                        </option>
+
+                        <option th:each="member : ${members}"
+                                th:value="${member.id}"
+                                th:text="${member.fullName}">
+                        </option>
+
+                    </select>
+
+                    <p class="field-hint">
+                        Only members of this project can be assigned
+                        to the task.
+                    </p>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+
+                    <button type="submit"
+                            class="button button-primary">
+                        Create Task
+                    </button>
+
+                    <a class="button button-secondary"
+                       th:href="@{/tasks(projectId=${projectId})}">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
 
     </div>
+
 </main>
 
 </body>

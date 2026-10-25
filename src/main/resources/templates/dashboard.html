@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -14,13 +13,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 
-
 <body class="dashboard-page">
-
-
-<!-- =========================================================
-     NAVIGATION
-========================================================= -->
 
 <header class="dashboard-header">
 
@@ -29,7 +22,6 @@
         <span>SkillForge</span>
     </a>
 
-
     <nav class="dashboard-nav" aria-label="Main navigation">
 
         <a class="active"
@@ -37,8 +29,8 @@
             Dashboard
         </a>
 
-        <a th:href="@{/dashboard#projects}">
-            Explore projects
+        <a th:href="@{/projects}">
+            Projects
         </a>
 
         <a th:href="@{/students/search}">
@@ -50,7 +42,6 @@
         </a>
 
     </nav>
-
 
     <form th:action="@{/logout}"
           method="post"
@@ -65,18 +56,54 @@
 
 </header>
 
-
-
-<!-- =========================================================
-     MAIN DASHBOARD
-========================================================= -->
-
 <main class="dashboard-container">
+    <section class="dashboard-section">
+    <div class="section-heading">
+        <div>
+            <p class="eyebrow">Notifications</p>
+            <h2>Project Invitations</h2>
+            <p>
+                Invitations from students who want you to join their projects.
+            </p>
+        </div>
+    </div>
 
+    <div class="project-card">
 
-    <!-- =====================================================
-         WELCOME
-    ====================================================== -->
+        <div th:if="${pendingInvitationCount > 0}">
+            <h3>
+                You have
+                <span th:text="${pendingInvitationCount}">0</span>
+                pending invitation(s).
+            </h3>
+
+            <p>
+                Review your project invitations and choose whether to join.
+            </p>
+
+            <a class="button button-primary"
+               href="/invitations">
+                View Invitations
+            </a>
+        </div>
+
+        <div th:if="${pendingInvitationCount == 0}">
+            <h3>No pending invitations</h3>
+
+            <p>
+                You don't have any project invitations right now.
+            </p>
+
+            <a class="button button-secondary"
+               href="/projects">
+                View Projects
+            </a>
+        </div>
+
+    </div>
+</section>
+
+    <!-- Welcome -->
 
     <section class="welcome-section">
 
@@ -97,9 +124,8 @@
 
         </div>
 
-
         <a class="primary-button"
-           th:href="@{/dashboard#projects}">
+           th:href="@{/projects}">
 
             Explore projects
 
@@ -110,18 +136,12 @@
         </a>
 
     </section>
+    
 
-
-
-    <!-- =====================================================
-         PLATFORM OVERVIEW
-    ====================================================== -->
+    <!-- Platform overview -->
 
     <section class="dashboard-stats"
              aria-label="Platform overview">
-
-
-        <!-- Discover -->
 
         <article class="stat-card">
 
@@ -143,10 +163,6 @@
 
         </article>
 
-
-
-        <!-- Connect -->
-
         <article class="stat-card">
 
             <span class="stat-icon">
@@ -166,10 +182,6 @@
             </span>
 
         </article>
-
-
-
-        <!-- Collaborate -->
 
         <article class="stat-card">
 
@@ -191,18 +203,12 @@
 
         </article>
 
-
     </section>
 
-
-
-    <!-- =====================================================
-         PROJECTS
-    ====================================================== -->
+    <!-- Project introduction -->
 
     <section class="content-section"
              id="projects">
-
 
         <div class="section-heading">
 
@@ -217,28 +223,22 @@
                 </h2>
 
                 <p>
-                    Discover sample projects and the skills they need.
+                    Create and manage your projects, and collaborate
+                    with other students.
                 </p>
 
             </div>
 
         </div>
 
-
-
         <div class="project-grid">
-
-
-            <!-- =================================================
-                 PROJECT 1
-            ================================================== -->
 
             <article class="project-card">
 
                 <div class="project-card-top">
 
                     <span class="project-category">
-                        Web Development
+                        Projects
                     </span>
 
                     <span class="project-symbol">
@@ -247,56 +247,28 @@
 
                 </div>
 
-
                 <h3>
-                    Campus Connect
+                    Your project workspace
                 </h3>
 
-
                 <p>
-                    A sample platform for helping students discover
-                    campus activities and connect with peers.
+                    View your projects, create new ones, and work
+                    with your project members.
                 </p>
 
-
-                <div class="skill-list">
-
-                    <span>
-                        Java
-                    </span>
-
-                    <span>
-                        HTML/CSS
-                    </span>
-
-                    <span>
-                        UI Design
-                    </span>
-
-                </div>
-
-
                 <a class="text-link"
-                   th:href="@{/students/search}">
-
-                    Find teammates →
-
+                   th:href="@{/projects}">
+                    Open projects →
                 </a>
 
             </article>
-
-
-
-            <!-- =================================================
-                 PROJECT 2
-            ================================================== -->
 
             <article class="project-card">
 
                 <div class="project-card-top">
 
                     <span class="project-category">
-                        Artificial Intelligence
+                        Team Building
                     </span>
 
                     <span class="project-symbol">
@@ -305,56 +277,28 @@
 
                 </div>
 
-
                 <h3>
-                    Smart Study Planner
+                    Find teammates
                 </h3>
 
-
                 <p>
-                    A sample application for organizing study schedules,
-                    tasks, and academic goals.
+                    Discover students and connect with people whose
+                    skills complement your project needs.
                 </p>
-
-
-                <div class="skill-list">
-
-                    <span>
-                        Python
-                    </span>
-
-                    <span>
-                        Problem Solving
-                    </span>
-
-                    <span>
-                        Design
-                    </span>
-
-                </div>
-
 
                 <a class="text-link"
                    th:href="@{/students/search}">
-
                     Find teammates →
-
                 </a>
 
             </article>
-
-
-
-            <!-- =================================================
-                 PROJECT 3
-            ================================================== -->
 
             <article class="project-card">
 
                 <div class="project-card-top">
 
                     <span class="project-category">
-                        Social Impact
+                        Your Work
                     </span>
 
                     <span class="project-symbol">
@@ -363,70 +307,30 @@
 
                 </div>
 
-
                 <h3>
-                    Green Campus
+                    Build your portfolio
                 </h3>
 
-
                 <p>
-                    A sample student initiative for tracking
-                    sustainability ideas and encouraging greener
-                    campus habits.
+                    Showcase your work, contributions, and completed
+                    projects through your portfolio.
                 </p>
 
-
-                <div class="skill-list">
-
-                    <span>
-                        Research
-                    </span>
-
-                    <span>
-                        Web Design
-                    </span>
-
-                    <span>
-                        Teamwork
-                    </span>
-
-                </div>
-
-
                 <a class="text-link"
-                   th:href="@{/students/search}">
-
-                    Find teammates →
-
+                   th:href="@{/portfolio}">
+                    View portfolio →
                 </a>
 
             </article>
 
-
         </div>
-
-
-
-        <p class="demo-notice">
-
-            These are demonstration projects.
-            Real project data will be connected after
-            the frontend is completed.
-
-        </p>
-
 
     </section>
 
-
-
-    <!-- =====================================================
-         TEAM / COLLABORATION
-    ====================================================== -->
+    <!-- Collaboration -->
 
     <section class="collaboration-section"
              id="teams">
-
 
         <div>
 
@@ -434,11 +338,9 @@
                 BETTER IDEAS, TOGETHER
             </p>
 
-
             <h2>
                 Your skills deserve the right team.
             </h2>
-
 
             <p>
                 Explore opportunities to work with students who share
@@ -446,7 +348,6 @@
             </p>
 
         </div>
-
 
         <a class="primary-button"
            th:href="@{/students/search}">
@@ -459,18 +360,12 @@
 
         </a>
 
-
     </section>
 
-
-
-    <!-- =====================================================
-         PROFILE
-    ====================================================== -->
+    <!-- Profile -->
 
     <section class="profile-placeholder"
              id="profile">
-
 
         <div>
 
@@ -478,11 +373,9 @@
                 YOUR SPACE
             </p>
 
-
             <h2>
                 Your student profile
             </h2>
-
 
             <p>
                 Keep your profile updated with your interests,
@@ -492,7 +385,6 @@
 
         </div>
 
-
         <a class="profile-badge"
            th:href="@{/profile}">
 
@@ -500,17 +392,9 @@
 
         </a>
 
-
     </section>
 
-
 </main>
-
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
 
 <footer class="dashboard-footer">
 
@@ -527,14 +411,11 @@
 
     </a>
 
-
     <p>
         Find your people. Build your idea.
     </p>
 
 </footer>
 
-
 </body>
 </html>
-```

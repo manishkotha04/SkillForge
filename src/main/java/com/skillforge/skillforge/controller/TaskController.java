@@ -62,6 +62,9 @@ public class TaskController {
 
         if (bindingResult.hasErrors()) {
             model.addAttribute("projectId", projectId);
+            model.addAttribute(
+                    "members",
+                    taskService.getProjectMembers(projectId));
             return "task-form";
         }
 
@@ -114,7 +117,14 @@ public class TaskController {
             model.addAttribute(
                     "projectId",
                     existingTask.getProject().getId());
+
             model.addAttribute("taskId", id);
+
+            model.addAttribute(
+                    "members",
+                    taskService.getProjectMembers(
+                            existingTask.getProject().getId()));
+
             return "task-edit";
         }
 

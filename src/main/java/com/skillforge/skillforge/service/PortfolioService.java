@@ -86,19 +86,20 @@ public class PortfolioService {
     }
 
     private Project resolveProject(Long projectId) {
-    if (projectId == null) {
-        return null;
+
+        if (projectId == null) {
+            return null;
+        }
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+
+        return projectRepository.findById(projectId)
+                .filter(project ->
+                        project.getOwner().getId().equals(currentUser.getId()))
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "You can only associate your own projects with portfolio items."));
     }
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    return projectRepository.findById(projectId)
-            .filter(project ->
-                    project.getOwner().getId().equals(currentUser.getId()))
-            .orElseThrow(() ->
-                    new IllegalArgumentException(
-                            "You can only associate your own projects with portfolio items."));
-}
 
     public PortfolioItemDto toDto(PortfolioItem item) {
 

@@ -8,14 +8,11 @@
 
     <title>Find Teammates | SkillForge</title>
 
-    <!-- Same shared stylesheets as the dashboard and profile page -->
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 
-    <!-- Page-only styles (prefixed "find-" so nothing clashes with dashboard.css) -->
     <style>
-        /* Same nav position as the home page, with the content pulled closer to it */
         body.dashboard-page {
             padding-top: 32px;
         }
@@ -51,8 +48,6 @@
             line-height: 1.6;
             max-width: 620px;
         }
-
-        /* ---------- Search ---------- */
 
         .find-search {
             background: #ffffff;
@@ -122,8 +117,6 @@
             background: #4054e8;
             transform: translateY(-1px);
         }
-
-        /* ---------- Results ---------- */
 
         .find-results-head {
             margin-bottom: 20px;
@@ -218,7 +211,11 @@
             font-style: italic;
         }
 
-        /* ---------- Empty state ---------- */
+        .find-card-actions {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #e2e8f0;
+        }
 
         .find-empty {
             background: #ffffff;
@@ -253,8 +250,6 @@
             color: #64748b;
             line-height: 1.6;
         }
-
-        /* ---------- Bottom band (mirrors profile + dashboard bands) ---------- */
 
         .find-cta {
             margin-top: 40px;
@@ -299,8 +294,6 @@
             background: #eef2ff;
         }
 
-        /* ---------- Responsive ---------- */
-
         @media (max-width: 700px) {
             .find-hero h1 {
                 font-size: 34px;
@@ -325,13 +318,7 @@
     </style>
 </head>
 
-
 <body class="dashboard-page">
-
-
-<!-- =========================================================
-     NAVIGATION (identical to dashboard; only "active" differs)
-========================================================= -->
 
 <header class="dashboard-header">
 
@@ -340,15 +327,14 @@
         <span>SkillForge</span>
     </a>
 
-
     <nav class="dashboard-nav" aria-label="Main navigation">
 
         <a th:href="@{/dashboard}">
             Dashboard
         </a>
 
-        <a th:href="@{/dashboard#projects}">
-            Explore projects
+        <a th:href="@{/projects}">
+            Projects
         </a>
 
         <a class="active"
@@ -361,7 +347,6 @@
         </a>
 
     </nav>
-
 
     <form th:action="@{/logout}"
           method="post"
@@ -376,16 +361,7 @@
 
 </header>
 
-
-
-<!-- =========================================================
-     MAIN
-========================================================= -->
-
 <main class="dashboard-container">
-
-
-    <!-- ================= INTRO ================= -->
 
     <section class="find-hero">
 
@@ -406,23 +382,34 @@
 
         </div>
 
-
         <a class="primary-button"
            th:href="@{/profile}">
-
             View my profile
-
-            <span aria-hidden="true">
-                →
-            </span>
-
+            <span aria-hidden="true">→</span>
         </a>
 
     </section>
 
+    <div class="message-stack"
+         th:if="${successMessage != null or errorMessage != null}">
 
+        <div class="alert alert-success"
+             th:if="${successMessage != null}">
 
-    <!-- ================= SEARCH ================= -->
+            <span class="alert-icon">✓</span>
+            <span th:text="${successMessage}"></span>
+
+        </div>
+
+        <div class="alert alert-error"
+             th:if="${errorMessage != null}">
+
+            <span class="alert-icon">!</span>
+            <span th:text="${errorMessage}"></span>
+
+        </div>
+
+    </div>
 
     <section class="find-search">
 
@@ -434,22 +421,24 @@
             Try a name, skill, or interest such as Java, design, AI, or web development.
         </p>
 
-
         <form class="find-form"
               th:action="@{/students/search}"
               th:object="${search}"
               method="get">
 
-            <input
-                class="find-input"
-                type="text"
-                th:field="*{query}"
-                placeholder="Search by name, interest, or skill"
-                autocomplete="off">
+            <input type="hidden"
+                   name="projectId"
+                   th:if="${projectId != null}"
+                   th:value="${projectId}">
 
-            <button
-                class="find-button"
-                type="submit">
+            <input class="find-input"
+                   type="text"
+                   th:field="*{query}"
+                   placeholder="Search by name, interest, or skill"
+                   autocomplete="off">
+
+            <button class="find-button"
+                    type="submit">
                 Search
             </button>
 
@@ -457,12 +446,7 @@
 
     </section>
 
-
-
-    <!-- ================= RESULTS ================= -->
-
-    <section
-        th:if="${students != null and !students.isEmpty()}">
+    <section th:if="${students != null and !students.isEmpty()}">
 
         <div class="find-results-head">
 
@@ -476,17 +460,17 @@
 
         </div>
 
-
         <div class="find-grid">
 
-            <article
-                class="find-card"
-                th:each="student : ${students}">
+            <article class="find-card"
+                     th:each="student : ${students}">
 
                 <div class="find-card-top">
 
                     <div class="find-avatar"
-                         th:text="${#strings.substring(student.displayName, 0, 1).toUpperCase()}">
+                         th:text="${student.displayName != null and !student.displayName.isEmpty()
+                                  ? #strings.substring(student.displayName, 0, 1).toUpperCase()
+                                  : 'S'}">
                         S
                     </div>
 
@@ -505,26 +489,23 @@
 
                 </div>
 
-
                 <div class="find-label">
                     About
                 </div>
 
                 <p class="find-text"
-                   th:text="${student.bio}">
+                   th:text="${student.bio ?: 'No bio added yet.'}">
                     Student bio
                 </p>
-
 
                 <div class="find-label">
                     Interests
                 </div>
 
                 <p class="find-text"
-                   th:text="${student.interests}">
+                   th:text="${student.interests ?: 'No interests added yet.'}">
                     Student interests
                 </p>
-
 
                 <div class="find-label">
                     Skills
@@ -545,19 +526,31 @@
                     No skills added yet
                 </p>
 
+                <div class="find-card-actions"
+                     th:if="${projectId != null and canInvite}">
+
+                    <form th:action="@{/projects/{projectId}/invitations/{userId}(
+                                        projectId=${projectId},
+                                        userId=${student.id})}"
+                          method="post">
+
+                        <button class="button button-primary button-small"
+                                type="submit">
+                            Invite to Project
+                        </button>
+
+                    </form>
+
+                </div>
+
             </article>
 
         </div>
 
     </section>
 
-
-
-    <!-- ================= EMPTY STATE ================= -->
-
-    <section
-        class="find-empty"
-        th:if="${students == null or students.isEmpty()}">
+    <section class="find-empty"
+             th:if="${students == null or students.isEmpty()}">
 
         <div class="find-empty-icon" aria-hidden="true">
             ✦
@@ -573,15 +566,13 @@
 
     </section>
 
-
-
-    <!-- ================= CTA ================= -->
-
     <section class="find-cta">
 
         <div>
 
-            <h2>Want to be found too?</h2>
+            <h2>
+                Want to be found too?
+            </h2>
 
             <p>
                 Keep your bio, interests and skills up to date so other
@@ -596,14 +587,7 @@
 
     </section>
 
-
 </main>
-
-
-
-<!-- =========================================================
-     FOOTER (identical to dashboard)
-========================================================= -->
 
 <footer class="dashboard-footer">
 
@@ -620,13 +604,11 @@
 
     </a>
 
-
     <p>
         Find your people. Build your idea.
     </p>
 
 </footer>
-
 
 </body>
 </html>

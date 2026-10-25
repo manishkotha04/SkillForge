@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Invitations | SkillForge</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<header class="app-header">
+    <div class="container">
+        <nav class="site-nav">
+
+            <a class="brand"
+               th:href="@{/dashboard}">
+                <span class="brand-mark">SF</span>
+                <span>SkillForge</span>
+            </a>
+
+            <div class="nav-links">
+
+                <a th:href="@{/dashboard}">
+                    Dashboard
+                </a>
+
+                <a th:href="@{/projects}">
+                    Projects
+                </a>
+
+                <a th:href="@{/portfolio}">
+                    Portfolio
+                </a>
+
+            </div>
+
+        </nav>
+    </div>
+</header>
+
+<main class="page-main">
+
+    <div class="container">
+
+        <!-- Page heading -->
+        <div class="dashboard-header">
+
+            <div>
+                <p class="field-hint">Projects</p>
+
+                <h1>My Invitations</h1>
+
+                <p class="field-hint">
+                    Project invitations waiting for your response.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Flash messages -->
+        <div class="message-stack"
+             th:if="${successMessage != null or errorMessage != null}">
+
+            <div class="alert alert-success"
+                 th:if="${successMessage != null}"
+                 role="status">
+
+                <span class="alert-icon">✓</span>
+
+                <span th:text="${successMessage}">
+                    Invitation accepted.
+                </span>
+
+            </div>
+
+            <div class="alert alert-error"
+                 th:if="${errorMessage != null}"
+                 role="alert">
+
+                <span class="alert-icon">!</span>
+
+                <span th:text="${errorMessage}">
+                    An error occurred.
+                </span>
+
+            </div>
+
+        </div>
+
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(invitations)}">
+
+            <div class="project-card">
+
+                <h3>No pending invitations</h3>
+
+                <p>
+                    You currently have no pending project invitations.
+                </p>
+
+                <a class="button button-secondary"
+                   th:href="@{/projects}">
+                    Back to Projects
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- Invitations -->
+        <div class="project-grid"
+             th:unless="${#lists.isEmpty(invitations)}">
+
+            <article class="project-card"
+                     th:each="invitation : ${invitations}">
+
+                <h3 th:text="${invitation.project.name}">
+                    Project Name
+                </h3>
+
+                <p th:if="${invitation.project.description != null}"
+                   th:text="${invitation.project.description}">
+                    Project description
+                </p>
+
+                <p>
+                    <strong>Invited by:</strong>
+                    <span th:text="${invitation.invitedBy.fullName}">
+                        Student Name
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Status:</strong>
+                    <span th:text="${invitation.status}">
+                        PENDING
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Received:</strong>
+                    <span th:text="${invitation.createdAt}">
+                        Date
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Expires:</strong>
+                    <span th:text="${invitation.expiresAt}">
+                        Date
+                    </span>
+                </p>
+
+                <!-- Invitation actions -->
+                <div class="form-actions">
+
+                    <form th:action="@{/invitations/{id}/accept(id=${invitation.id})}"
+                          method="post">
+
+                        <button type="submit"
+                                class="button button-primary">
+                            Accept
+                        </button>
+
+                    </form>
+
+                    <form th:action="@{/invitations/{id}/reject(id=${invitation.id})}"
+                          method="post">
+
+                        <button type="submit"
+                                class="button button-secondary">
+                            Reject
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</main>
+
+</body>
+</html>

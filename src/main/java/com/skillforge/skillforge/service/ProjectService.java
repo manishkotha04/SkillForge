@@ -106,6 +106,13 @@ public List<Project> getMyProjects() {
     return myProjects;
 }
 
+@Transactional(readOnly = true)
+public List<Project> getMyOwnedProjects() {
+    AppUser currentUser = currentUserService.getCurrentUser();
+
+    return projectRepository.findByOwner_Id(currentUser.getId());
+}
+
 
     @Transactional(readOnly = true)
     public Project getProjectById(Long projectId) {
@@ -158,11 +165,6 @@ public List<Project> getMyProjects() {
         }
 
 
-if (!project.getOwner().getId().equals(currentUser.getId())) {
-    throw new AccessDeniedException(
-            "Only the project owner can invite users.");
-}
-
 // CHECK TEAM CAPACITY BEFORE SENDING AN INVITATION
 Integer maxTeamSize = project.getMaxTeamSize();
 
@@ -186,11 +188,6 @@ if (maxTeamSize != null) {
 }
 
 // YOUR EXISTING CODE CONTINUES BELOW
-if (currentUser.getId().equals(invitedUserId)) {
-    throw new IllegalArgumentException(
-            "You cannot invite yourself to your own project.");
-}
-
 
         if (currentUser.getId().equals(invitedUserId)) {
             throw new IllegalArgumentException(

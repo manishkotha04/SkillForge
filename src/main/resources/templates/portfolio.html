@@ -11,43 +11,45 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
 </head>
 
 <body>
 
 <header class="app-header">
-    <div class="container site-nav">
+    <div class="container">
+        <nav class="site-nav">
 
-        <a class="brand"
-           th:href="@{/dashboard}">
-            <span class="brand-mark">S</span>
-            <span>SkillForge</span>
-        </a>
+            <a class="brand"
+               th:href="@{/dashboard}">
+                <span class="brand-mark">S</span>
+                <span>SkillForge</span>
+            </a>
 
-        <nav class="nav-links">
-            <a th:href="@{/dashboard}">Dashboard</a>
-            <a th:href="@{/projects}">Projects</a>
-            <a th:href="@{/profile}">Profile</a>
+            <div class="nav-links">
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/projects}">Projects</a>
+                <a th:href="@{/profile}">Profile</a>
+            </div>
+
         </nav>
-
     </div>
 </header>
 
 <main class="page-main">
+
     <div class="container">
 
-        <div style="display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 16px;
-                    flex-wrap: wrap;
-                    margin-bottom: 28px;">
+        <div class="page-header">
 
             <div>
+                <p class="field-hint">Your Work</p>
+
                 <h1>My Portfolio</h1>
 
-                <p style="color: var(--muted);
-                          margin-bottom: 0;">
+                <p class="field-hint">
                     Showcase your projects, work, and achievements.
                 </p>
             </div>
@@ -59,16 +61,14 @@
 
         </div>
 
-        <div th:if="${#lists.isEmpty(items)}"
-             style="padding: 40px;
-                    text-align: center;
-                    background: white;
-                    border: 1px solid var(--line);
-                    border-radius: var(--radius);">
+        <!-- Empty state -->
+        <section th:if="${#lists.isEmpty(items)}"
+                 class="project-card"
+                 style="text-align: center;">
 
             <h2>Your portfolio is empty</h2>
 
-            <p style="color: var(--muted);">
+            <p class="field-hint">
                 Add your first portfolio item to showcase your work.
             </p>
 
@@ -77,37 +77,31 @@
                 Add Portfolio Item
             </a>
 
-        </div>
+        </section>
 
+        <!-- Portfolio items -->
         <div th:unless="${#lists.isEmpty(items)}"
-             style="display: grid;
-                    gap: 16px;">
+             class="project-grid">
 
             <article th:each="item : ${items}"
-                     style="background: white;
-                            border: 1px solid var(--line);
-                            border-radius: var(--radius);
-                            padding: 22px;
-                            box-shadow: var(--shadow);">
+                     class="project-card">
 
-                <h2 th:text="${item.title}"
-                    style="margin-top: 0;">
+                <h2 th:text="${item.title}">
                     Portfolio Item
                 </h2>
 
                 <p th:if="${item.description != null
                            and !#strings.isEmpty(item.description)}"
                    th:text="${item.description}"
-                   style="color: var(--muted);">
+                   class="field-hint">
                     Description
                 </p>
 
                 <div th:if="${item.project != null}"
-                     style="margin-top: 14px;
-                            color: var(--muted);
-                            font-size: .9rem;">
+                     class="field-hint">
 
                     <strong>Project:</strong>
+
                     <span th:text="${item.project.name}">
                         Project name
                     </span>
@@ -116,7 +110,7 @@
 
                 <div th:if="${item.externalUrl != null
                             and !#strings.isEmpty(item.externalUrl)}"
-                     style="margin-top: 12px;">
+                     style="margin-top: 14px;">
 
                     <a th:href="${item.externalUrl}"
                        target="_blank"
@@ -144,6 +138,7 @@
         </div>
 
     </div>
+
 </main>
 
 </body>

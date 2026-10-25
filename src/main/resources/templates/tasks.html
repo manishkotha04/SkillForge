@@ -11,36 +11,49 @@
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
 
 <header class="app-header">
-    <div class="container site-nav">
-        <a class="brand"
-           th:href="@{/dashboard}">
-            <span class="brand-mark">S</span>
-            <span>SkillForge</span>
-        </a>
+    <div class="container">
+        <nav class="site-nav">
 
-        <nav class="nav-links">
-            <a th:href="@{/dashboard}">Dashboard</a>
-            <a th:href="@{/projects}">Projects</a>
-            <a th:href="@{/profile}">Profile</a>
+            <a class="brand"
+               th:href="@{/dashboard}">
+                <span class="brand-mark">S</span>
+                <span>SkillForge</span>
+            </a>
+
+            <div class="nav-links">
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/projects}">Projects</a>
+                <a th:href="@{/profile}">Profile</a>
+            </div>
+
         </nav>
     </div>
 </header>
 
 <main class="page-main">
+
     <div class="container">
 
-        <div style="display: flex; justify-content: space-between;
-                    align-items: center; gap: 16px;
-                    flex-wrap: wrap; margin-bottom: 28px;">
+        <!-- Page heading -->
+        <div class="dashboard-header">
 
             <div>
+                <p class="field-hint">Project</p>
+
                 <h1>Project Tasks</h1>
-                <p style="color: var(--muted); margin-bottom: 0;">
+
+                <p class="field-hint">
                     Manage tasks and track project progress.
                 </p>
             </div>
@@ -53,102 +66,85 @@
         </div>
 
         <!-- Empty state -->
-        <div th:if="${#lists.isEmpty(tasks)}"
-             style="padding: 40px; text-align: center;
-                    background: white; border: 1px solid var(--line);
-                    border-radius: var(--radius);">
+        <div th:if="${#lists.isEmpty(tasks)}">
 
-            <h2>No tasks yet</h2>
+            <div class="project-card">
 
-            <p style="color: var(--muted);">
-                Create the first task for this project.
-            </p>
+                <h3>No tasks yet</h3>
 
-            <a class="button button-primary"
-               th:href="@{/tasks/new(projectId=${projectId})}">
-                Create Task
-            </a>
+                <p>
+                    Create the first task for this project.
+                </p>
+
+                <a class="button button-primary"
+                   th:href="@{/tasks/new(projectId=${projectId})}">
+                    Create Task
+                </a>
+
+            </div>
+
         </div>
 
         <!-- Task list -->
-        <div th:unless="${#lists.isEmpty(tasks)}"
-             style="display: grid; gap: 16px;">
+        <div class="project-grid"
+             th:unless="${#lists.isEmpty(tasks)}">
 
-            <article th:each="task : ${tasks}"
-                     style="background: white;
-                            border: 1px solid var(--line);
-                            border-radius: var(--radius);
-                            padding: 22px;
-                            box-shadow: var(--shadow);">
+            <article class="project-card"
+                     th:each="task : ${tasks}">
 
-                <div style="display: flex;
-                            justify-content: space-between;
-                            align-items: flex-start;
-                            gap: 16px;
-                            flex-wrap: wrap;">
+                <div class="task-header">
 
-                    <div style="min-width: 0;">
-
-                        <h2 th:text="${task.title}"
-                            style="margin-top: 0;">
+                    <div>
+                        <h3 th:text="${task.title}">
                             Task title
-                        </h2>
+                        </h3>
 
                         <p th:if="${task.description != null
                                   and !#strings.isEmpty(task.description)}"
-                           th:text="${task.description}"
-                           style="color: var(--muted);">
+                           th:text="${task.description}">
                             Task description
                         </p>
-
                     </div>
 
-                    <span th:text="${task.status}"
-                          style="padding: 6px 10px;
-                                 border-radius: 999px;
-                                 background: var(--surface-soft);
-                                 color: var(--navy);
-                                 font-size: .8rem;
-                                 font-weight: 700;">
+                    <span class="project-category"
+                          th:text="${task.status}">
                         TODO
                     </span>
 
                 </div>
 
-                <div style="display: grid;
-                            gap: 8px;
-                            margin-top: 18px;
-                            color: var(--muted);
-                            font-size: .9rem;">
+                <div class="form-stack">
 
-                    <div>
+                    <p>
                         <strong>Due date:</strong>
+
                         <span th:if="${task.dueDate != null}"
                               th:text="${task.dueDate}">
                             —
                         </span>
+
                         <span th:unless="${task.dueDate != null}">
                             No due date
                         </span>
-                    </div>
+                    </p>
 
-                    <div>
+                    <p>
                         <strong>Assigned to:</strong>
+
                         <span th:if="${task.assignee != null}"
                               th:text="${task.assignee.fullName}">
                             —
                         </span>
-                        <span th:unless="${task.assignee != null}">
+
+                        <span th:unless="${task.assignee == null}">
                             Unassigned
                         </span>
-                    </div>
+                    </p>
 
                 </div>
 
-                <div style="display: flex;
-                            gap: 10px;
-                            flex-wrap: wrap;
-                            margin-top: 20px;">
+                <!-- Task actions -->
+                <div class="form-actions">
 
                     <a class="button button-secondary button-small"
                        th:href="@{/tasks/{id}/edit(id=${task.id})}">
@@ -157,18 +153,10 @@
 
                     <form th:action="@{/tasks/{id}/status(id=${task.id})}"
                           method="post"
-                          style="display: flex;
-                                 gap: 8px;
-                                 align-items: center;">
+                          class="form-actions">
 
                         <select name="status"
-                                style="min-height: 36px;
-                                       padding: 6px 10px;
-                                       border: 1px solid #dce2ed;
-                                       border-radius: 9px;
-                                       background: white;
-                                       font: inherit;
-                                       font-size: .82rem;">
+                                aria-label="Task status">
 
                             <option th:each="statusOption :
                                     ${T(com.skillforge.skillforge.enums.TaskStatus).values()}"
@@ -194,6 +182,7 @@
         </div>
 
     </div>
+
 </main>
 
 </body>

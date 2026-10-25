@@ -40,8 +40,13 @@ public class StudentDiscoveryService {
         List<StudentProfile> profiles = new ArrayList<>();
 
         if (searchTerm.isBlank()) {
-            profiles.addAll(studentProfileRepository.findAll());
+
+            profiles.addAll(
+                    studentProfileRepository.findAll()
+            );
+
         } else {
+
             profiles.addAll(
                     studentProfileRepository
                             .findByDisplayNameContainingIgnoreCaseOrInterestsContainingIgnoreCase(
@@ -51,10 +56,13 @@ public class StudentDiscoveryService {
             );
 
             List<StudentSkill> skillMatches =
-                    studentSkillRepository.findBySkillNameContainingIgnoreCase(searchTerm);
+                    studentSkillRepository
+                            .findBySkillNameContainingIgnoreCase(searchTerm);
 
             for (StudentSkill studentSkill : skillMatches) {
-                StudentProfile profile = studentSkill.getStudentProfile();
+
+                StudentProfile profile =
+                        studentSkill.getStudentProfile();
 
                 if (!profiles.contains(profile)) {
                     profiles.add(profile);
@@ -64,29 +72,39 @@ public class StudentDiscoveryService {
 
         return profiles.stream()
                 .filter(profile ->
-                        !profile.getUser().getId().equals(currentUser.getId()))
+                        !profile.getUser()
+                                .getId()
+                                .equals(currentUser.getId()))
                 .map(this::toDto)
                 .toList();
     }
 
     private StudentSummaryDto toDto(StudentProfile profile) {
 
-    StudentSummaryDto dto = new StudentSummaryDto();
+        StudentSummaryDto dto = new StudentSummaryDto();
 
-    dto.setId(profile.getId());
-    dto.setDisplayName(profile.getDisplayName());
-    dto.setBio(profile.getBio());
-    dto.setInterests(profile.getInterests());
+        /*
+         * The invitation system works with AppUser IDs,
+         * not StudentProfile IDs.
+         *
+         * StudentProfile -> AppUser -> id
+         */
+        dto.setId(profile.getUser().getId());
 
-    List<String> skillNames = studentSkillRepository
-            .findByStudentProfileId(profile.getId())
-            .stream()
-            .map(StudentSkill::getSkill)
-            .map(skill -> skill.getName())
-            .toList();
+        dto.setDisplayName(profile.getDisplayName());
+        dto.setBio(profile.getBio());
+        dto.setInterests(profile.getInterests());
 
-    dto.setSkills(skillNames);
+        List<String> skillNames =
+                studentSkillRepository
+                        .findByStudentProfileId(profile.getId())
+                        .stream()
+                        .map(StudentSkill::getSkill)
+                        .map(skill -> skill.getName())
+                        .toList();
 
-    return dto;
-}
+        dto.setSkills(skillNames);
+
+        return dto;
+    }
 }

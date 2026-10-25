@@ -1,4 +1,3 @@
-
 package com.skillforge.skillforge.controller;
 
 import com.skillforge.skillforge.AppUser;
@@ -16,8 +15,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -34,66 +33,143 @@ public class InvitationController {
             ProjectInvitationRepository invitationRepository,
             UserRepository userRepository,
             CurrentUserService currentUserService) {
+
         this.projectService = projectService;
         this.invitationRepository = invitationRepository;
         this.userRepository = userRepository;
         this.currentUserService = currentUserService;
     }
 
-@GetMapping("/invitations")
-public String listInvitations(Model model) {
-    AppUser currentUser = currentUserService.getCurrentUser();
+    @GetMapping("/invitations")
+    public String listInvitations(Model model) {
 
-    List<ProjectInvitation> invitations =
-            invitationRepository.findByInvitedUser_IdAndStatus(
-                    currentUser.getId(),
-                    InvitationStatus.PENDING
-            );
+        AppUser currentUser =
+                currentUserService.getCurrentUser();
 
-    model.addAttribute("invitations", invitations);
-    return "invitations/list";
-}
+        List<ProjectInvitation> invitations =
+                invitationRepository.findByInvitedUser_IdAndStatus(
+                        currentUser.getId(),
+                        InvitationStatus.PENDING);
+
+        model.addAttribute("invitations", invitations);
+
+        return "invitations/list";
+    }
 
     @PostMapping("/projects/{projectId}/invitations")
     public String inviteUser(
             @PathVariable Long projectId,
-            @RequestParam String username,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) Long invitedUserId,
             RedirectAttributes redirectAttributes) {
+
         try {
-            AppUser invitedUser = userRepository
-                    .findByUsernameIgnoreCase(username.trim())
-                    .orElseThrow(() -> new NoSuchElementException(
-                            "No user found with that username."));
+            Long targetUserId;
 
-            projectService.inviteUser(projectId, invitedUser.getId());
+            if (invitedUserId != null) {
+
+                targetUserId = invitedUserId;
+
+            } else if (username != null
+                    && !username.trim().isEmpty()) {
+
+                AppUser invitedUser =
+                        userRepository
+                                .findByUsernameIgnoreCase(
+                                        username.trim())
+                                .orElseThrow(
+                                        () -> new NoSuchElementException(
+                                                "No user found with that username."));
+
+                targetUserId = invitedUser.getId();
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "Please select a student to invite.");
+            }
+
+            projectService.inviteUser(
+                    projectId,
+                    targetUserId);
 
             redirectAttributes.addFlashAttribute(
-                    "successMessage", "Invitation sent successfully.");
-        } catch (IllegalArgumentException | NoSuchElementException exception) {
+                    "successMessage",
+                    "Invitation sent successfully.");
+
+        } catch (IllegalArgumentException
+                | NoSuchElementException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
+
         } catch (AccessDeniedException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
         }
 
         return "redirect:/projects/" + projectId;
+    }
+
+    @PostMapping("/projects/{projectId}/invitations/{userId}")
+    public String inviteStudent(
+            @PathVariable Long projectId,
+            @PathVariable Long userId,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            projectService.inviteUser(
+                    projectId,
+                    userId);
+
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Invitation sent successfully.");
+
+        } catch (IllegalArgumentException
+                | NoSuchElementException exception) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    exception.getMessage());
+
+        } catch (AccessDeniedException exception) {
+
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    exception.getMessage());
+        }
+
+        return "redirect:/students/search?projectId=" + projectId;
     }
 
     @PostMapping("/invitations/{invitationId}/accept")
     public String acceptInvitation(
             @PathVariable Long invitationId,
             RedirectAttributes redirectAttributes) {
+
         try {
             projectService.acceptInvitation(invitationId);
+
             redirectAttributes.addFlashAttribute(
-                    "successMessage", "Invitation accepted.");
-        } catch (IllegalArgumentException | NoSuchElementException exception) {
+                    "successMessage",
+                    "Invitation accepted.");
+
+        } catch (IllegalArgumentException
+                | NoSuchElementException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
+
         } catch (AccessDeniedException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
         }
 
         return "redirect:/invitations";
@@ -103,16 +179,26 @@ public String listInvitations(Model model) {
     public String rejectInvitation(
             @PathVariable Long invitationId,
             RedirectAttributes redirectAttributes) {
+
         try {
             projectService.rejectInvitation(invitationId);
+
             redirectAttributes.addFlashAttribute(
-                    "successMessage", "Invitation rejected.");
-        } catch (IllegalArgumentException | NoSuchElementException exception) {
+                    "successMessage",
+                    "Invitation rejected.");
+
+        } catch (IllegalArgumentException
+                | NoSuchElementException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
+
         } catch (AccessDeniedException exception) {
+
             redirectAttributes.addFlashAttribute(
-                    "errorMessage", exception.getMessage());
+                    "errorMessage",
+                    exception.getMessage());
         }
 
         return "redirect:/invitations";

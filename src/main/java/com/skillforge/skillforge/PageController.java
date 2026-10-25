@@ -1,5 +1,7 @@
-
 package com.skillforge.skillforge;
+
+import com.skillforge.skillforge.enums.InvitationStatus;
+import com.skillforge.skillforge.repository.ProjectInvitationRepository;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,9 +13,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class PageController {
 
     private final RegistrationService registrationService;
+    private final CurrentUserService currentUserService;
+    private final ProjectInvitationRepository invitationRepository;
 
-    public PageController(RegistrationService registrationService) {
+    public PageController(
+            RegistrationService registrationService,
+            CurrentUserService currentUserService,
+            ProjectInvitationRepository invitationRepository) {
+
         this.registrationService = registrationService;
+        this.currentUserService = currentUserService;
+        this.invitationRepository = invitationRepository;
     }
 
     @GetMapping({"/", "/login"})
@@ -24,8 +34,11 @@ public class PageController {
     @GetMapping("/register")
     public String register(Model model) {
         if (!model.containsAttribute("registrationForm")) {
-            model.addAttribute("registrationForm", new RegistrationForm());
+            model.addAttribute(
+                    "registrationForm",
+                    new RegistrationForm());
         }
+
         return "auth/register";
     }
 
@@ -37,14 +50,30 @@ public class PageController {
         try {
             registrationService.register(form);
             return "redirect:/login?registered";
+
         } catch (IllegalArgumentException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+            model.addAttribute(
+                    "errorMessage",
+                    ex.getMessage());
+
             return "auth/register";
         }
     }
 
     @GetMapping("/dashboard")
-    public String dashboard() {
+    public String dashboard(Model model) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+
+        long pendingInvitationCount =
+                invitationRepository.countByInvitedUser_IdAndStatus(
+                        currentUser.getId(),
+                        InvitationStatus.PENDING);
+
+        model.addAttribute(
+                "pendingInvitationCount",
+                pendingInvitationCount);
+
         return "dashboard";
     }
 }
