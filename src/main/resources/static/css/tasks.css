@@ -1,0 +1,110 @@
+/* SkillForge – Task pages
+   Scoped with the tk- prefix. Reuses the pj- classes from projects.css, so load order is:
+   style.css, components.css, dashboard.css, projects.css, tasks.css */
+
+/* ---------- Status pills (combine with .pj-pill) ---------- */
+.tk-pill-todo {
+    background: #f1f3f8;
+    color: #647087;
+}
+
+.tk-pill-progress {
+    background: #fff4dc;
+    color: #9a6400;
+}
+
+.tk-pill-done {
+    background: #effaf4;
+    color: #176544;
+}
+
+/* ---------- Task card ---------- */
+.tk-card h2 {
+    margin: 14px 0 10px;
+    color: var(--navy);
+    font-size: 1.25rem;
+    overflow-wrap: anywhere;
+}
+
+.tk-card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eef1f7;
+}
+
+.tk-status-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+/* ---------- Select controls ---------- */
+.tk-select,
+.pj-form .form-field select {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 42px 12px 14px;
+    color: var(--ink);
+    background-color: #fff;
+    border: 1px solid #dce2ed;
+    border-radius: 11px;
+    outline: none;
+    font: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23647087' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    transition: border .15s, box-shadow .15s;
+}
+
+.tk-select:focus,
+.pj-form .form-field select:focus {
+    border-color: #7086ee;
+    box-shadow: 0 0 0 4px #7086ee20;
+}
+
+.tk-status-form .tk-select {
+    width: auto;
+    min-height: 36px;
+    padding: 7px 34px 7px 12px;
+    border-radius: 9px;
+    font-size: .82rem;
+    font-weight: 600;
+    background-position: right 12px center;
+}
+
+/* ---------- Edit badge ---------- */
+.tk-editing-badge {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #fff4dc;
+    color: #9a6400;
+    font-size: .78rem;
+    font-weight: 750;
+}
+
+@media (max-width: 560px) {
+    .tk-card-footer,
+    .tk-status-form {
+        width: 100%;
+    }
+
+    .tk-status-form .tk-select {
+        flex: 1;
+    }
+
+    .tk-card-footer > .button {
+        width: 100%;
+    }
+}

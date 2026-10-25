@@ -9,177 +9,176 @@
 
     <title>Project Tasks | SkillForge</title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/style.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/css/components.css}">
-
-    <link rel="stylesheet"
-          th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
+    <link rel="stylesheet" th:href="@{/css/tasks.css}">
 </head>
 
-<body>
+<body class="dashboard-page">
 
-<header class="app-header">
-    <div class="container">
-        <nav class="site-nav">
+<header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
 
-            <a class="brand"
-               th:href="@{/dashboard}">
-                <span class="brand-mark">S</span>
-                <span>SkillForge</span>
-            </a>
+<main class="dashboard-container">
 
-            <div class="nav-links">
-                <a th:href="@{/dashboard}">Dashboard</a>
-                <a th:href="@{/projects}">Projects</a>
-                <a th:href="@{/profile}">Profile</a>
-            </div>
+    <a class="pj-back"
+       th:href="@{/projects/{id}(id=${projectId})}">
+        &larr; Back to project
+    </a>
 
-        </nav>
+    <!-- Page heading -->
+    <div class="pj-header">
+
+        <div>
+            <p class="pj-eyebrow">Project tasks</p>
+
+            <h1>Project Tasks</h1>
+
+            <p class="pj-subtitle">
+                Manage tasks and track project progress.
+            </p>
+
+            <span class="pj-count"
+                  th:unless="${#lists.isEmpty(tasks)}"
+                  th:text="${#lists.size(tasks)} + (${#lists.size(tasks)} == 1 ? ' task' : ' tasks')">
+                3 tasks
+            </span>
+        </div>
+
+        <a class="button button-primary"
+           th:href="@{/tasks/new(projectId=${projectId})}">
+            + Create task
+        </a>
+
     </div>
-</header>
 
-<main class="page-main">
+    <!-- Empty state -->
+    <section class="pj-empty"
+             th:if="${#lists.isEmpty(tasks)}">
 
-    <div class="container">
+        <span class="pj-empty-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="3"></rect>
+                <path d="M8.5 12.5l2.5 2.5 4.5-5"></path>
+            </svg>
+        </span>
 
-        <!-- Page heading -->
-        <div class="dashboard-header">
+        <h2>No tasks yet</h2>
 
-            <div>
-                <p class="field-hint">Project</p>
+        <p>
+            Create the first task for this project.
+        </p>
 
-                <h1>Project Tasks</h1>
+        <a class="button button-primary"
+           th:href="@{/tasks/new(projectId=${projectId})}">
+            + Create task
+        </a>
 
-                <p class="field-hint">
-                    Manage tasks and track project progress.
-                </p>
-            </div>
+    </section>
 
-            <a class="button button-primary"
-               th:href="@{/tasks/new(projectId=${projectId})}">
-                Create Task
-            </a>
+    <!-- Task list -->
+    <div class="pj-grid"
+         th:unless="${#lists.isEmpty(tasks)}">
 
-        </div>
+        <article class="pj-card tk-card"
+                 th:each="task : ${tasks}">
 
-        <!-- Empty state -->
-        <div th:if="${#lists.isEmpty(tasks)}">
+            <div class="pj-card-body">
 
-            <div class="project-card">
+                <div class="pj-card-top">
 
-                <h3>No tasks yet</h3>
-
-                <p>
-                    Create the first task for this project.
-                </p>
-
-                <a class="button button-primary"
-                   th:href="@{/tasks/new(projectId=${projectId})}">
-                    Create Task
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- Task list -->
-        <div class="project-grid"
-             th:unless="${#lists.isEmpty(tasks)}">
-
-            <article class="project-card"
-                     th:each="task : ${tasks}">
-
-                <div class="task-header">
-
-                    <div>
-                        <h3 th:text="${task.title}">
-                            Task title
-                        </h3>
-
-                        <p th:if="${task.description != null
-                                  and !#strings.isEmpty(task.description)}"
-                           th:text="${task.description}">
-                            Task description
-                        </p>
-                    </div>
-
-                    <span class="project-category"
-                          th:text="${task.status}">
-                        TODO
+                    <span class="pj-pill"
+                          th:classappend="${task.status.name() == 'DONE' ? 'tk-pill-done' : (task.status.name() == 'IN_PROGRESS' ? 'tk-pill-progress' : 'tk-pill-todo')}"
+                          th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(task.status, '_', ' ')))}">
+                        To do
                     </span>
 
                 </div>
 
-                <div class="form-stack">
+                <h2 th:text="${task.title}">
+                    Task title
+                </h2>
 
-                    <p>
-                        <strong>Due date:</strong>
+                <p class="pj-description"
+                   th:if="${task.description != null
+                            and !#strings.isEmpty(#strings.trim(task.description))}"
+                   th:text="${task.description}">
+                    Task description
+                </p>
 
-                        <span th:if="${task.dueDate != null}"
-                              th:text="${task.dueDate}">
-                            —
+                <ul class="pj-meta">
+
+                    <li>
+                        <span class="pj-label">Due date</span>
+
+                        <span class="pj-value"
+                              th:if="${task.dueDate != null}"
+                              th:text="${#temporals.format(task.dueDate, 'dd MMM yyyy')}">
+                            01 Jan 2026
                         </span>
 
-                        <span th:unless="${task.dueDate != null}">
+                        <span class="pj-value pj-team-muted"
+                              th:unless="${task.dueDate != null}">
                             No due date
                         </span>
-                    </p>
+                    </li>
 
-                    <p>
-                        <strong>Assigned to:</strong>
+                    <li>
+                        <span class="pj-label">Assigned to</span>
 
-                        <span th:if="${task.assignee != null}"
+                        <span class="pj-value"
+                              th:if="${task.assignee != null}"
                               th:text="${task.assignee.fullName}">
-                            —
+                            Student name
                         </span>
 
-                        <span th:unless="${task.assignee == null}">
+                        <span class="pj-value pj-team-muted"
+                              th:unless="${task.assignee != null}">
                             Unassigned
                         </span>
-                    </p>
+                    </li>
 
-                </div>
+                </ul>
 
-                <!-- Task actions -->
-                <div class="form-actions">
+            </div>
 
-                    <a class="button button-secondary button-small"
-                       th:href="@{/tasks/{id}/edit(id=${task.id})}">
-                        Edit
-                    </a>
+            <!-- Task actions -->
+            <div class="tk-card-footer">
 
-                    <form th:action="@{/tasks/{id}/status(id=${task.id})}"
-                          method="post"
-                          class="form-actions">
+                <form th:action="@{/tasks/{id}/status(id=${task.id})}"
+                      method="post"
+                      class="tk-status-form">
 
-                        <select name="status"
-                                aria-label="Task status">
+                    <select name="status"
+                            class="tk-select"
+                            aria-label="Task status">
 
-                            <option th:each="statusOption :
-                                    ${T(com.skillforge.skillforge.enums.TaskStatus).values()}"
-                                    th:value="${statusOption}"
-                                    th:text="${statusOption}"
-                                    th:selected="${statusOption == task.status}">
-                                TODO
-                            </option>
+                        <option th:each="statusOption : ${T(com.skillforge.skillforge.enums.TaskStatus).values()}"
+                                th:value="${statusOption}"
+                                th:text="${#strings.capitalize(#strings.toLowerCase(#strings.replace(statusOption, '_', ' ')))}"
+                                th:selected="${statusOption == task.status}">
+                            TODO
+                        </option>
 
-                        </select>
+                    </select>
 
-                        <button type="submit"
-                                class="button button-primary button-small">
-                            Update Status
-                        </button>
+                    <button type="submit"
+                            class="button button-primary button-small">
+                        Update status
+                    </button>
 
-                    </form>
+                </form>
 
-                </div>
+                <a class="button button-secondary button-small"
+                   th:href="@{/tasks/{id}/edit(id=${task.id})}">
+                    Edit
+                </a>
 
-            </article>
+            </div>
 
-        </div>
+        </article>
 
     </div>
 

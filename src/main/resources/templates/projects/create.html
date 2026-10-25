@@ -9,148 +9,142 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
 </head>
 
-<body>
+<body class="dashboard-page">
 
-<header class="app-header">
-    <div class="container">
-        <nav class="site-nav">
+<header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
 
-            <a class="brand" th:href="@{/dashboard}">
-                <span class="brand-mark">S</span>
-                <span>SkillForge</span>
-            </a>
+<main class="dashboard-container">
 
-            <div class="nav-links">
-                <a th:href="@{/dashboard}">Home</a>
-                <a th:href="@{/projects}">Projects</a>
-                <a th:href="@{/portfolio}">Portfolio</a>
+    <a class="pj-back"
+       th:href="@{/projects}">
+        &larr; Back to projects
+    </a>
+
+    <div class="pj-header">
+
+        <div>
+            <p class="pj-eyebrow">New project</p>
+
+            <h1>Create a project</h1>
+
+            <p class="pj-subtitle">
+                Enter the details for your new SkillForge project.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Server-side error -->
+    <div class="message-stack"
+         th:if="${errorMessage}">
+
+        <div class="alert alert-error"
+             role="alert">
+            <span class="alert-icon">!</span>
+            <span th:text="${errorMessage}">
+                An error occurred.
+            </span>
+        </div>
+
+    </div>
+
+    <section class="pj-form-card">
+
+        <form class="form-stack pj-form"
+              th:action="@{/projects}"
+              method="post">
+
+            <h2 class="pj-section-title">Project details</h2>
+
+            <!-- Project name -->
+            <div class="form-field">
+
+                <label for="name">
+                    Project name<span class="pj-required" aria-hidden="true">*</span>
+                </label>
+
+                <input id="name"
+                       type="text"
+                       name="name"
+                       maxlength="150"
+                       required>
+
             </div>
 
-        </nav>
-    </div>
-</header>
+            <!-- Description -->
+            <div class="form-field">
 
-<main class="page-main">
+                <label for="description">
+                    Description<span class="pj-optional">Optional</span>
+                </label>
 
-    <div class="container">
+                <textarea id="description"
+                          name="description"
+                          maxlength="5000"
+                          rows="5"
+                          placeholder="Describe your project and its goals"></textarea>
 
-        <div class="dashboard-header">
-            <div>
-                <p class="field-hint">Projects</p>
-                <h1>Create a Project</h1>
+            </div>
+
+            <h2 class="pj-section-title">Team requirements</h2>
+
+            <!-- Required skills -->
+            <div class="form-field">
+
+                <label for="requiredSkillsText">
+                    Required skills<span class="pj-optional">Optional</span>
+                </label>
+
+                <textarea id="requiredSkillsText"
+                          name="requiredSkillsText"
+                          maxlength="2000"
+                          rows="4"
+                          placeholder="For example: Java, SQL, HTML, CSS"></textarea>
+
+            </div>
+
+            <!-- Maximum team size -->
+            <div class="form-field">
+
+                <label for="maxTeamSize">
+                    Maximum team size<span class="pj-required" aria-hidden="true">*</span>
+                </label>
+
+                <input id="maxTeamSize"
+                       type="number"
+                       name="maxTeamSize"
+                       min="1"
+                       step="1"
+                       required>
+
                 <p class="field-hint">
-                    Enter the details for your new SkillForge project.
+                    Enter the total number of team members,
+                    including the project owner.
                 </p>
-            </div>
-        </div>
 
-        <!-- Server-side error -->
-        <div class="message-stack"
-             th:if="${errorMessage}">
-
-            <div class="alert alert-error">
-                <span class="alert-icon">!</span>
-                <span th:text="${errorMessage}">
-                    An error occurred.
-                </span>
             </div>
 
-        </div>
+            <!-- Actions -->
+            <div class="pj-actions">
 
-        <section class="project-card">
+                <button class="button button-primary"
+                        type="submit">
+                    Create Project
+                </button>
 
-            <form class="form-stack"
-                  th:action="@{/projects}"
-                  method="post">
+                <a class="button button-secondary"
+                   th:href="@{/projects}">
+                    Cancel
+                </a>
 
-                <!-- Project name -->
-                <div class="form-field">
+            </div>
 
-                    <label for="name">
-                        Project name
-                    </label>
+        </form>
 
-                    <input id="name"
-                           type="text"
-                           name="name"
-                           maxlength="150"
-                           required>
-
-                </div>
-
-                <!-- Description -->
-                <div class="form-field">
-
-                    <label for="description">
-                        Description
-                    </label>
-
-                    <textarea id="description"
-                              name="description"
-                              maxlength="5000"
-                              rows="5"
-                              placeholder="Describe your project and its goals"></textarea>
-
-                </div>
-
-                <!-- Required skills -->
-                <div class="form-field">
-
-                    <label for="requiredSkillsText">
-                        Required skills
-                    </label>
-
-                    <textarea id="requiredSkillsText"
-                              name="requiredSkillsText"
-                              maxlength="2000"
-                              rows="4"
-                              placeholder="For example: Java, SQL, HTML, CSS"></textarea>
-
-                </div>
-
-                <!-- Maximum team size -->
-                <div class="form-field">
-
-                    <label for="maxTeamSize">
-                        Maximum team size
-                    </label>
-
-                    <input id="maxTeamSize"
-                           type="number"
-                           name="maxTeamSize"
-                           min="1"
-                           step="1"
-                           required>
-
-                    <p class="field-hint">
-                        Enter the total number of team members,
-                        including the project owner.
-                    </p>
-
-                </div>
-
-                <!-- Actions -->
-                <div class="form-actions">
-
-                    <a class="button button-secondary"
-                       th:href="@{/projects}">
-                        Cancel
-                    </a>
-
-                    <button class="button button-primary"
-                            type="submit">
-                        Create Project
-                    </button>
-
-                </div>
-
-            </form>
-
-        </section>
-
-    </div>
+    </section>
 
 </main>
 

@@ -10,164 +10,54 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
 </head>
 
-<body>
+<body class="dashboard-page">
 
-<header class="app-header">
+<header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
 
-    <div class="container">
+<main class="dashboard-container">
 
-        <nav class="site-nav">
+    <a class="pj-back"
+       th:href="@{/projects}">
+        &larr; Back to My Projects
+    </a>
 
-            <a class="brand" th:href="@{/dashboard}">
-                <span class="brand-mark">S</span>
-                <span>SkillForge</span>
-            </a>
+    <!-- Project identity -->
+    <section class="pj-hero">
 
-            <div class="nav-links">
+        <div class="pj-hero-main">
 
-                <a th:href="@{/dashboard}">
-                    Home
-                </a>
+            <p class="pj-eyebrow">Project</p>
 
-                <a th:href="@{/projects}">
-                    Projects
-                </a>
+            <h1 th:text="${project.name}">
+                Project name
+            </h1>
 
-                <a th:href="@{/portfolio}">
-                    Portfolio
-                </a>
+            <div class="pj-hero-badges">
 
-            </div>
+                <span class="pj-pill"
+                      th:classappend="${project.archived} ? 'pj-pill-archived' : 'pj-pill-active'"
+                      th:text="${project.archived ? 'Archived' : 'Active'}">
+                    Active
+                </span>
 
-        </nav>
-
-    </div>
-
-</header>
-
-<main class="page-main">
-
-    <div class="container">
-
-        <div class="dashboard-header">
-
-            <div>
-
-                <p class="field-hint">
-                    Project
+                <p class="pj-date"
+                   th:if="${project.createdAt != null}"
+                   th:text="'Created ' + ${#temporals.format(project.createdAt, 'dd MMM yyyy')}">
+                    Created 01 Jan 2026
                 </p>
 
-                <h1 th:text="${project.name}">
-                    Project name
-                </h1>
-
             </div>
 
         </div>
 
-        <div class="message-stack"
-             th:if="${successMessage != null or errorMessage != null}">
-
-            <div class="alert alert-success"
-                 th:if="${successMessage != null}">
-
-                <span class="alert-icon">✓</span>
-                <span th:text="${successMessage}"></span>
-
-            </div>
-
-            <div class="alert alert-error"
-                 th:if="${errorMessage != null}">
-
-                <span class="alert-icon">!</span>
-                <span th:text="${errorMessage}"></span>
-
-            </div>
-
-        </div>
-
-        <section class="project-card">
-
-            <h2>
-                Project Overview
-            </h2>
-
-            <div class="project-info">
-
-                <div class="info-item description">
-
-                    <span class="info-label">
-                        Description
-                    </span>
-
-                    <div class="info-value"
-                         th:text="${project.description ?: 'No description provided'}">
-                        Project description
-                    </div>
-
-                </div>
-
-                <div class="info-item">
-
-                    <span class="info-label">
-                        Required Skills
-                    </span>
-
-                    <div class="info-value"
-                         th:text="${project.requiredSkillsText ?: 'Not specified'}">
-                        Required skills
-                    </div>
-
-                </div>
-
-                <div class="info-item">
-
-                    <span class="info-label">
-                        Maximum Team Size
-                    </span>
-
-                    <div class="info-value"
-                         th:text="${project.maxTeamSize != null
-                                  ? project.maxTeamSize
-                                  : 'Not specified'}">
-                        Not specified
-                    </div>
-
-                </div>
-
-                <div class="info-item">
-
-                    <span class="info-label">
-                        Project Status
-                    </span>
-
-                    <div class="info-value">
-
-                        <span th:text="${project.archived
-                                         ? 'Archived'
-                                         : 'Active'}">
-                            Active
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <nav class="navigation"
+        <!-- Existing project actions -->
+        <nav class="pj-actions-row"
              aria-label="Project navigation">
 
-            <a class="button button-secondary"
-               th:href="@{/projects}">
-                &larr; Back to My Projects
-            </a>
-
-            <a class="button button-secondary"
+            <a class="button button-primary"
                th:if="${!project.archived and isProjectOwner}"
                th:href="@{/students/search(projectId=${project.id})}">
                 Find Teammates
@@ -178,70 +68,160 @@
                 View Tasks
             </a>
 
-            <a class="button button-secondary"
+            <a class="button button-quiet"
                th:href="@{/invitations}">
                 My Invitations
             </a>
 
         </nav>
 
-        <section class="project-card"
-                 th:if="${!project.archived and isProjectOwner}">
+    </section>
 
-            <h2>
-                Invite a Member
-            </h2>
+    <!-- Flash messages -->
+    <div class="message-stack"
+         th:if="${successMessage != null or errorMessage != null}">
 
-            <p>
-                You can invite a member directly by username,
-                or use Find Teammates above to search by skills and interests.
-            </p>
+        <div class="alert alert-success"
+             role="status"
+             th:if="${successMessage != null}">
 
-            <form class="form-stack"
-                  th:action="@{/projects/{projectId}/invitations(projectId=${project.id})}"
-                  method="post">
-
-                <div class="form-field">
-
-                    <label for="username">
-                        Member's username
-                    </label>
-
-                    <input type="text"
-                           id="username"
-                           name="username"
-                           placeholder="Enter their SkillForge username"
-                           autocomplete="off"
-                           required>
-
-                </div>
-
-                <div>
-
-                    <button class="button button-primary"
-                            type="submit">
-                        Send Invitation
-                    </button>
-
-                </div>
-
-            </form>
-
-        </section>
-
-        <div class="alert alert-info"
-             th:if="${project.archived}">
-
-            <span class="alert-icon">
-                i
-            </span>
-
-            <span>
-                This project is archived.
-                New invitations cannot be sent.
-            </span>
+            <span class="alert-icon">✓</span>
+            <span th:text="${successMessage}"></span>
 
         </div>
+
+        <div class="alert alert-error"
+             role="alert"
+             th:if="${errorMessage != null}">
+
+            <span class="alert-icon">!</span>
+            <span th:text="${errorMessage}"></span>
+
+        </div>
+
+    </div>
+
+    <!-- Overview -->
+    <section class="pj-section">
+
+        <h2>Project overview</h2>
+
+        <div class="pj-info">
+
+            <div class="pj-info-item is-wide">
+
+                <span class="pj-label">Description</span>
+
+                <div class="pj-text"
+                     th:text="${project.description ?: 'No description provided'}">
+                    Project description
+                </div>
+
+            </div>
+
+            <div class="pj-info-item is-wide">
+
+                <span class="pj-label">Required skills</span>
+
+                <div class="pj-skills"
+                     th:if="${project.requiredSkillsText != null and !#strings.isEmpty(#strings.trim(project.requiredSkillsText))}">
+
+                    <span th:each="skill : ${#strings.listSplit(project.requiredSkillsText, ',')}"
+                          th:if="${!#strings.isEmpty(#strings.trim(skill))}"
+                          th:text="${#strings.trim(skill)}">
+                        Skill
+                    </span>
+
+                </div>
+
+                <div class="pj-text"
+                     th:if="${project.requiredSkillsText == null or #strings.isEmpty(#strings.trim(project.requiredSkillsText))}">
+                    Not specified
+                </div>
+
+            </div>
+
+            <div class="pj-info-item">
+
+                <span class="pj-label">Maximum team size</span>
+
+                <div class="pj-text"
+                     th:text="${project.maxTeamSize != null
+                              ? project.maxTeamSize
+                              : 'Not specified'}">
+                    Not specified
+                </div>
+
+            </div>
+
+            <div class="pj-info-item">
+
+                <span class="pj-label">Project status</span>
+
+                <div class="pj-text"
+                     th:text="${project.archived
+                               ? 'Archived'
+                               : 'Active'}">
+                    Active
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Invite a member (owner of an active project only) -->
+    <section class="pj-section"
+             th:if="${!project.archived and isProjectOwner}">
+
+        <h2>Invite a member</h2>
+
+        <p class="pj-section-intro">
+            You can invite a member directly by username,
+            or use Find Teammates above to search by skills and interests.
+        </p>
+
+        <form class="pj-invite-form"
+              th:action="@{/projects/{projectId}/invitations(projectId=${project.id})}"
+              method="post">
+
+            <div class="form-field">
+
+                <label for="username">
+                    Member’s username
+                </label>
+
+                <input type="text"
+                       id="username"
+                       name="username"
+                       placeholder="Enter their SkillForge username"
+                       autocomplete="off"
+                       required>
+
+            </div>
+
+            <button class="button button-primary"
+                    type="submit">
+                Send Invitation
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- Archived notice -->
+    <div class="alert alert-info"
+         th:if="${project.archived}">
+
+        <span class="alert-icon">
+            i
+        </span>
+
+        <span>
+            This project is archived.
+            New invitations cannot be sent.
+        </span>
 
     </div>
 
