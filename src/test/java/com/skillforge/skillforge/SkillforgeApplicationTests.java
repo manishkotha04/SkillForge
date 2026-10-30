@@ -1,6 +1,6 @@
-
 package com.skillforge.skillforge;
 
+import com.skillforge.skillforge.repository.OwnershipTransferRepository;
 import com.skillforge.skillforge.repository.PortfolioItemRepository;
 import com.skillforge.skillforge.repository.ProjectInvitationRepository;
 import com.skillforge.skillforge.repository.ProjectMemberRepository;
@@ -33,6 +33,9 @@ class SkillforgeApplicationTests {
 
     @MockitoBean
     private ProjectInvitationRepository projectInvitationRepository;
+
+    @MockitoBean
+    private OwnershipTransferRepository ownershipTransferRepository;
 
     @MockitoBean
     private PortfolioItemRepository portfolioItemRepository;

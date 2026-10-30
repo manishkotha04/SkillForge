@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leave Requests | SkillForge</title>
+    <link rel="stylesheet" th:href="@{/css/leave-requests.css}">
+</head>
+<body>
+
+<div class="leave-container">
+
+    <header class="page-header">
+        <h1>Project Leave Requests</h1>
+        <p>Review requests from students who want to leave your projects.</p>
+    </header>
+
+    <p class="message success"
+       th:if="${successMessage}"
+       th:text="${successMessage}"></p>
+
+    <p class="message error"
+       th:if="${errorMessage}"
+       th:text="${errorMessage}"></p>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(leaveRequests)}">
+        <h2>No pending leave requests</h2>
+        <p>There are currently no requests requiring your attention.</p>
+    </div>
+
+    <div th:each="request : ${leaveRequests}" class="request-card">
+        <span class="status-label">Pending request</span>
+
+        <h2 th:text="${request.project.name}">Project name</h2>
+
+        <p>
+            <strong>Requested by:</strong>
+            <span th:text="${request.requestedBy.fullName}">Student name</span>
+        </p>
+
+        <p>
+            <strong>Requested on:</strong>
+            <span th:text="${#temporals.format(request.createdAt, 'dd MMM yyyy, hh:mm a')}">
+                Request date
+            </span>
+        </p>
+
+        <div class="actions">
+            <form th:action="@{/leave-requests/{id}/approve(id=${request.id})}"
+                  method="post">
+                <button type="submit" class="approve-button">
+                    Approve
+                </button>
+            </form>
+
+            <form th:action="@{/leave-requests/{id}/reject(id=${request.id})}"
+                  method="post">
+                <button type="submit" class="reject-button">
+                    Reject
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <a th:href="@{/projects}" class="back-link">← Back to Projects</a>
+
+</div>
+
+</body>
+</html>

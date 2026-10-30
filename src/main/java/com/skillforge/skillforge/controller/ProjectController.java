@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.skillforge.skillforge.entity.Project;
 import org.springframework.web.bind.annotation.PathVariable;
+import com.skillforge.skillforge.entity.OwnershipTransfer;
+import java.util.List;
+import com.skillforge.skillforge.entity.LeaveRequest;
+import java.util.List;
 
 @Controller
 public class ProjectController {
@@ -61,23 +65,170 @@ public String listProjects(Model model) {
         }
     }
 
+
 @GetMapping("/projects/{projectId}")
-public String showProjectDetails(
-        @PathVariable Long projectId,
-        Model model) {
+public String showProjectDetails(@PathVariable Long projectId, Model model) {
 
     Project project = projectService.getProjectForCurrentUser(projectId);
+
     model.addAttribute("project", project);
 
-    // Check whether the logged-in user owns this project.
     boolean isProjectOwner = projectService.isProjectOwner(projectId);
     model.addAttribute("isProjectOwner", isProjectOwner);
 
-    System.out.println("SUCCESS MESSAGE: "
-            + model.getAttribute("successMessage"));
-    System.out.println("ERROR MESSAGE: "
-            + model.getAttribute("errorMessage"));
+    if (isProjectOwner) {
+        model.addAttribute("projectMembers",
+                projectService.getProjectMembers(projectId));
+    } else {
+        model.addAttribute("hasPendingLeaveRequest",
+                projectService.hasPendingLeaveRequest(projectId));
+    }
 
     return "projects/details";
 }
+
+@PostMapping("/projects/{projectId}/ownership-transfer")
+public String requestOwnershipTransfer(
+        @PathVariable Long projectId,
+        @RequestParam Long nominatedUserId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.requestOwnershipTransfer(
+                projectId, nominatedUserId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Ownership transfer request sent successfully.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/projects/" + projectId;
+}
+
+
+@GetMapping("/ownership-transfers")
+public String showOwnershipTransferRequests(Model model) {
+    model.addAttribute(
+            "transfers",
+            projectService.getMyPendingOwnershipTransfers());
+
+    return "projects/ownership-transfers";
+}
+
+
+@PostMapping("/ownership-transfers/{transferId}/accept")
+public String acceptOwnershipTransfer(
+        @PathVariable Long transferId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.acceptOwnershipTransfer(transferId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Project ownership transferred successfully.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/ownership-transfers";
+}
+
+
+@PostMapping("/ownership-transfers/{transferId}/reject")
+public String rejectOwnershipTransfer(
+        @PathVariable Long transferId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.rejectOwnershipTransfer(transferId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Ownership transfer request rejected.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/ownership-transfers";
+}
+
+@PostMapping("/projects/{projectId}/leave-request")
+public String requestToLeaveProject(
+        @PathVariable Long projectId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.requestToLeaveProject(projectId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Your leave request has been submitted successfully.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/projects/" + projectId;
+}
+
+@GetMapping("/leave-requests")
+public String showPendingLeaveRequests(Model model) {
+
+    model.addAttribute(
+            "leaveRequests",
+            projectService.getPendingLeaveRequestsForOwner());
+
+    return "projects/leave-requests";
+}
+
+@PostMapping("/leave-requests/{requestId}/approve")
+public String approveLeaveRequest(
+        @PathVariable Long requestId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.approveLeaveRequest(requestId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Leave request approved. The member has been removed.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/leave-requests";
+}
+
+@PostMapping("/leave-requests/{requestId}/reject")
+public String rejectLeaveRequest(
+        @PathVariable Long requestId,
+        RedirectAttributes redirectAttributes) {
+
+    try {
+        projectService.rejectLeaveRequest(requestId);
+
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Leave request rejected.");
+
+    } catch (RuntimeException e) {
+        redirectAttributes.addFlashAttribute(
+                "errorMessage", e.getMessage());
+    }
+
+    return "redirect:/leave-requests";
+}
+
 }

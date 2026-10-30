@@ -73,6 +73,12 @@
                 My Invitations
             </a>
 
+                <a class="button button-quiet"
+                 th:if="${isProjectOwner}"
+                 th:href="@{/leave-requests}">
+                Leave Requests
+                </a>
+
         </nav>
 
     </section>
@@ -169,6 +175,32 @@
 
         </div>
 
+        <div th:if="${isProjectOwner and !project.archived}">
+    <h3>Transfer Project Ownership</h3>
+
+    <form th:action="@{/projects/{id}/ownership-transfer(id=${project.id})}"
+          method="post">
+
+        <label for="nominatedUserId">
+            Select the new project owner:
+        </label>
+
+        <select id="nominatedUserId" name="nominatedUserId" required>
+            <option value="">Choose a project member</option>
+
+            <option th:each="member : ${projectMembers}"
+                    th:if="${member.user.id != project.owner.id}"
+                    th:value="${member.user.id}"
+                    th:text="${member.user.fullName}">
+            </option>
+        </select>
+
+            <button type="submit">Send Transfer Request</button>
+        </form>
+    </div>
+    <a th:href="@{/ownership-transfers}">
+        Ownership Transfer Requests
+    </a>
     </section>
 
     <!-- Invite a member (owner of an active project only) -->
@@ -207,6 +239,45 @@
             </button>
 
         </form>
+
+    </section>
+
+    <!-- Leave project (regular members only) -->
+<section class="pj-section"
+         th:if="${!isProjectOwner and !project.archived}">
+
+    <h2>Project Membership</h2>
+
+    <div th:if="${hasPendingLeaveRequest}"
+         class="alert alert-info">
+
+        <span class="alert-icon">i</span>
+
+        <span>
+            Your leave request is pending.
+            The project owner will review it.
+        </span>
+
+    </div>
+
+    <div th:unless="${hasPendingLeaveRequest}">
+
+        <p class="pj-section-intro">
+            You can request to leave this project.
+            Your membership will remain active until the owner approves your request.
+        </p>
+
+        <form th:action="@{/projects/{id}/leave-request(id=${project.id})}"
+              method="post">
+
+            <button class="button button-secondary"
+                    type="submit">
+                Request to Leave Project
+            </button>
+
+        </form>
+
+    </div>
 
     </section>
 
