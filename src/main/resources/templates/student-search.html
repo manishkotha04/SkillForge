@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -294,6 +295,41 @@
             background: #eef2ff;
         }
 
+        /* Skill matching styles */
+
+        .find-match {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 14px;
+            background: #f1f5ff;
+            border: 1px solid #dbe5ff;
+        }
+
+        .find-match-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .find-match-header strong {
+            color: #4054dc;
+            font-size: 20px;
+        }
+
+        .find-match .skill-list span {
+            background: #ffffff;
+            border: 1px solid #c7d2fe;
+        }
+
+        .find-unavailable {
+            margin-bottom: 24px;
+        }
+
         @media (max-width: 700px) {
             .find-hero h1 {
                 font-size: 34px;
@@ -363,6 +399,8 @@
 
 <main class="dashboard-container">
 
+    <!-- Page introduction -->
+
     <section class="find-hero">
 
         <div>
@@ -390,6 +428,8 @@
 
     </section>
 
+    <!-- Success and error messages -->
+
     <div class="message-stack"
          th:if="${successMessage != null or errorMessage != null}">
 
@@ -410,6 +450,22 @@
         </div>
 
     </div>
+
+    <!-- Matching unavailable message -->
+
+    <div class="alert alert-info find-unavailable"
+         th:if="${projectId != null and !matchingAvailable}">
+
+        <span class="alert-icon">i</span>
+
+        <span>
+            This project has no required skills specified.
+            Skill matching is currently unavailable.
+        </span>
+
+    </div>
+
+    <!-- Student search -->
 
     <section class="find-search">
 
@@ -446,7 +502,9 @@
 
     </section>
 
-    <section th:if="${students != null and !students.isEmpty()}">
+    <!-- Student results -->
+
+    <section th:if="${studentMatches != null and !studentMatches.isEmpty()}">
 
         <div class="find-results-head">
 
@@ -454,8 +512,12 @@
                 Students
             </h2>
 
-            <p>
-                Students matching your search
+            <p th:if="${projectId != null and matchingAvailable}">
+                Students ranked by their skill match with this project.
+            </p>
+
+            <p th:unless="${projectId != null and matchingAvailable}">
+                Students matching your search.
             </p>
 
         </div>
@@ -463,13 +525,15 @@
         <div class="find-grid">
 
             <article class="find-card"
-                     th:each="student : ${students}">
+                     th:each="match : ${studentMatches}">
+
+                <!-- Student identity -->
 
                 <div class="find-card-top">
 
                     <div class="find-avatar"
-                         th:text="${student.displayName != null and !student.displayName.isEmpty()
-                                  ? #strings.substring(student.displayName, 0, 1).toUpperCase()
+                         th:text="${match.student.displayName != null and !match.student.displayName.isEmpty()
+                                  ? #strings.substring(match.student.displayName, 0, 1).toUpperCase()
                                   : 'S'}">
                         S
                     </div>
@@ -477,7 +541,7 @@
                     <div>
 
                         <h3 class="find-name"
-                            th:text="${student.displayName}">
+                            th:text="${match.student.displayName}">
                             Student Name
                         </h3>
 
@@ -489,32 +553,72 @@
 
                 </div>
 
+                <!-- Skill match information -->
+
+                <div class="find-match"
+                     th:if="${projectId != null and matchingAvailable}">
+
+                    <div class="find-match-header">
+
+                        <span>
+                            Skill match
+                        </span>
+
+                        <strong th:text="|${match.matchPercentage}%|">
+                            80.00%
+                        </strong>
+
+                    </div>
+
+                    <div class="skill-list"
+                         th:if="${!match.matchedSkills.isEmpty()}">
+
+                        <span th:each="skill : ${match.matchedSkills}"
+                              th:text="${skill}">
+                            Java
+                        </span>
+
+                    </div>
+
+                    <p class="find-text"
+                       th:if="${match.matchedSkills.isEmpty()}">
+                        No required skills matched.
+                    </p>
+
+                </div>
+
+                <!-- About -->
+
                 <div class="find-label">
                     About
                 </div>
 
                 <p class="find-text"
-                   th:text="${student.bio ?: 'No bio added yet.'}">
+                   th:text="${match.student.bio ?: 'No bio added yet.'}">
                     Student bio
                 </p>
+
+                <!-- Interests -->
 
                 <div class="find-label">
                     Interests
                 </div>
 
                 <p class="find-text"
-                   th:text="${student.interests ?: 'No interests added yet.'}">
+                   th:text="${match.student.interests ?: 'No interests added yet.'}">
                     Student interests
                 </p>
+
+                <!-- All skills -->
 
                 <div class="find-label">
                     Skills
                 </div>
 
                 <div class="skill-list"
-                     th:if="${student.skills != null and !student.skills.isEmpty()}">
+                     th:if="${match.student.skills != null and !match.student.skills.isEmpty()}">
 
-                    <span th:each="skill : ${student.skills}"
+                    <span th:each="skill : ${match.student.skills}"
                           th:text="${skill}">
                         Java
                     </span>
@@ -522,16 +626,18 @@
                 </div>
 
                 <p class="find-text"
-                   th:if="${student.skills == null or student.skills.isEmpty()}">
-                    No skills added yet
+                   th:if="${match.student.skills == null or match.student.skills.isEmpty()}">
+                    No skills added yet.
                 </p>
+
+                <!-- Project invitation -->
 
                 <div class="find-card-actions"
                      th:if="${projectId != null and canInvite}">
 
                     <form th:action="@{/projects/{projectId}/invitations/{userId}(
                                         projectId=${projectId},
-                                        userId=${student.id})}"
+                                        userId=${match.student.id})}"
                           method="post">
 
                         <button class="button button-primary button-small"
@@ -549,8 +655,10 @@
 
     </section>
 
+    <!-- Empty search results -->
+
     <section class="find-empty"
-             th:if="${students == null or students.isEmpty()}">
+             th:if="${studentMatches == null or studentMatches.isEmpty()}">
 
         <div class="find-empty-icon" aria-hidden="true">
             ✦
@@ -565,6 +673,8 @@
         </p>
 
     </section>
+
+    <!-- Profile update call to action -->
 
     <section class="find-cta">
 
