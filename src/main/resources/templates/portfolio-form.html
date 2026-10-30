@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Add Portfolio Item | SkillForge</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/components.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
+
+    <style>
+        /* Portfolio form styles (scoped with the pf- prefix) */
+        .pf-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 18px;
+            color: #65718c;
+            font-size: .88rem;
+            font-weight: 650;
+        }
+
+        .pf-back:hover {
+            color: var(--blue);
+        }
+
+        .pf-header {
+            margin-bottom: 26px;
+        }
+
+        .pf-eyebrow {
+            margin: 0 0 10px;
+            color: #5969e6;
+            font-size: .74rem;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .pf-header h1 {
+            margin: 0;
+            color: var(--navy);
+            font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+            letter-spacing: -.045em;
+        }
+
+        .pf-subtitle {
+            max-width: 560px;
+            margin: 10px 0 0;
+            color: #707b94;
+            font-size: 1.02rem;
+            line-height: 1.7;
+        }
+
+        .pf-form-card {
+            max-width: 760px;
+            padding: 32px;
+            border: 1px solid #e6eaf3;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 30px #202b5008;
+        }
+
+        .pf-form {
+            gap: 22px;
+        }
+
+        .pf-section-title {
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eef1f7;
+            color: #7a849c;
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        .pf-optional {
+            margin-left: 6px;
+            color: #8a94aa;
+            font-size: .76rem;
+            font-weight: 600;
+        }
+
+        .pf-required {
+            margin-left: 3px;
+            color: #d74b57;
+        }
+
+        /* components.css styles inputs only; match it for textarea and select */
+        .pf-form .form-field textarea,
+        .pf-form .form-field select {
+            width: 100%;
+            padding: 12px 14px;
+            color: var(--ink);
+            background: #fff;
+            border: 1px solid #dce2ed;
+            border-radius: 11px;
+            outline: none;
+            font: inherit;
+            transition: border .15s, box-shadow .15s;
+        }
+
+        .pf-form .form-field textarea {
+            min-height: 150px;
+            line-height: 1.65;
+            resize: vertical;
+        }
+
+        .pf-form .form-field textarea::placeholder {
+            color: #a0a9ba;
+        }
+
+        .pf-form .form-field select {
+            min-height: 48px;
+            padding-right: 42px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23647087' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+
+        .pf-form .form-field textarea:focus,
+        .pf-form .form-field select:focus {
+            border-color: #7086ee;
+            box-shadow: 0 0 0 4px #7086ee20;
+        }
+
+        .pf-form .field-hint,
+        .pf-form .field-error {
+            margin: 0;
+        }
+
+        .pf-form .field-error {
+            font-weight: 600;
+        }
+
+        .pf-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 22px;
+            border-top: 1px solid #eef1f7;
+        }
+
+        @media (max-width: 560px) {
+            .pf-form-card {
+                padding: 22px;
+            }
+
+            .pf-actions .button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('portfolio')}"></header>
+
+<main class="dashboard-container">
+
+    <div>
+
+        <a class="pf-back"
+           th:href="@{/portfolio}">
+            &larr; Back to portfolio
+        </a>
+
+        <div class="pf-header">
+
+            <p class="pf-eyebrow">New portfolio item</p>
+
+            <h1>Add portfolio item</h1>
+
+            <p class="pf-subtitle">
+                Showcase a project, achievement, or piece of work.
+            </p>
+
+        </div>
+
+        <section class="pf-form-card">
+
+            <form th:action="@{/portfolio}"
+                  th:object="${item}"
+                  method="post"
+                  class="form-stack pf-form">
+
+                <!-- Error summary (only when validation failed) -->
+                <div class="alert alert-error"
+                     role="alert"
+                     th:if="${#fields.hasErrors('*')}">
+
+                    <span class="alert-icon">!</span>
+
+                    <span>Please fix the highlighted fields and try again.</span>
+
+                </div>
+
+                <h2 class="pf-section-title">Details</h2>
+
+                <!-- Title -->
+                <div class="form-field">
+
+                    <label for="title">
+                        Title<span class="pf-required" aria-hidden="true">*</span>
+                    </label>
+
+                    <input id="title"
+                           type="text"
+                           th:field="*{title}"
+                           maxlength="150"
+                           required
+                           th:attr="aria-invalid=${#fields.hasErrors('title')}">
+
+                    <p class="field-hint">
+                        A short, clear name. Up to 150 characters.
+                    </p>
+
+                    <p class="field-error"
+                       th:if="${#fields.hasErrors('title')}"
+                       th:errors="*{title}">
+                    </p>
+
+                </div>
+
+                <!-- Description -->
+                <div class="form-field">
+
+                    <label for="description">
+                        Description<span class="pf-optional">Optional</span>
+                    </label>
+
+                    <textarea id="description"
+                              th:field="*{description}"
+                              rows="6"
+                              placeholder="Describe your work, contribution, or achievement."></textarea>
+
+                    <p class="field-hint">
+                        What did you build or achieve, and what was your role?
+                    </p>
+
+                </div>
+
+                <h2 class="pf-section-title">Links</h2>
+
+                <!-- Project -->
+                <div class="form-field">
+
+                    <label for="projectId">
+                        Linked project<span class="pf-optional">Optional</span>
+                    </label>
+
+                    <select id="projectId"
+                            th:field="*{projectId}">
+
+                        <option value="">
+                            No project
+                        </option>
+
+                        <option th:each="project : ${projects}"
+                                th:value="${project.id}"
+                                th:text="${project.name}">
+                        </option>
+
+                    </select>
+
+                    <p class="field-hint">
+                        Optionally associate this portfolio item
+                        with one of your projects.
+                    </p>
+
+                </div>
+
+                <!-- External URL -->
+                <div class="form-field">
+
+                    <label for="externalUrl">
+                        External link<span class="pf-optional">Optional</span>
+                    </label>
+
+                    <input id="externalUrl"
+                           type="url"
+                           th:field="*{externalUrl}"
+                           maxlength="500"
+                           placeholder="https://example.com"
+                           th:attr="aria-invalid=${#fields.hasErrors('externalUrl')}">
+
+                    <p class="field-hint">
+                        Optional link to a repository, demo,
+                        or other public work.
+                    </p>
+
+                    <p class="field-error"
+                       th:if="${#fields.hasErrors('externalUrl')}"
+                       th:errors="*{externalUrl}">
+                    </p>
+
+                </div>
+
+                <!-- Actions -->
+                <div class="pf-actions">
+
+                    <button type="submit"
+                            class="button button-primary">
+                        Add to Portfolio
+                    </button>
+
+                    <a class="button button-secondary"
+                       th:href="@{/portfolio}">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+</main>
+
+</body>
+</html>

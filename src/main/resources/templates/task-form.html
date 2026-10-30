@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Task | SkillForge</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
+    <link rel="stylesheet" th:href="@{/css/tasks.css}">
+</head>
+
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
+
+<main class="dashboard-container">
+
+    <a class="pj-back"
+       th:href="@{/tasks(projectId=${projectId})}">
+        &larr; Back to tasks
+    </a>
+
+    <div class="pj-header">
+
+        <div>
+            <p class="pj-eyebrow">New task</p>
+
+            <h1>Create task</h1>
+
+            <p class="pj-subtitle">
+                Add a task to this project and optionally assign it to a project member.
+            </p>
+
+        </div>
+
+    </div>
+
+    <section class="pj-form-card">
+
+        <form th:action="@{/tasks(projectId=${projectId})}"
+              th:object="${task}"
+              method="post"
+              class="form-stack pj-form">
+
+            <!-- Error summary (only when validation failed) -->
+            <div class="alert alert-error"
+                 role="alert"
+                 th:if="${#fields.hasErrors('*')}">
+
+                <span class="alert-icon">!</span>
+
+                <span>Please fix the highlighted fields and try again.</span>
+
+            </div>
+
+            <h2 class="pj-section-title">Task details</h2>
+
+            <!-- Task title -->
+            <div class="form-field">
+
+                <label for="title">
+                    Task title<span class="pj-required" aria-hidden="true">*</span>
+                </label>
+
+                <input id="title"
+                       type="text"
+                       th:field="*{title}"
+                       maxlength="150"
+                       required
+                       th:attr="aria-invalid=${#fields.hasErrors('title')}">
+
+                <p class="field-hint">
+                    A short, clear name. Up to 150 characters.
+                </p>
+
+                <p class="field-error"
+                   th:if="${#fields.hasErrors('title')}"
+                   th:errors="*{title}">
+                </p>
+
+            </div>
+
+            <!-- Description -->
+            <div class="form-field">
+
+                <label for="description">
+                    Description<span class="pj-optional">Optional</span>
+                </label>
+
+                <textarea id="description"
+                          th:field="*{description}"
+                          rows="5"
+                          placeholder="Describe the task and expected outcome"></textarea>
+
+            </div>
+
+            <h2 class="pj-section-title">Planning</h2>
+
+            <!-- Due date -->
+            <div class="form-field">
+
+                <label for="dueDate">
+                    Due date<span class="pj-optional">Optional</span>
+                </label>
+
+                <input id="dueDate"
+                       type="date"
+                       th:field="*{dueDate}">
+
+            </div>
+
+            <!-- Assignee -->
+            <div class="form-field">
+
+                <label for="assigneeId">
+                    Assign to<span class="pj-optional">Optional</span>
+                </label>
+
+                <select id="assigneeId"
+                        th:field="*{assigneeId}">
+
+                    <option value="">
+                        Unassigned
+                    </option>
+
+                    <option th:each="member : ${members}"
+                            th:value="${member.id}"
+                            th:text="${member.fullName}">
+                    </option>
+
+                </select>
+
+                <p class="field-hint">
+                    Only members of this project can be assigned
+                    to the task.
+                </p>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="pj-actions">
+
+                <button type="submit"
+                        class="button button-primary">
+                    Create Task
+                </button>
+
+                <a class="button button-secondary"
+                   th:href="@{/tasks(projectId=${projectId})}">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+</body>
+</html>

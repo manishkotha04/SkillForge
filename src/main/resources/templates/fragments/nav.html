@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<header class="dashboard-header"
+        th:fragment="mainHeader(active)">
+
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
+    </a>
+
+    <nav class="dashboard-nav" aria-label="Main navigation">
+
+        <a th:href="@{/dashboard}"
+           th:classappend="${active == 'dashboard'} ? 'active'">
+            Dashboard
+        </a>
+
+        <a th:href="@{/projects}"
+           th:classappend="${active == 'projects'} ? 'active'">
+            Projects
+        </a>
+
+        <a th:href="@{/students/search}"
+           th:classappend="${active == 'students'} ? 'active'">
+            Find teammates
+        </a>
+
+        <a class="has-badge"
+           th:with="pending=${@navigationInfo.pendingInvitationCount()}"
+           th:href="@{/invitations}"
+           th:classappend="${active == 'invitations'} ? 'active'">
+
+            Invitations
+
+            <span class="nav-badge"
+                  th:if="${pending > 0}"
+                  th:text="${pending}"
+                  th:title="|${pending} pending invitations|">
+                1
+            </span>
+
+        </a>
+
+        <a th:href="@{/profile}"
+           th:classappend="${active == 'profile'} ? 'active'">
+            My profile
+        </a>
+
+    </nav>
+
+    <form th:action="@{/logout}"
+          method="post"
+          class="logout-form">
+
+        <button type="submit"
+                class="header-action">
+            Sign out
+        </button>
+
+    </form>
+
+</header>
+
+</body>
+</html>

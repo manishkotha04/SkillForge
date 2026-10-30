@@ -1,4 +1,3 @@
-
 package com.skillforge.skillforge.repository;
 
 import com.skillforge.skillforge.entity.ProjectInvitation;
@@ -29,14 +28,20 @@ public interface ProjectInvitationRepository
             @Param("status") InvitationStatus status
     );
 
+    long countByInvitedUser_IdAndStatus(
+            Long userId,
+            InvitationStatus status
+    );
+
     boolean existsByProject_IdAndInvitedUser_IdAndStatus(
             Long projectId,
             Long invitedUserId,
             InvitationStatus status
     );
+
     long countByProject_IdAndStatusAndExpiresAtAfter(
-        Long projectId,
-        InvitationStatus status,
-        LocalDateTime now
-);
+            Long projectId,
+            InvitationStatus status,
+            LocalDateTime now
+    );
 }

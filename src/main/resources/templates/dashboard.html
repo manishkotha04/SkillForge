@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
+
+    <title>Dashboard | SkillForge</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <style>
+        /* Personalised greeting */
+        .dashboard-greeting {
+            margin-bottom: 26px;
+        }
+
+        .dashboard-greeting h2 {
+            margin: 0;
+            font-size: clamp(1.5rem, 2.6vw, 2rem);
+            letter-spacing: -.04em;
+        }
+
+        .dashboard-greeting p {
+            margin: 8px 0 0;
+            color: #707b94;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Invitation notification banner (shown only when count > 0) */
+        .invite-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 28px;
+            padding: 22px 26px;
+            border: 1px solid #d9defa;
+            border-left: 4px solid #4055dc;
+            border-radius: 18px;
+            background: linear-gradient(125deg, #ffffff, #eef0ff);
+            box-shadow: 0 10px 28px #4055dc14;
+        }
+
+        .invite-banner-main {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .invite-banner-icon {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: #4055dc;
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        .invite-banner-count {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            display: grid;
+            place-items: center;
+            border: 2px solid #fff;
+            border-radius: 999px;
+            background: #e5484d;
+            color: #fff;
+            font-size: .72rem;
+            font-weight: 800;
+        }
+
+        .invite-banner h2 {
+            margin: 0 0 4px;
+            font-size: 1.12rem;
+        }
+
+        .invite-banner p {
+            margin: 0;
+            color: #5f6b87;
+            font-size: .93rem;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 650px) {
+            .invite-banner {
+                align-items: flex-start;
+                flex-direction: column;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('dashboard')}"></header>
+
+<main class="dashboard-container">
+
+    <!-- Personalised greeting (dynamic, never hardcoded) -->
+    <section class="dashboard-greeting">
+
+        <h2>
+            Hi,
+            <span th:text="${currentUser != null ? currentUser.username : 'there'}">username</span>
+            👋
+        </h2>
+
+        <p>Ready to find your next project or teammate?</p>
+
+    </section>
+
+    <!-- Invitation notification: rendered only when there is at least one pending invitation -->
+    <section class="invite-banner"
+             th:if="${pendingInvitationCount != null and pendingInvitationCount > 0}"
+             role="status"
+             aria-label="Project invitation notification">
+
+        <div class="invite-banner-main">
+
+            <span class="invite-banner-icon" aria-hidden="true">
+                🔔
+                <span class="invite-banner-count"
+                      th:text="${pendingInvitationCount}">2</span>
+            </span>
+
+            <div>
+                <h2>New project invitations</h2>
+
+                <p>
+                    You have
+                    <strong th:text="${pendingInvitationCount}">2</strong>
+                    pending project
+                    <span th:text="${pendingInvitationCount == 1 ? 'invitation' : 'invitations'}">invitations</span>.
+                </p>
+            </div>
+
+        </div>
+
+        <a class="primary-button"
+           th:href="@{/invitations}">
+
+            View Invitations
+
+            <span aria-hidden="true">→</span>
+
+        </a>
+
+    </section>
+
+    <!-- Welcome -->
+
+    <section class="welcome-section">
+
+        <div>
+
+            <p class="eyebrow">
+                STUDENT COLLABORATION PLATFORM
+            </p>
+
+            <h1>
+                Build something <span>great.</span>
+            </h1>
+
+            <p class="welcome-description">
+                Discover projects, connect with talented students,
+                and turn your ideas into reality.
+            </p>
+
+        </div>
+
+        <a class="primary-button"
+           th:href="@{/projects}">
+
+            Explore projects
+
+            <span aria-hidden="true">
+                →
+            </span>
+
+        </a>
+
+    </section>
+
+
+    <!-- Platform overview -->
+
+    <section class="dashboard-stats"
+             aria-label="Platform overview">
+
+        <article class="stat-card">
+
+            <span class="stat-icon">
+                ✦
+            </span>
+
+            <p>
+                Discover
+            </p>
+
+            <h2>
+                New ideas
+            </h2>
+
+            <span class="stat-description">
+                Find projects worth building
+            </span>
+
+        </article>
+
+        <article class="stat-card">
+
+            <span class="stat-icon">
+                ♧
+            </span>
+
+            <p>
+                Connect
+            </p>
+
+            <h2>
+                Find teammates
+            </h2>
+
+            <span class="stat-description">
+                Meet students with useful skills
+            </span>
+
+        </article>
+
+        <article class="stat-card">
+
+            <span class="stat-icon">
+                ↗
+            </span>
+
+            <p>
+                Collaborate
+            </p>
+
+            <h2>
+                Build together
+            </h2>
+
+            <span class="stat-description">
+                Bring your ideas to life
+            </span>
+
+        </article>
+
+    </section>
+
+    <!-- Project introduction -->
+
+    <section class="content-section"
+             id="projects">
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    YOUR NEXT OPPORTUNITY
+                </p>
+
+                <h2>
+                    Explore projects
+                </h2>
+
+                <p>
+                    Create and manage your projects, and collaborate
+                    with other students.
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="project-grid">
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Projects
+                    </span>
+
+                    <span class="project-symbol">
+                        01
+                    </span>
+
+                </div>
+
+                <h3>
+                    Your project workspace
+                </h3>
+
+                <p>
+                    View your projects, create new ones, and work
+                    with your project members.
+                </p>
+
+                <a class="text-link"
+                   th:href="@{/projects}">
+                    Open projects →
+                </a>
+
+            </article>
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Team Building
+                    </span>
+
+                    <span class="project-symbol">
+                        02
+                    </span>
+
+                </div>
+
+                <h3>
+                    Find teammates
+                </h3>
+
+                <p>
+                    Discover students and connect with people whose
+                    skills complement your project needs.
+                </p>
+
+                <a class="text-link"
+                   th:href="@{/students/search}">
+                    Find teammates →
+                </a>
+
+            </article>
+
+            <article class="project-card">
+
+                <div class="project-card-top">
+
+                    <span class="project-category">
+                        Your Work
+                    </span>
+
+                    <span class="project-symbol">
+                        03
+                    </span>
+
+                </div>
+
+                <h3>
+                    Build your portfolio
+                </h3>
+
+                <p>
+                    Showcase your work, contributions, and completed
+                    projects through your portfolio.
+                </p>
+
+                <a class="text-link"
+                   th:href="@{/portfolio}">
+                    View portfolio →
+                </a>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- Collaboration -->
+
+    <section class="collaboration-section"
+             id="teams">
+
+        <div>
+
+            <p class="eyebrow">
+                BETTER IDEAS, TOGETHER
+            </p>
+
+            <h2>
+                Your skills deserve the right team.
+            </h2>
+
+            <p>
+                Explore opportunities to work with students who share
+                your interests and complement your strengths.
+            </p>
+
+        </div>
+
+        <a class="primary-button"
+           th:href="@{/students/search}">
+
+            Find teammates
+
+            <span aria-hidden="true">
+                →
+            </span>
+
+        </a>
+
+    </section>
+
+    <!-- Profile -->
+
+    <section class="profile-placeholder"
+             id="profile">
+
+        <div>
+
+            <p class="eyebrow">
+                YOUR SPACE
+            </p>
+
+            <h2>
+                Your student profile
+            </h2>
+
+            <p>
+                Keep your profile updated with your interests,
+                background, and skills so other students can
+                discover what you bring to a team.
+            </p>
+
+        </div>
+
+        <a class="profile-badge"
+           th:href="@{/profile}">
+
+            View my profile
+
+        </a>
+
+    </section>
+
+</main>
+
+<footer class="dashboard-footer">
+
+    <a class="brand"
+       th:href="@{/dashboard}">
+
+        <span class="brand-mark">
+            S
+        </span>
+
+        <span>
+            SkillForge
+        </span>
+
+    </a>
+
+    <p>
+        Find your people. Build your idea.
+    </p>
+
+</footer>
+
+</body>
+</html>

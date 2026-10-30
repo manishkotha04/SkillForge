@@ -1,0 +1,491 @@
+/* SkillForge – Project pages
+   Scoped with the pj- prefix. Load AFTER style.css, components.css and dashboard.css. */
+
+/* ---------- Page header ---------- */
+.pj-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.pj-eyebrow {
+    margin: 0 0 10px;
+    color: #5969e6;
+    font-size: .74rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.pj-header h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+    letter-spacing: -.045em;
+    overflow-wrap: anywhere;
+}
+
+.pj-subtitle {
+    max-width: 560px;
+    margin: 10px 0 0;
+    color: #707b94;
+    font-size: 1.02rem;
+    line-height: 1.7;
+}
+
+.pj-count {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eef0ff;
+    color: #4054dc;
+    font-size: .8rem;
+    font-weight: 750;
+}
+
+.pj-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 18px;
+    color: #65718c;
+    font-size: .88rem;
+    font-weight: 650;
+}
+
+.pj-back:hover {
+    color: var(--blue);
+}
+
+/* ---------- Status pill / date ---------- */
+.pj-pill {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: .72rem;
+    font-weight: 750;
+}
+
+.pj-pill-active {
+    background: #effaf4;
+    color: #176544;
+}
+
+.pj-pill-archived {
+    background: #f1f3f8;
+    color: #647087;
+}
+
+.pj-date {
+    margin: 0;
+    color: #8a94aa;
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+/* ---------- Project list cards ---------- */
+.pj-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.pj-card {
+    display: flex;
+    flex-direction: column;
+    padding: 26px;
+    border: 1px solid #e6eaf3;
+    border-radius: 18px;
+    background: #fff;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.pj-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 34px #202b5010;
+}
+
+.pj-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.pj-card-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pj-card h2 {
+    margin: 14px 0 10px;
+    font-size: 1.3rem;
+    overflow-wrap: anywhere;
+}
+
+.pj-card h2 a {
+    color: var(--navy);
+}
+
+.pj-card h2 a:hover {
+    color: var(--blue);
+}
+
+.pj-description {
+    margin: 0;
+    color: #707b94;
+    font-size: .93rem;
+    line-height: 1.75;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.pj-card .pj-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ---------- Skill chips ---------- */
+.pj-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.pj-skills span {
+    max-width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #e5e9f3;
+    border-radius: 8px;
+    background: #fbfcff;
+    color: #4e5ed0;
+    font-size: .76rem;
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+/* ---------- Meta and team ---------- */
+.pj-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 28px;
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pj-meta li {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pj-label {
+    color: #8a94aa;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.pj-value {
+    color: #192653;
+    font-size: .92rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.pj-team {
+    margin-top: 18px;
+    padding: 12px 14px;
+    border: 1px solid #e1e5fb;
+    border-radius: 12px;
+    background: #f4f5ff;
+}
+
+.pj-team .pj-value {
+    margin-top: 3px;
+    font-size: .9rem;
+}
+
+.pj-team-muted {
+    color: #707b94;
+    font-weight: 500;
+}
+
+.pj-card-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eef1f7;
+}
+
+/* ---------- Empty state ---------- */
+.pj-empty {
+    padding: 60px 24px;
+    border: 1px dashed #d5dcee;
+    border-radius: 18px;
+    background: #fbfcff;
+    text-align: center;
+}
+
+.pj-empty-icon {
+    display: inline-grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: #eef0ff;
+    color: #4054dc;
+}
+
+.pj-empty-icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.pj-empty h2 {
+    margin: 18px 0 8px;
+    color: var(--navy);
+    font-size: 1.35rem;
+}
+
+.pj-empty p {
+    max-width: 440px;
+    margin: 0 auto 24px;
+    color: #707b94;
+    line-height: 1.7;
+}
+
+/* ---------- Details page ---------- */
+.pj-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+    padding: 32px;
+    border: 1px solid #e6e9fb;
+    border-radius: 22px;
+    background:
+        radial-gradient(ellipse at 95% 5%, #7584ff30, transparent 42%),
+        linear-gradient(125deg, #fff, #f0f2ff);
+}
+
+.pj-hero-main {
+    min-width: 0;
+    flex: 1 1 320px;
+}
+
+.pj-hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.pj-hero h1 {
+    margin: 0;
+    color: var(--navy);
+    font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+    letter-spacing: -.045em;
+    overflow-wrap: anywhere;
+}
+
+.pj-actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.pj-section {
+    margin-bottom: 22px;
+    padding: 28px;
+    border: 1px solid #e6eaf3;
+    border-radius: 18px;
+    background: #fff;
+}
+
+.pj-section h2 {
+    margin: 0 0 6px;
+    color: var(--navy);
+    font-size: 1.2rem;
+}
+
+.pj-section-intro {
+    max-width: 620px;
+    margin: 0 0 20px;
+    color: #707b94;
+    font-size: .93rem;
+    line-height: 1.7;
+}
+
+.pj-info {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 28px;
+    margin-top: 20px;
+}
+
+.pj-info-item {
+    min-width: 0;
+}
+
+.pj-info-item.is-wide {
+    grid-column: 1 / -1;
+}
+
+.pj-info-item .pj-label {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.pj-info-item .pj-text {
+    color: #3d4863;
+    font-size: .96rem;
+    line-height: 1.75;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.pj-info-item .pj-skills {
+    margin-top: 0;
+}
+
+/* ---------- Forms (create) ---------- */
+.pj-form-card {
+    max-width: 760px;
+    padding: 32px;
+    border: 1px solid #e6eaf3;
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 30px #202b5008;
+}
+
+.pj-form {
+    gap: 22px;
+}
+
+.pj-section-title {
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eef1f7;
+    color: #7a849c;
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.pj-optional {
+    margin-left: 6px;
+    color: #8a94aa;
+    font-size: .76rem;
+    font-weight: 600;
+}
+
+.pj-required {
+    margin-left: 3px;
+    color: #d74b57;
+}
+
+/* components.css styles inputs only; match it for textarea */
+.pj-form .form-field textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 14px;
+    color: var(--ink);
+    background: #fff;
+    border: 1px solid #dce2ed;
+    border-radius: 11px;
+    outline: none;
+    font: inherit;
+    line-height: 1.65;
+    resize: vertical;
+    transition: border .15s, box-shadow .15s;
+}
+
+.pj-form .form-field textarea::placeholder {
+    color: #a0a9ba;
+}
+
+.pj-form .form-field textarea:focus {
+    border-color: #7086ee;
+    box-shadow: 0 0 0 4px #7086ee20;
+}
+
+.pj-form .field-hint {
+    margin: 0;
+}
+
+.pj-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-top: 22px;
+    border-top: 1px solid #eef1f7;
+}
+
+.pj-invite-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+    max-width: 620px;
+}
+
+.pj-invite-form .form-field {
+    flex: 1 1 260px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+    .pj-grid,
+    .pj-info {
+        grid-template-columns: 1fr;
+    }
+
+    .pj-card,
+    .pj-section {
+        padding: 22px;
+    }
+
+    .pj-hero {
+        padding: 24px;
+    }
+
+    .pj-header .button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+    .pj-form-card {
+        padding: 22px;
+    }
+
+    .pj-actions .button,
+    .pj-invite-form .button {
+        width: 100%;
+    }
+
+    .pj-actions-row .button {
+        flex: 1 1 100%;
+    }
+}

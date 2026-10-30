@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile | SkillForge</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <style>
+        /* Same nav position as the home page */
+        body.dashboard-page {
+            padding-top: 32px;
+        }
+
+        .edit-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 36px 32px 80px;
+        }
+
+        .edit-intro {
+            margin-bottom: 26px;
+        }
+
+        .edit-intro .eyebrow {
+            margin-bottom: 10px;
+        }
+
+        .edit-intro h1 {
+            margin: 0 0 12px;
+        }
+
+        .edit-intro p {
+            max-width: 680px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .edit-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
+            overflow: hidden;
+        }
+
+        .edit-card-header {
+            padding: 30px 36px;
+            background: linear-gradient(135deg, #eef2ff, #f8faff);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .edit-card-header h2 {
+            margin: 0 0 8px;
+            color: #172554;
+            font-size: 24px;
+        }
+
+        .edit-card-header p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .edit-form {
+            padding: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 26px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #172554;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: #4f6df5;
+            box-shadow: 0 0 0 3px rgba(79, 109, 245, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            margin-top: 7px;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Skills */
+
+        .skills-section {
+            margin-top: 30px;
+            padding-top: 28px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .skills-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .skills-hint {
+            margin: 0 0 16px;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 20px;
+            margin-bottom: 18px;
+        }
+
+        .skill-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 11px 8px 13px;
+            border-radius: 999px;
+            background: #eef2ff;
+            border: 1px solid #dbe3ff;
+            color: #3346b9;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .remove-skill {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: #64748b;
+            font-size: 16px;
+            line-height: 20px;
+            cursor: pointer;
+        }
+
+        .remove-skill:hover {
+            background: #dbe3ff;
+            color: #172554;
+        }
+
+        .add-skill-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .skill-input {
+            flex: 1;
+        }
+
+        .add-skill-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #eef2ff;
+            color: #4355e6;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .add-skill-button:hover {
+            background: #e0e7ff;
+        }
+
+        .no-skills {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 34px;
+            padding-top: 26px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .edit-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .save-button {
+            border: none;
+            background: #4355e6;
+            color: white;
+        }
+
+        .save-button:hover {
+            background: #3546d4;
+            transform: translateY(-1px);
+        }
+
+        .cancel-button {
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+        }
+
+        .cancel-button:hover {
+            background: #f8fafc;
+        }
+
+        @media (max-width: 700px) {
+
+            .edit-page {
+                padding: 26px 18px 60px;
+            }
+
+            .edit-card-header,
+            .edit-form {
+                padding: 26px;
+            }
+
+            .add-skill-row {
+                flex-direction: column;
+            }
+
+            .add-skill-button {
+                width: 100%;
+            }
+
+            .edit-actions {
+                justify-content: stretch;
+                flex-direction: column-reverse;
+            }
+
+            .edit-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+
+<header class="dashboard-header">
+
+    <a class="brand" th:href="@{/dashboard}">
+        <span class="brand-mark">S</span>
+        <span>SkillForge</span>
+    </a>
+
+    <nav class="dashboard-nav" aria-label="Main navigation">
+
+        <a th:href="@{/dashboard}">
+            Dashboard
+        </a>
+
+        <a th:href="@{/dashboard#projects}">
+            Explore projects
+        </a>
+
+        <a th:href="@{/students/search}">
+            Find teammates
+        </a>
+
+        <a class="active" th:href="@{/profile}">
+            My profile
+        </a>
+
+    </nav>
+
+    <form th:action="@{/logout}" method="post" class="logout-form">
+
+        <button type="submit" class="header-action">
+            Sign out
+        </button>
+
+    </form>
+
+</header>
+
+
+<main class="edit-page">
+
+    <section class="edit-intro">
+
+        <p class="eyebrow">
+            YOUR SPACE
+        </p>
+
+        <h1>
+            Edit your profile
+        </h1>
+
+        <p>
+            Keep your profile information up to date so other students
+            can understand your background, interests, and experience.
+        </p>
+
+    </section>
+
+
+    <section class="edit-card">
+
+        <header class="edit-card-header">
+
+            <h2>
+                Profile information
+            </h2>
+
+            <p>
+                Update the information shown on your SkillForge profile.
+            </p>
+
+        </header>
+
+
+        <form class="edit-form"
+              th:action="@{/profile/edit}"
+              th:object="${profile}"
+              method="post">
+
+            <div class="form-group">
+
+                <label for="displayName">
+                    Display Name
+                </label>
+
+                <input
+                    class="form-control"
+                    type="text"
+                    id="displayName"
+                    th:field="*{displayName}"
+                    placeholder="Enter your display name"
+                    required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="bio">
+                    Bio
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="bio"
+                    th:field="*{bio}"
+                    placeholder="Tell other students about yourself"></textarea>
+
+                <p class="form-hint">
+                    Give other students a short introduction to who you are.
+                </p>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="interests">
+                    Interests
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="interests"
+                    th:field="*{interests}"
+                    placeholder="Describe your interests"></textarea>
+
+                <p class="form-hint">
+                    Mention subjects, technologies, activities, or areas
+                    you enjoy learning and working on.
+                </p>
+
+            </div>
+
+
+            <!-- SKILLS -->
+
+            <div class="skills-section">
+
+                <label class="skills-label">
+                    Skills
+                </label>
+
+                <p class="skills-hint">
+                    Add the skills you want other students to see on your profile.
+                </p>
+
+                <div id="skillsList" class="skills-list">
+
+                    <span
+                        class="skill-item"
+                        th:each="skill, stat : ${profile.skills}">
+
+                        <span th:text="${skill}">
+                            Java
+                        </span>
+
+                        <button
+                            type="button"
+                            class="remove-skill"
+                            title="Remove skill"
+                            aria-label="Remove skill">
+                            ×
+                        </button>
+
+                        <input
+                            type="hidden"
+                            th:name="'skills[' + ${stat.index} + ']'"
+                            th:value="${skill}">
+                    </span>
+
+                    <span
+                        id="noSkills"
+                        class="no-skills"
+                        th:if="${#lists.isEmpty(profile.skills)}">
+                        No skills added yet.
+                    </span>
+
+                </div>
+
+
+                <div class="add-skill-row">
+
+                    <input
+                        id="skillInput"
+                        class="form-control skill-input"
+                        type="text"
+                        placeholder="Enter a skill, e.g. Java"
+                        maxlength="100">
+
+                    <button
+                        type="button"
+                        id="addSkillButton"
+                        class="add-skill-button">
+                        Add skill
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="edit-actions">
+
+                <a class="edit-button cancel-button"
+                   th:href="@{/profile}">
+                    Cancel
+                </a>
+
+                <button class="edit-button save-button"
+                        type="submit">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+
+<script>
+    const skillInput = document.getElementById("skillInput");
+    const addSkillButton = document.getElementById("addSkillButton");
+    const skillsList = document.getElementById("skillsList");
+
+    function removeEmptyMessage() {
+        const message = document.getElementById("noSkills");
+
+        if (message) {
+            message.remove();
+        }
+    }
+
+    function createSkill(name) {
+
+        const existingSkills =
+            Array.from(
+                skillsList.querySelectorAll("input[type='hidden']")
+            ).map(input => input.value.toLowerCase());
+
+        if (existingSkills.includes(name.toLowerCase())) {
+            return;
+        }
+
+        removeEmptyMessage();
+
+        const item = document.createElement("span");
+        item.className = "skill-item";
+
+        const label = document.createElement("span");
+        label.textContent = name;
+
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "remove-skill";
+        removeButton.title = "Remove skill";
+        removeButton.setAttribute("aria-label", "Remove skill");
+        removeButton.textContent = "×";
+
+        removeButton.addEventListener("click", function () {
+            item.remove();
+
+            if (skillsList.querySelectorAll(".skill-item").length === 0) {
+                const message = document.createElement("span");
+                message.id = "noSkills";
+                message.className = "no-skills";
+                message.textContent = "No skills added yet.";
+                skillsList.appendChild(message);
+            }
+
+            updateSkillIndexes();
+        });
+
+        const hiddenInput = document.createElement("input");
+        hiddenInput.type = "hidden";
+        hiddenInput.name = "skills[]";
+        hiddenInput.value = name;
+
+        item.appendChild(label);
+        item.appendChild(removeButton);
+        item.appendChild(hiddenInput);
+
+        skillsList.appendChild(item);
+
+        updateSkillIndexes();
+    }
+
+    function updateSkillIndexes() {
+
+        const hiddenInputs =
+            skillsList.querySelectorAll(
+                ".skill-item input[type='hidden']"
+            );
+
+        hiddenInputs.forEach(function (input, index) {
+            input.name = "skills[" + index + "]";
+        });
+    }
+
+    addSkillButton.addEventListener("click", function () {
+
+        const name = skillInput.value.trim();
+
+        if (!name) {
+            skillInput.focus();
+            return;
+        }
+
+        createSkill(name);
+
+        skillInput.value = "";
+        skillInput.focus();
+    });
+
+    skillInput.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter") {
+            event.preventDefault();
+            addSkillButton.click();
+        }
+    });
+
+    document.querySelectorAll(".remove-skill").forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const item = button.closest(".skill-item");
+
+            if (item) {
+                item.remove();
+            }
+
+            if (skillsList.querySelectorAll(".skill-item").length === 0) {
+
+                const message = document.createElement("span");
+
+                message.id = "noSkills";
+                message.className = "no-skills";
+                message.textContent = "No skills added yet.";
+
+                skillsList.appendChild(message);
+            }
+
+            updateSkillIndexes();
+        });
+    });
+
+    updateSkillIndexes();
+</script>
+
+</body>
+</html>
