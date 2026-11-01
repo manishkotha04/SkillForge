@@ -1,30 +1,30 @@
-
 package com.skillforge.skillforge.service;
 
 import com.skillforge.skillforge.AppUser;
 import com.skillforge.skillforge.CurrentUserService;
 import com.skillforge.skillforge.UserRepository;
+import com.skillforge.skillforge.entity.LeaveRequest;
+import com.skillforge.skillforge.entity.OwnershipTransfer;
 import com.skillforge.skillforge.entity.Project;
 import com.skillforge.skillforge.entity.ProjectInvitation;
 import com.skillforge.skillforge.entity.ProjectMember;
 import com.skillforge.skillforge.enums.InvitationStatus;
+import com.skillforge.skillforge.enums.LeaveRequestStatus;
+import com.skillforge.skillforge.enums.OwnershipTransferStatus;
 import com.skillforge.skillforge.enums.ProjectMemberRole;
+import com.skillforge.skillforge.repository.LeaveRequestRepository;
+import com.skillforge.skillforge.repository.OwnershipTransferRepository;
 import com.skillforge.skillforge.repository.ProjectInvitationRepository;
 import com.skillforge.skillforge.repository.ProjectMemberRepository;
 import com.skillforge.skillforge.repository.ProjectRepository;
-import java.util.ArrayList;
-import java.util.List;
-import com.skillforge.skillforge.entity.OwnershipTransfer;
-import com.skillforge.skillforge.enums.OwnershipTransferStatus;
-import com.skillforge.skillforge.repository.OwnershipTransferRepository;
-import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
-import com.skillforge.skillforge.entity.LeaveRequest;
-import com.skillforge.skillforge.enums.LeaveRequestStatus;
-import com.skillforge.skillforge.repository.LeaveRequestRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ProjectService {
@@ -36,6 +36,7 @@ public class ProjectService {
     private final CurrentUserService currentUserService;
     private final OwnershipTransferRepository ownershipTransferRepository;
     private final LeaveRequestRepository leaveRequestRepository;
+
     public ProjectService(
             ProjectRepository projectRepository,
             ProjectMemberRepository projectMemberRepository,
@@ -44,6 +45,7 @@ public class ProjectService {
             CurrentUserService currentUserService,
             OwnershipTransferRepository ownershipTransferRepository,
             LeaveRequestRepository leaveRequestRepository) {
+
         this.projectRepository = projectRepository;
         this.projectMemberRepository = projectMemberRepository;
         this.projectInvitationRepository = projectInvitationRepository;
@@ -52,6 +54,10 @@ public class ProjectService {
         this.ownershipTransferRepository = ownershipTransferRepository;
         this.leaveRequestRepository = leaveRequestRepository;
     }
+
+    // ---------------------------------------------------------
+    // PROJECT CREATION
+    // ---------------------------------------------------------
 
     @Transactional
     public Project createProject(
@@ -74,54 +80,56 @@ public class ProjectService {
 
         Project project = new Project(
                 name.trim(), description, requiredSkillsText, owner);
-
         project.setMaxTeamSize(maxTeamSize);
 
         Project savedProject = projectRepository.save(project);
 
         ProjectMember ownerMembership = new ProjectMember(
                 savedProject, owner, ProjectMemberRole.OWNER);
-
         projectMemberRepository.save(ownerMembership);
 
         return savedProject;
     }
 
+    // ---------------------------------------------------------
+    // MY PROJECTS
+    // ---------------------------------------------------------
 
-@Transactional(readOnly = true)
-public List<Project> getMyProjects() {
-    AppUser currentUser = currentUserService.getCurrentUser();
+    @Transactional(readOnly = true)
+    public List<Project> getMyProjects() {
 
-    List<Project> ownedProjects =
-            projectRepository.findByOwner_Id(currentUser.getId());
+        AppUser currentUser = currentUserService.getCurrentUser();
 
-    List<ProjectMember> memberships =
-            projectMemberRepository.findByUser_Id(currentUser.getId());
+        List<Project> ownedProjects =
+                projectRepository.findByOwner_Id(currentUser.getId());
+        List<ProjectMember> memberships =
+                projectMemberRepository.findByUser_Id(currentUser.getId());
 
-    List<Project> myProjects = new ArrayList<>(ownedProjects);
+        List<Project> myProjects = new ArrayList<>(ownedProjects);
 
-    for (ProjectMember membership : memberships) {
-        Project project = membership.getProject();
+        for (ProjectMember membership : memberships) {
+            Project project = membership.getProject();
+            boolean alreadyIncluded = myProjects.stream()
+                    .anyMatch(existing ->
+                            existing.getId().equals(project.getId()));
 
-        boolean alreadyIncluded = myProjects.stream()
-                .anyMatch(existing ->
-                        existing.getId().equals(project.getId()));
-
-        if (!alreadyIncluded) {
-            myProjects.add(project);
+            if (!alreadyIncluded) {
+                myProjects.add(project);
+            }
         }
+
+        return myProjects;
     }
 
-    return myProjects;
-}
+    @Transactional(readOnly = true)
+    public List<Project> getMyOwnedProjects() {
+        AppUser currentUser = currentUserService.getCurrentUser();
+        return projectRepository.findByOwner_Id(currentUser.getId());
+    }
 
-@Transactional(readOnly = true)
-public List<Project> getMyOwnedProjects() {
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    return projectRepository.findByOwner_Id(currentUser.getId());
-}
-
+    // ---------------------------------------------------------
+    // PROJECT RETRIEVAL
+    // ---------------------------------------------------------
 
     @Transactional(readOnly = true)
     public Project getProjectById(Long projectId) {
@@ -130,36 +138,74 @@ public List<Project> getMyOwnedProjects() {
     }
 
     @Transactional(readOnly = true)
-        public Project getProjectForCurrentUser(Long projectId) {
-                AppUser currentUser = currentUserService.getCurrentUser();
+    public Project getProjectForCurrentUser(Long projectId) {
 
-                Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-                boolean isOwner = project.getOwner().getId()
-            .equals(currentUser.getId());
+        boolean isOwner = project.getOwner().getId()
+                .equals(currentUser.getId());
+        boolean isMember =
+                projectMemberRepository.existsByProject_IdAndUser_Id(
+                        projectId, currentUser.getId());
 
-                 boolean isMember =
-            projectMemberRepository.existsByProject_IdAndUser_Id(
-                    projectId, currentUser.getId());
+        if (!isOwner && !isMember) {
+            throw new AccessDeniedException(
+                    "You are not authorized to view this project.");
+        }
 
-         if (!isOwner && !isMember) {
-        throw new AccessDeniedException(
-                "You are not authorized to view this project.");
+        return project;
     }
 
-    return project;
-}
+    @Transactional(readOnly = true)
+    public boolean isProjectOwner(Long projectId) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        return project.getOwner().getId().equals(currentUser.getId());
+    }
+
+    // ---------------------------------------------------------
+    // PROJECT TEAM SUMMARIES
+    // ---------------------------------------------------------
+
+    @Transactional(readOnly = true)
+    public List<ProjectTeamSummary> getMyProjectTeamSummaries() {
+
+        List<Project> projects = getMyProjects();
+
+        return projects.stream()
+                .map(project -> {
+                    List<ProjectMember> members =
+                            projectMemberRepository.findByProject_Id(
+                                    project.getId());
+                    List<String> names = members.stream()
+                            .map(ProjectMember::getUser)
+                            .map(AppUser::getFullName)
+                            .toList();
+
+                    return new ProjectTeamSummary(
+                            project.getId(), members.size(), names);
+                })
+                .toList();
+    }
+
+    // ---------------------------------------------------------
+    // PROJECT INVITATIONS
+    // ---------------------------------------------------------
 
     @Transactional
     public ProjectInvitation inviteUser(Long projectId, Long invitedUserId) {
+
         if (invitedUserId == null) {
             throw new IllegalArgumentException(
                     "Invited user ID is required.");
         }
 
         AppUser currentUser = currentUserService.getCurrentUser();
-
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
@@ -173,30 +219,24 @@ public List<Project> getMyOwnedProjects() {
                     "Only the project owner can invite users.");
         }
 
+        Integer maxTeamSize = project.getMaxTeamSize();
+        if (maxTeamSize != null) {
+            long currentMemberCount =
+                    projectMemberRepository.countByProject_Id(projectId);
+            long pendingInvitationCount =
+                    projectInvitationRepository
+                            .countByProject_IdAndStatusAndExpiresAtAfter(
+                                    projectId,
+                                    InvitationStatus.PENDING,
+                                    LocalDateTime.now());
 
-// CHECK TEAM CAPACITY BEFORE SENDING AN INVITATION
-Integer maxTeamSize = project.getMaxTeamSize();
-
-if (maxTeamSize != null) {
-    long currentMemberCount =
-            projectMemberRepository.countByProject_Id(projectId);
-
-    long pendingInvitationCount =
-            projectInvitationRepository
-                    .countByProject_IdAndStatusAndExpiresAtAfter(
-                            projectId,
-                            InvitationStatus.PENDING,
-                            LocalDateTime.now());
-
-    if (currentMemberCount + pendingInvitationCount >= maxTeamSize) {
-        throw new IllegalArgumentException(
-                "The team is full or all available team slots "
-                + "are reserved by pending invitations. "
-                + "No more invitations can be sent.");
-    }
-}
-
-// YOUR EXISTING CODE CONTINUES BELOW
+            if (currentMemberCount + pendingInvitationCount >= maxTeamSize) {
+                throw new IllegalArgumentException(
+                        "The team is full or all available team slots "
+                                + "are reserved by pending invitations. "
+                                + "No more invitations can be sent.");
+            }
+        }
 
         if (currentUser.getId().equals(invitedUserId)) {
             throw new IllegalArgumentException(
@@ -228,13 +268,15 @@ if (maxTeamSize != null) {
 
     @Transactional
     public ProjectMember acceptInvitation(Long invitationId) {
+
         AppUser currentUser = currentUserService.getCurrentUser();
+        ProjectInvitation invitation =
+                projectInvitationRepository.findById(invitationId)
+                        .orElseThrow(() -> new NoSuchElementException(
+                                "Invitation was not found."));
 
-        ProjectInvitation invitation = projectInvitationRepository.findById(invitationId)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Invitation was not found."));
-
-        if (!invitation.getInvitedUser().getId().equals(currentUser.getId())) {
+        if (!invitation.getInvitedUser().getId()
+                .equals(currentUser.getId())) {
             throw new AccessDeniedException(
                     "Only the invited student can accept this invitation.");
         }
@@ -251,7 +293,6 @@ if (maxTeamSize != null) {
         }
 
         Project project = invitation.getProject();
-
         if (project.isArchived()) {
             throw new IllegalArgumentException(
                     "Cannot join an archived project.");
@@ -267,7 +308,6 @@ if (maxTeamSize != null) {
         }
 
         Integer maxTeamSize = project.getMaxTeamSize();
-
         if (maxTeamSize != null) {
             if (maxTeamSize < 1) {
                 throw new IllegalStateException(
@@ -276,7 +316,6 @@ if (maxTeamSize != null) {
 
             long currentMemberCount =
                     projectMemberRepository.countByProject_Id(projectId);
-
             if (currentMemberCount >= maxTeamSize) {
                 throw new IllegalArgumentException(
                         "This project has reached its maximum team size.");
@@ -285,7 +324,6 @@ if (maxTeamSize != null) {
 
         ProjectMember membership = new ProjectMember(
                 project, currentUser, ProjectMemberRole.MEMBER);
-
         projectMemberRepository.save(membership);
         invitation.setStatus(InvitationStatus.ACCEPTED);
 
@@ -294,13 +332,15 @@ if (maxTeamSize != null) {
 
     @Transactional
     public ProjectInvitation rejectInvitation(Long invitationId) {
+
         AppUser currentUser = currentUserService.getCurrentUser();
+        ProjectInvitation invitation =
+                projectInvitationRepository.findById(invitationId)
+                        .orElseThrow(() -> new NoSuchElementException(
+                                "Invitation was not found."));
 
-        ProjectInvitation invitation = projectInvitationRepository.findById(invitationId)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "Invitation was not found."));
-
-        if (!invitation.getInvitedUser().getId().equals(currentUser.getId())) {
+        if (!invitation.getInvitedUser().getId()
+                .equals(currentUser.getId())) {
             throw new AccessDeniedException(
                     "Only the invited student can reject this invitation.");
         }
@@ -314,331 +354,311 @@ if (maxTeamSize != null) {
         return invitation;
     }
 
-@Transactional(readOnly = true)
-public boolean isProjectOwner(Long projectId) {
-    AppUser currentUser = currentUserService.getCurrentUser();
+    // ---------------------------------------------------------
+    // OWNERSHIP TRANSFER
+    // ---------------------------------------------------------
 
-    Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+    @Transactional
+    public OwnershipTransfer requestOwnershipTransfer(
+            Long projectId, Long nominatedUserId) {
 
-    return project.getOwner().getId().equals(currentUser.getId());
-}
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-@Transactional(readOnly = true)
-public List<ProjectTeamSummary> getMyProjectTeamSummaries() {
-    List<Project> projects = getMyProjects();
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "Archived projects cannot transfer ownership.");
+        }
 
-    return projects.stream()
-            .map(project -> {
-                List<ProjectMember> members =
-                        projectMemberRepository.findByProject_Id(
-                                project.getId());
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the current owner can request ownership transfer.");
+        }
 
-                List<String> names = members.stream()
-                        .map(ProjectMember::getUser)
-                        .map(AppUser::getFullName)
-                        .toList();
+        if (nominatedUserId == null
+                || nominatedUserId.equals(currentUser.getId())) {
+            throw new IllegalArgumentException(
+                    "Select another project member as the new owner.");
+        }
 
-                return new ProjectTeamSummary(
-                        project.getId(),
-                        members.size(),
-                        names
-                );
-            })
-            .toList();
-}
+        if (!projectMemberRepository.existsByProject_IdAndUser_Id(
+                projectId, nominatedUserId)) {
+            throw new IllegalArgumentException(
+                    "The nominated user must already be a project member.");
+        }
 
-@Transactional
-public OwnershipTransfer requestOwnershipTransfer(
-        Long projectId,
-        Long nominatedUserId) {
+        if (ownershipTransferRepository.existsByProject_IdAndStatus(
+                projectId, OwnershipTransferStatus.PENDING)) {
+            throw new IllegalArgumentException(
+                    "This project already has a pending ownership transfer.");
+        }
 
-    AppUser currentUser = currentUserService.getCurrentUser();
+        AppUser nominatedUser = userRepository.findById(nominatedUserId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "The nominated user was not found."));
 
-    Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
+        OwnershipTransfer transfer = new OwnershipTransfer(
+                project, currentUser, nominatedUser);
 
-    if (project.isArchived()) {
-        throw new IllegalArgumentException(
-                "Archived projects cannot transfer ownership.");
+        return ownershipTransferRepository.save(transfer);
     }
 
-    if (!project.getOwner().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the current owner can request ownership transfer.");
+    @Transactional(readOnly = true)
+    public List<OwnershipTransfer> getMyPendingOwnershipTransfers() {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        return ownershipTransferRepository
+                .findByNominatedUser_IdAndStatus(
+                        currentUser.getId(), OwnershipTransferStatus.PENDING);
     }
 
-    if (nominatedUserId == null
-            || nominatedUserId.equals(currentUser.getId())) {
-        throw new IllegalArgumentException(
-                "Select another project member as the new owner.");
+    @Transactional
+    public OwnershipTransfer acceptOwnershipTransfer(Long transferId) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        OwnershipTransfer transfer =
+                ownershipTransferRepository.findById(transferId)
+                        .orElseThrow(() -> new NoSuchElementException(
+                                "Ownership transfer request was not found."));
+
+        if (!transfer.getNominatedUser().getId()
+                .equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the nominated member can accept this request.");
+        }
+
+        if (transfer.getStatus() != OwnershipTransferStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "This ownership transfer is no longer pending.");
+        }
+
+        Project project = transfer.getProject();
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "Archived projects cannot transfer ownership.");
+        }
+
+        if (!project.getOwner().getId()
+                .equals(transfer.getRequestedBy().getId())) {
+            throw new IllegalStateException(
+                    "The project owner has changed. This request is no longer valid.");
+        }
+
+        List<ProjectMember> members =
+                projectMemberRepository.findByProject_Id(project.getId());
+
+        ProjectMember previousOwnerMembership = members.stream()
+                .filter(member -> member.getUser().getId()
+                        .equals(transfer.getRequestedBy().getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Previous owner membership was not found."));
+
+        ProjectMember newOwnerMembership = members.stream()
+                .filter(member -> member.getUser().getId()
+                        .equals(currentUser.getId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(
+                        "New owner membership was not found."));
+
+        project.setOwner(currentUser);
+        previousOwnerMembership.setRole(ProjectMemberRole.MEMBER);
+        newOwnerMembership.setRole(ProjectMemberRole.OWNER);
+        transfer.setStatus(OwnershipTransferStatus.ACCEPTED);
+        transfer.setDecidedAt(LocalDateTime.now());
+
+        return transfer;
     }
 
-    if (!projectMemberRepository.existsByProject_IdAndUser_Id(
-            projectId, nominatedUserId)) {
-        throw new IllegalArgumentException(
-                "The nominated user must already be a project member.");
+    @Transactional
+    public OwnershipTransfer rejectOwnershipTransfer(Long transferId) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        OwnershipTransfer transfer =
+                ownershipTransferRepository.findById(transferId)
+                        .orElseThrow(() -> new NoSuchElementException(
+                                "Ownership transfer request was not found."));
+
+        if (!transfer.getNominatedUser().getId()
+                .equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the nominated member can reject this request.");
+        }
+
+        if (transfer.getStatus() != OwnershipTransferStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "This ownership transfer is no longer pending.");
+        }
+
+        // Archived projects are read-only: no rejection or other state change.
+        Project project = transfer.getProject();
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "Archived projects cannot transfer ownership.");
+        }
+
+        transfer.setStatus(OwnershipTransferStatus.REJECTED);
+        transfer.setDecidedAt(LocalDateTime.now());
+
+        return transfer;
     }
 
-    if (ownershipTransferRepository.existsByProject_IdAndStatus(
-            projectId, OwnershipTransferStatus.PENDING)) {
-        throw new IllegalArgumentException(
-                "This project already has a pending ownership transfer.");
+    // ---------------------------------------------------------
+    // PROJECT MEMBERS
+    // ---------------------------------------------------------
+
+    @Transactional(readOnly = true)
+    public List<ProjectMember> getProjectMembers(Long projectId) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the project owner can view transfer nominees.");
+        }
+
+        return projectMemberRepository.findByProject_Id(projectId);
     }
 
-    AppUser nominatedUser = userRepository.findById(nominatedUserId)
-            .orElseThrow(() -> new NoSuchElementException(
-                    "The nominated user was not found."));
+    // ---------------------------------------------------------
+    // LEAVE REQUESTS
+    // ---------------------------------------------------------
 
-    OwnershipTransfer transfer = new OwnershipTransfer(
-            project, currentUser, nominatedUser);
+    @Transactional
+    public LeaveRequest requestToLeaveProject(Long projectId) {
 
-    return ownershipTransferRepository.save(transfer);
-}
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
 
-@Transactional(readOnly = true)
-public List<OwnershipTransfer> getMyPendingOwnershipTransfers() {
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "You cannot request to leave an archived project.");
+        }
 
-    AppUser currentUser = currentUserService.getCurrentUser();
+        if (project.getOwner().getId().equals(currentUser.getId())) {
+            throw new IllegalArgumentException(
+                    "Project owners must transfer ownership before leaving.");
+        }
 
-    return ownershipTransferRepository.findByNominatedUser_IdAndStatus(
-            currentUser.getId(),
-            OwnershipTransferStatus.PENDING);
-}
+        if (!projectMemberRepository.existsByProject_IdAndUser_Id(
+                projectId, currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "You are not a member of this project.");
+        }
 
-@Transactional
-public OwnershipTransfer acceptOwnershipTransfer(Long transferId) {
+        if (leaveRequestRepository
+                .existsByProject_IdAndRequestedBy_IdAndStatus(
+                        projectId, currentUser.getId(),
+                        LeaveRequestStatus.PENDING)) {
+            throw new IllegalArgumentException(
+                    "You already have a pending leave request.");
+        }
 
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    OwnershipTransfer transfer = ownershipTransferRepository.findById(transferId)
-            .orElseThrow(() -> new NoSuchElementException(
-                    "Ownership transfer request was not found."));
-
-    if (!transfer.getNominatedUser().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the nominated member can accept this request.");
+        LeaveRequest request = new LeaveRequest(project, currentUser);
+        return leaveRequestRepository.save(request);
     }
 
-    if (transfer.getStatus() != OwnershipTransferStatus.PENDING) {
-        throw new IllegalArgumentException(
-                "This ownership transfer is no longer pending.");
+    @Transactional(readOnly = true)
+    public List<LeaveRequest> getPendingLeaveRequestsForOwner() {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        return leaveRequestRepository.findByProject_Owner_IdAndStatus(
+                currentUser.getId(), LeaveRequestStatus.PENDING);
     }
 
-    Project project = transfer.getProject();
+    @Transactional
+    public LeaveRequest approveLeaveRequest(Long requestId) {
 
-    if (project.isArchived()) {
-        throw new IllegalArgumentException(
-                "Archived projects cannot transfer ownership.");
+        AppUser currentUser = currentUserService.getCurrentUser();
+        LeaveRequest request = leaveRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Leave request was not found."));
+
+        Project project = request.getProject();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the project owner can approve leave requests.");
+        }
+
+        if (request.getStatus() != LeaveRequestStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "This leave request is no longer pending.");
+        }
+
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "Leave requests cannot be approved for archived projects.");
+        }
+
+        if (request.getRequestedBy().getId()
+                .equals(project.getOwner().getId())) {
+            throw new IllegalStateException(
+                    "The project owner cannot leave without transferring ownership.");
+        }
+
+        ProjectMember membership =
+                projectMemberRepository.findByProject_Id(project.getId())
+                        .stream()
+                        .filter(member -> member.getUser().getId()
+                                .equals(request.getRequestedBy().getId()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException(
+                                "The requesting member is no longer part of this project."));
+
+        projectMemberRepository.delete(membership);
+
+        request.setStatus(LeaveRequestStatus.APPROVED);
+        request.setDecidedBy(currentUser);
+        request.setDecidedAt(LocalDateTime.now());
+
+        return request;
     }
 
-    if (!project.getOwner().getId()
-            .equals(transfer.getRequestedBy().getId())) {
-        throw new IllegalStateException(
-                "The project owner has changed. This request is no longer valid.");
+    @Transactional
+    public LeaveRequest rejectLeaveRequest(Long requestId) {
+
+        AppUser currentUser = currentUserService.getCurrentUser();
+        LeaveRequest request = leaveRequestRepository.findById(requestId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "Leave request was not found."));
+
+        Project project = request.getProject();
+
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException(
+                    "Only the project owner can reject leave requests.");
+        }
+
+        if (request.getStatus() != LeaveRequestStatus.PENDING) {
+            throw new IllegalArgumentException(
+                    "This leave request is no longer pending.");
+        }
+
+        // Archived projects are read-only: no rejection or other state change.
+        if (project.isArchived()) {
+            throw new IllegalArgumentException(
+                    "Leave requests cannot be rejected for archived projects.");
+        }
+
+        request.setStatus(LeaveRequestStatus.REJECTED);
+        request.setDecidedBy(currentUser);
+        request.setDecidedAt(LocalDateTime.now());
+
+        return request;
     }
 
-    ProjectMember previousOwnerMembership =
-            projectMemberRepository.findByProject_Id(project.getId())
-                    .stream()
-                    .filter(member -> member.getUser().getId()
-                            .equals(transfer.getRequestedBy().getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException(
-                            "Previous owner membership was not found."));
+    @Transactional(readOnly = true)
+    public boolean hasPendingLeaveRequest(Long projectId) {
 
-    ProjectMember newOwnerMembership =
-            projectMemberRepository.findByProject_Id(project.getId())
-                    .stream()
-                    .filter(member -> member.getUser().getId()
-                            .equals(currentUser.getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalStateException(
-                            "New owner membership was not found."));
-
-    project.setOwner(currentUser);
-    previousOwnerMembership.setRole(ProjectMemberRole.MEMBER);
-    newOwnerMembership.setRole(ProjectMemberRole.OWNER);
-
-    transfer.setStatus(OwnershipTransferStatus.ACCEPTED);
-    transfer.setDecidedAt(LocalDateTime.now());
-
-    return transfer;
-}
-
-@Transactional
-public OwnershipTransfer rejectOwnershipTransfer(Long transferId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    OwnershipTransfer transfer = ownershipTransferRepository.findById(transferId)
-            .orElseThrow(() -> new NoSuchElementException(
-                    "Ownership transfer request was not found."));
-
-    if (!transfer.getNominatedUser().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the nominated member can reject this request.");
+        AppUser currentUser = currentUserService.getCurrentUser();
+        return leaveRequestRepository
+                .existsByProject_IdAndRequestedBy_IdAndStatus(
+                        projectId, currentUser.getId(),
+                        LeaveRequestStatus.PENDING);
     }
-
-    if (transfer.getStatus() != OwnershipTransferStatus.PENDING) {
-        throw new IllegalArgumentException(
-                "This ownership transfer is no longer pending.");
-    }
-
-    transfer.setStatus(OwnershipTransferStatus.REJECTED);
-    transfer.setDecidedAt(LocalDateTime.now());
-
-    return transfer;
-}
-@Transactional(readOnly = true)
-public List<ProjectMember> getProjectMembers(Long projectId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-    if (!project.getOwner().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the project owner can view transfer nominees.");
-    }
-
-    return projectMemberRepository.findByProject_Id(projectId);
-}
-
-@Transactional
-public LeaveRequest requestToLeaveProject(Long projectId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    Project project = projectRepository.findById(projectId)
-            .orElseThrow(() -> new ProjectNotFoundException(projectId));
-
-    if (project.isArchived()) {
-        throw new IllegalArgumentException(
-                "You cannot request to leave an archived project.");
-    }
-
-    if (project.getOwner().getId().equals(currentUser.getId())) {
-        throw new IllegalArgumentException(
-                "Project owners must transfer ownership before leaving.");
-    }
-
-    if (!projectMemberRepository.existsByProject_IdAndUser_Id(
-            projectId, currentUser.getId())) {
-        throw new AccessDeniedException(
-                "You are not a member of this project.");
-    }
-
-    if (leaveRequestRepository
-            .existsByProject_IdAndRequestedBy_IdAndStatus(
-                    projectId,
-                    currentUser.getId(),
-                    LeaveRequestStatus.PENDING)) {
-        throw new IllegalArgumentException(
-                "You already have a pending leave request.");
-    }
-
-    LeaveRequest request = new LeaveRequest(project, currentUser);
-
-    return leaveRequestRepository.save(request);
-}
-
-@Transactional(readOnly = true)
-public List<LeaveRequest> getPendingLeaveRequestsForOwner() {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    return leaveRequestRepository.findByProject_Owner_IdAndStatus(
-            currentUser.getId(),
-            LeaveRequestStatus.PENDING);
-}
-
-@Transactional
-public LeaveRequest approveLeaveRequest(Long requestId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    LeaveRequest request = leaveRequestRepository.findById(requestId)
-            .orElseThrow(() -> new NoSuchElementException(
-                    "Leave request was not found."));
-
-    Project project = request.getProject();
-
-    if (!project.getOwner().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the project owner can approve leave requests.");
-    }
-
-    if (request.getStatus() != LeaveRequestStatus.PENDING) {
-        throw new IllegalArgumentException(
-                "This leave request is no longer pending.");
-    }
-
-    if (project.isArchived()) {
-        throw new IllegalArgumentException(
-                "Leave requests cannot be approved for archived projects.");
-    }
-
-    if (request.getRequestedBy().getId().equals(project.getOwner().getId())) {
-        throw new IllegalStateException(
-                "The project owner cannot leave without transferring ownership.");
-    }
-
-    ProjectMember membership = projectMemberRepository
-            .findByProject_Id(project.getId())
-            .stream()
-            .filter(member -> member.getUser().getId()
-                    .equals(request.getRequestedBy().getId()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException(
-                    "The requesting member is no longer part of this project."));
-
-    projectMemberRepository.delete(membership);
-
-    request.setStatus(LeaveRequestStatus.APPROVED);
-    request.setDecidedBy(currentUser);
-    request.setDecidedAt(LocalDateTime.now());
-
-    return request;
-}
-
-@Transactional
-public LeaveRequest rejectLeaveRequest(Long requestId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    LeaveRequest request = leaveRequestRepository.findById(requestId)
-            .orElseThrow(() -> new NoSuchElementException(
-                    "Leave request was not found."));
-
-    Project project = request.getProject();
-
-    if (!project.getOwner().getId().equals(currentUser.getId())) {
-        throw new AccessDeniedException(
-                "Only the project owner can reject leave requests.");
-    }
-
-    if (request.getStatus() != LeaveRequestStatus.PENDING) {
-        throw new IllegalArgumentException(
-                "This leave request is no longer pending.");
-    }
-
-    request.setStatus(LeaveRequestStatus.REJECTED);
-    request.setDecidedBy(currentUser);
-    request.setDecidedAt(LocalDateTime.now());
-
-    return request;
-}
-@Transactional(readOnly = true)
-public boolean hasPendingLeaveRequest(Long projectId) {
-
-    AppUser currentUser = currentUserService.getCurrentUser();
-
-    return leaveRequestRepository
-            .existsByProject_IdAndRequestedBy_IdAndStatus(
-                    projectId,
-                    currentUser.getId(),
-                    LeaveRequestStatus.PENDING);
-}
 }

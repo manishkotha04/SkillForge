@@ -1,5 +1,5 @@
 package com.skillforge.skillforge;
-
+import com.skillforge.skillforge.repository.LeaveRequestRepository;
 import com.skillforge.skillforge.repository.OwnershipTransferRepository;
 import com.skillforge.skillforge.repository.PortfolioItemRepository;
 import com.skillforge.skillforge.repository.ProjectInvitationRepository;
@@ -10,6 +10,7 @@ import com.skillforge.skillforge.repository.StudentProfileRepository;
 import com.skillforge.skillforge.repository.StudentSkillRepository;
 import com.skillforge.skillforge.repository.TaskRepository;
 import org.junit.jupiter.api.Test;
+import com.skillforge.skillforge.repository.LeaveRequestRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -36,7 +37,8 @@ class SkillforgeApplicationTests {
 
     @MockitoBean
     private OwnershipTransferRepository ownershipTransferRepository;
-
+    @MockitoBean
+    private LeaveRequestRepository leaveRequestRepository;
     @MockitoBean
     private PortfolioItemRepository portfolioItemRepository;
 
