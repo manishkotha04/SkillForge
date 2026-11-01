@@ -1,15 +1,19 @@
+
 package com.skillforge.skillforge.service;
 
 import com.skillforge.skillforge.AppUser;
 import com.skillforge.skillforge.CurrentUserService;
+import com.skillforge.skillforge.dto.AchievementViewDto;
 import com.skillforge.skillforge.dto.ProfileUpdateRequest;
 import com.skillforge.skillforge.dto.ProfileViewDto;
 import com.skillforge.skillforge.entity.Skill;
 import com.skillforge.skillforge.entity.StudentProfile;
 import com.skillforge.skillforge.entity.StudentSkill;
+import com.skillforge.skillforge.repository.AchievementRepository;
 import com.skillforge.skillforge.repository.SkillRepository;
 import com.skillforge.skillforge.repository.StudentProfileRepository;
 import com.skillforge.skillforge.repository.StudentSkillRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,18 +30,25 @@ public class ProfileService {
     private final StudentSkillRepository studentSkillRepository;
     private final SkillRepository skillRepository;
     private final CurrentUserService currentUserService;
+    private final AchievementRepository achievementRepository;
 
     public ProfileService(
             StudentProfileRepository studentProfileRepository,
             StudentSkillRepository studentSkillRepository,
             SkillRepository skillRepository,
-            CurrentUserService currentUserService) {
+            CurrentUserService currentUserService,
+            AchievementRepository achievementRepository) {
 
         this.studentProfileRepository = studentProfileRepository;
         this.studentSkillRepository = studentSkillRepository;
         this.skillRepository = skillRepository;
         this.currentUserService = currentUserService;
+        this.achievementRepository = achievementRepository;
     }
+
+    // ---------------------------------------------------------
+    // GET CURRENT PROFILE
+    // ---------------------------------------------------------
 
     public ProfileViewDto getCurrentProfile() {
 
@@ -47,10 +58,15 @@ public class ProfileService {
                 .findByUserId(currentUser.getId())
                 .orElseGet(() -> createDefaultProfile(currentUser));
 
-        return toViewDto(profile);
+        return toViewDto(profile, currentUser.getId());
     }
 
-    public ProfileViewDto updateCurrentProfile(ProfileUpdateRequest request) {
+    // ---------------------------------------------------------
+    // UPDATE CURRENT PROFILE
+    // ---------------------------------------------------------
+
+    public ProfileViewDto updateCurrentProfile(
+            ProfileUpdateRequest request) {
 
         AppUser currentUser = currentUserService.getCurrentUser();
 
@@ -66,8 +82,12 @@ public class ProfileService {
 
         updateSkills(profile, request.getSkills());
 
-        return toViewDto(profile);
+        return toViewDto(profile, currentUser.getId());
     }
+
+    // ---------------------------------------------------------
+    // UPDATE PROFILE SKILLS
+    // ---------------------------------------------------------
 
     private void updateSkills(
             StudentProfile profile,
@@ -96,9 +116,7 @@ public class ProfileService {
             }
         }
 
-        /*
-         * Remove skills that are no longer selected.
-         */
+        // Remove skills that are no longer selected.
         for (StudentSkill studentSkill : existingStudentSkills) {
 
             String existingName = studentSkill.getSkill().getName()
@@ -110,9 +128,7 @@ public class ProfileService {
             }
         }
 
-        /*
-         * Find the skills that are already attached to this profile.
-         */
+        // Identify skills that are already attached.
         Set<String> existingSkillNames = new HashSet<>();
 
         for (StudentSkill studentSkill : existingStudentSkills) {
@@ -126,10 +142,7 @@ public class ProfileService {
             }
         }
 
-        /*
-         * Add only skills that do not already exist
-         * for this student profile.
-         */
+        // Add only skills that do not already exist.
         for (String requestedSkillName : requestedSkillNames) {
 
             if (existingSkillNames.contains(requestedSkillName)) {
@@ -152,6 +165,10 @@ public class ProfileService {
         }
     }
 
+    // ---------------------------------------------------------
+    // CREATE DEFAULT PROFILE
+    // ---------------------------------------------------------
+
     private StudentProfile createDefaultProfile(AppUser user) {
 
         StudentProfile profile = new StudentProfile();
@@ -164,7 +181,13 @@ public class ProfileService {
         return studentProfileRepository.save(profile);
     }
 
-    private ProfileViewDto toViewDto(StudentProfile profile) {
+    // ---------------------------------------------------------
+    // CONVERT PROFILE TO VIEW DTO
+    // ---------------------------------------------------------
+
+    private ProfileViewDto toViewDto(
+            StudentProfile profile,
+            Long userId) {
 
         ProfileViewDto dto = new ProfileViewDto();
 
@@ -173,6 +196,7 @@ public class ProfileService {
         dto.setBio(profile.getBio());
         dto.setInterests(profile.getInterests());
 
+        // Load profile skills.
         List<String> skillNames = studentSkillRepository
                 .findByStudentProfileId(profile.getId())
                 .stream()
@@ -181,6 +205,20 @@ public class ProfileService {
                 .toList();
 
         dto.setSkills(skillNames);
+
+        // Load achievements belonging to the current user.
+        List<AchievementViewDto> achievements =
+                achievementRepository
+                        .findByUserIdOrderByAchievedDateDesc(userId)
+                        .stream()
+                        .map(achievement -> new AchievementViewDto(
+                                achievement.getId(),
+                                achievement.getTitle(),
+                                achievement.getDescription(),
+                                achievement.getAchievedDate()))
+                        .toList();
+
+        dto.setAchievements(achievements);
 
         return dto;
     }

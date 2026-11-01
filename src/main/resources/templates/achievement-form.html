@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title th:text="${editing} ? 'Edit Achievement | SkillForge' : 'Add Achievement | SkillForge'">
+        Achievement | SkillForge
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <style>
+        .achievement-form-page {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 36px 24px 80px;
+        }
+
+        .achievement-form-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
+        }
+
+        .achievement-form-header {
+            padding: 30px 36px;
+            background: linear-gradient(135deg, #eef2ff, #f8faff);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .achievement-form-header h1 {
+            color: #172554;
+            margin-bottom: 10px;
+        }
+
+        .achievement-form-header p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .achievement-form {
+            padding: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #172554;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            background: white;
+            color: #172554;
+            font-family: inherit;
+            font-size: 15px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4f6df5;
+            box-shadow: 0 0 0 3px rgba(79, 109, 245, 0.12);
+        }
+
+        textarea.form-control {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .form-button {
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .save-button {
+            background: #4355e6;
+            color: white;
+            border: none;
+        }
+
+        .cancel-button {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+        }
+
+        .form-error {
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 600px) {
+            .achievement-form {
+                padding: 24px;
+            }
+
+            .achievement-form-header {
+                padding: 24px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .form-button {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('profile')}"></header>
+
+<main class="achievement-form-page">
+
+    <section class="achievement-form-card">
+
+        <div class="achievement-form-header">
+
+            <p class="eyebrow">YOUR ACCOMPLISHMENTS</p>
+
+            <h1 th:text="${editing} ? 'Edit achievement' : 'Add achievement'">
+                Add achievement
+            </h1>
+
+            <p>
+                Showcase certifications, awards, competitions and
+                other accomplishments on your SkillForge profile.
+            </p>
+
+        </div>
+
+        <form class="achievement-form"
+              th:action="${editing} ? @{/profile/achievements/{id}/edit(id=${achievementId})} : @{/profile/achievements}"
+              th:object="${achievementRequest}"
+              method="post">
+
+            <div class="form-group">
+
+                <label for="title">Achievement title</label>
+
+                <input class="form-control"
+                       type="text"
+                       id="title"
+                       th:field="*{title}"
+                       placeholder="e.g. Java Programming Certification"
+                       maxlength="150"
+                       required>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="description">Description</label>
+
+                <textarea class="form-control"
+                          id="description"
+                          th:field="*{description}"
+                          placeholder="Describe your achievement..."
+                          required></textarea>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="achievedDate">Date achieved</label>
+
+                <input class="form-control"
+                       type="date"
+                       id="achievedDate"
+                       th:field="*{achievedDate}"
+                       required>
+
+            </div>
+
+            <div class="form-actions">
+
+                <a class="form-button cancel-button"
+                   th:href="@{/profile}">
+                    Cancel
+                </a>
+
+                <button class="form-button save-button"
+                        type="submit"
+                        th:text="${editing} ? 'Save changes' : 'Add achievement'">
+                    Add achievement
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
+
+</body>
+</html>

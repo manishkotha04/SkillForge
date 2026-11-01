@@ -8,6 +8,7 @@ import com.skillforge.skillforge.dto.ProfileViewDto;
 import com.skillforge.skillforge.entity.Skill;
 import com.skillforge.skillforge.entity.StudentProfile;
 import com.skillforge.skillforge.entity.StudentSkill;
+import com.skillforge.skillforge.repository.AchievementRepository;
 import com.skillforge.skillforge.repository.SkillRepository;
 import com.skillforge.skillforge.repository.StudentProfileRepository;
 import com.skillforge.skillforge.repository.StudentSkillRepository;
@@ -46,6 +47,9 @@ class ProfileServiceTest {
     @Mock
     private CurrentUserService currentUserService;
 
+    @Mock
+    private AchievementRepository achievementRepository;
+
     @InjectMocks
     private ProfileService profileService;
 
@@ -60,6 +64,10 @@ class ProfileServiceTest {
 
         when(currentUserService.getCurrentUser())
                 .thenReturn(currentUser);
+
+        when(achievementRepository
+                .findByUserIdOrderByAchievedDateDesc(USER_ID))
+                .thenReturn(List.of());
     }
 
     private StudentProfile createProfile() {
@@ -118,6 +126,11 @@ class ProfileServiceTest {
                 List.of("Java", "SQL"),
                 result.getSkills()
         );
+
+        assertTrue(result.getAchievements().isEmpty());
+
+        verify(achievementRepository)
+                .findByUserIdOrderByAchievedDateDesc(USER_ID);
     }
 
     @Test
@@ -159,6 +172,7 @@ class ProfileServiceTest {
 
         assertEquals("New Student", result.getDisplayName());
         assertTrue(result.getSkills().isEmpty());
+        assertTrue(result.getAchievements().isEmpty());
     }
 
     @Test
@@ -224,6 +238,7 @@ class ProfileServiceTest {
         assertEquals("java", savedLink.getSkill().getName());
 
         assertEquals(List.of("java"), result.getSkills());
+        assertTrue(result.getAchievements().isEmpty());
     }
 
     @Test
@@ -276,6 +291,8 @@ class ProfileServiceTest {
                 List.of("Java"),
                 result.getSkills()
         );
+
+        assertTrue(result.getAchievements().isEmpty());
     }
 
     @Test
@@ -316,6 +333,7 @@ class ProfileServiceTest {
         verify(studentSkillRepository).delete(sqlLink);
 
         assertTrue(result.getSkills().isEmpty());
+        assertTrue(result.getAchievements().isEmpty());
 
         verifyNoInteractions(skillRepository);
     }

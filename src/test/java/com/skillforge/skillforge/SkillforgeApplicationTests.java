@@ -1,4 +1,6 @@
 package com.skillforge.skillforge;
+import com.skillforge.skillforge.repository.AchievementRepository;
+
 import com.skillforge.skillforge.repository.LeaveRequestRepository;
 import com.skillforge.skillforge.repository.OwnershipTransferRepository;
 import com.skillforge.skillforge.repository.PortfolioItemRepository;
@@ -25,6 +27,8 @@ class SkillforgeApplicationTests {
 
     @MockitoBean
     private UserRepository userRepository;
+    @MockitoBean
+private AchievementRepository achievementRepository;
 
     @MockitoBean
     private ProjectRepository projectRepository;

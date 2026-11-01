@@ -9,6 +9,7 @@ public class ProfileViewDto {
     private String bio;
     private String interests;
     private List<String> skills;
+    private List<AchievementViewDto> achievements;
 
     public Long getId() {
         return id;
@@ -48,5 +49,13 @@ public class ProfileViewDto {
 
     public void setSkills(List<String> skills) {
         this.skills = skills;
+    }
+
+    public List<AchievementViewDto> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(List<AchievementViewDto> achievements) {
+        this.achievements = achievements;
     }
 }
