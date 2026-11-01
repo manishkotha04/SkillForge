@@ -13,9 +13,6 @@
 
     <style>
         /* Same nav position as the home page */
-        body.dashboard-page {
-            padding-top: 32px;
-        }
 
         .edit-page {
             max-width: 1000px;
@@ -284,42 +281,7 @@
 
 <body class="dashboard-page">
 
-<header class="dashboard-header">
-
-    <a class="brand" th:href="@{/dashboard}">
-        <span class="brand-mark">S</span>
-        <span>SkillForge</span>
-    </a>
-
-    <nav class="dashboard-nav" aria-label="Main navigation">
-
-        <a th:href="@{/dashboard}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/dashboard#projects}">
-            Explore projects
-        </a>
-
-        <a th:href="@{/students/search}">
-            Find teammates
-        </a>
-
-        <a class="active" th:href="@{/profile}">
-            My profile
-        </a>
-
-    </nav>
-
-    <form th:action="@{/logout}" method="post" class="logout-form">
-
-        <button type="submit" class="header-action">
-            Sign out
-        </button>
-
-    </form>
-
-</header>
+<header th:replace="~{fragments/nav :: mainHeader('profile')}"></header>
 
 
 <main class="edit-page">

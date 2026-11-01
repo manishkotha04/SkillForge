@@ -29,16 +29,16 @@
         </a>
 
         <a class="has-badge"
-           th:with="pending=${@navigationInfo.pendingInvitationCount()}"
-           th:href="@{/invitations}"
-           th:classappend="${active == 'invitations'} ? 'active'">
+           th:with="pending=${@navigationInfo.pendingNotificationCount()}"
+           th:href="@{/notifications}"
+           th:classappend="${active == 'notifications'} ? 'active'">
 
-            Invitations
+            Notifications
 
             <span class="nav-badge"
                   th:if="${pending > 0}"
                   th:text="${pending}"
-                  th:title="|${pending} pending invitations|">
+                  th:title="|${pending} pending notifications|">
                 1
             </span>
 

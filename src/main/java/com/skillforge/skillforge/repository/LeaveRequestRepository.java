@@ -1,4 +1,3 @@
-
 package com.skillforge.skillforge.repository;
 
 import com.skillforge.skillforge.entity.LeaveRequest;
@@ -14,6 +13,10 @@ public interface LeaveRequestRepository
     boolean existsByProject_IdAndRequestedBy_IdAndStatus(
             Long projectId,
             Long userId,
+            LeaveRequestStatus status);
+
+    long countByProject_Owner_IdAndStatus(
+            Long ownerId,
             LeaveRequestStatus status);
 
     @EntityGraph(attributePaths = {"project", "requestedBy"})

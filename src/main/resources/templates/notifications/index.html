@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#172554">
+    <title>Notifications | SkillForge</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/notifications.css}">
+</head>
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('notifications')}"></header>
+
+<main class="dashboard-container notifications-page">
+
+    <section class="notifications-heading">
+        <div>
+            <p class="eyebrow">YOUR ACTIVITY</p>
+            <h1>Notifications</h1>
+            <p class="notifications-intro">
+                Project invitations, membership requests and ownership changes,
+                all in one place.
+            </p>
+        </div>
+
+        <div class="notifications-total" role="status">
+            <span class="notifications-total-number"
+                  th:text="${pendingNotificationCount}">0</span>
+            <span>pending items</span>
+        </div>
+    </section>
+
+    <div class="message-stack"
+         th:if="${successMessage != null or errorMessage != null}">
+        <div class="alert alert-success"
+             role="status"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}"></div>
+        <div class="alert alert-error"
+             role="alert"
+             th:if="${errorMessage != null}"
+             th:text="${errorMessage}"></div>
+    </div>
+
+    <section class="notifications-empty"
+             th:if="${#lists.isEmpty(invitations)
+                    and #lists.isEmpty(leaveRequests)
+                    and #lists.isEmpty(ownershipTransfers)}">
+        <div class="notifications-empty-icon" aria-hidden="true">✓</div>
+        <h2>You're all caught up</h2>
+        <p>New project invitations and requests will appear here.</p>
+        <a class="primary-button" th:href="@{/projects}">Go to my projects</a>
+    </section>
+
+    <!-- Project invitations received by the signed-in student -->
+    <section class="notification-group"
+             th:if="${!#lists.isEmpty(invitations)}">
+        <div class="notification-group-heading">
+            <div>
+                <p class="eyebrow">JOIN A TEAM</p>
+                <h2>Project invitations</h2>
+                <p>Students have invited you to join their projects.</p>
+            </div>
+            <span class="notification-count"
+                  th:text="${#lists.size(invitations)}">0</span>
+        </div>
+
+        <article class="notification-card invitation-card"
+                 th:each="invitation : ${invitations}">
+            <div class="notification-card-top">
+                <span class="notification-type">Project invitation</span>
+                <span class="notification-date"
+                      th:text="${#temporals.format(invitation.createdAt, 'dd MMM yyyy, hh:mm a')}">
+                    Request date
+                </span>
+            </div>
+
+            <h3 th:text="${invitation.project.name}">Project name</h3>
+            <p class="notification-message">
+                <strong th:text="${invitation.invitedBy.fullName}">Student</strong>
+                invited you to join this project.
+            </p>
+
+            <div class="notification-actions">
+                <form th:action="@{/invitations/{id}/accept(id=${invitation.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button primary-action">
+                        Accept invitation
+                    </button>
+                </form>
+                <form th:action="@{/invitations/{id}/reject(id=${invitation.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button secondary-action">
+                        Decline
+                    </button>
+                </form>
+                <a class="notification-link"
+                   th:href="@{/projects/{id}(id=${invitation.project.id})}">
+                    View project
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <!-- Leave requests submitted by members of projects owned by the signed-in student -->
+    <section class="notification-group"
+             th:if="${!#lists.isEmpty(leaveRequests)}">
+        <div class="notification-group-heading">
+            <div>
+                <p class="eyebrow">MEMBERSHIP</p>
+                <h2>Leave requests</h2>
+                <p>Members are asking to leave projects you own.</p>
+            </div>
+            <span class="notification-count"
+                  th:text="${#lists.size(leaveRequests)}">0</span>
+        </div>
+
+        <article class="notification-card leave-card"
+                 th:each="request : ${leaveRequests}">
+            <div class="notification-card-top">
+                <span class="notification-type">Membership request</span>
+                <span class="notification-date"
+                      th:text="${#temporals.format(request.createdAt, 'dd MMM yyyy, hh:mm a')}">
+                    Request date
+                </span>
+            </div>
+
+            <h3 th:text="${request.project.name}">Project name</h3>
+            <p class="notification-message">
+                <strong th:text="${request.requestedBy.fullName}">Student</strong>
+                requested to leave this project.
+            </p>
+
+            <div class="notification-actions">
+                <form th:action="@{/leave-requests/{id}/approve(id=${request.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button primary-action">
+                        Approve leave
+                    </button>
+                </form>
+                <form th:action="@{/leave-requests/{id}/reject(id=${request.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button secondary-action">
+                        Reject
+                    </button>
+                </form>
+                <a class="notification-link"
+                   th:href="@{/projects/{id}(id=${request.project.id})}">
+                    View project
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <!-- Ownership transfer requests addressed to the signed-in student -->
+    <section class="notification-group"
+             th:if="${!#lists.isEmpty(ownershipTransfers)}">
+        <div class="notification-group-heading">
+            <div>
+                <p class="eyebrow">PROJECT OWNERSHIP</p>
+                <h2>Ownership transfers</h2>
+                <p>You have been nominated to become the owner of a project.</p>
+            </div>
+            <span class="notification-count"
+                  th:text="${#lists.size(ownershipTransfers)}">0</span>
+        </div>
+
+        <article class="notification-card ownership-card"
+                 th:each="transfer : ${ownershipTransfers}">
+            <div class="notification-card-top">
+                <span class="notification-type">Ownership request</span>
+                <span class="notification-date"
+                      th:text="${#temporals.format(transfer.createdAt, 'dd MMM yyyy, hh:mm a')}">
+                    Request date
+                </span>
+            </div>
+
+            <h3 th:text="${transfer.project.name}">Project name</h3>
+            <p class="notification-message">
+                <strong th:text="${transfer.requestedBy.fullName}">Current owner</strong>
+                nominated you to become the owner of this project.
+            </p>
+
+            <div class="notification-actions">
+                <form th:action="@{/ownership-transfers/{id}/accept(id=${transfer.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button primary-action">
+                        Accept transfer
+                    </button>
+                </form>
+                <form th:action="@{/ownership-transfers/{id}/reject(id=${transfer.id})}"
+                      method="post">
+                    <button type="submit" class="notification-button secondary-action">
+                        Decline
+                    </button>
+                </form>
+                <a class="notification-link"
+                   th:href="@{/projects/{id}(id=${transfer.project.id})}">
+                    View project
+                </a>
+            </div>
+        </article>
+    </section>
+
+</main>
+
+</body>
+</html>

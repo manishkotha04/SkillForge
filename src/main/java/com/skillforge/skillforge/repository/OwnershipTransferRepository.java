@@ -15,6 +15,10 @@ public interface OwnershipTransferRepository
             Long projectId,
             OwnershipTransferStatus status);
 
+    long countByNominatedUser_IdAndStatus(
+            Long userId,
+            OwnershipTransferStatus status);
+
     @EntityGraph(attributePaths = {"project", "requestedBy"})
     List<OwnershipTransfer> findByNominatedUser_IdAndStatus(
             Long userId,

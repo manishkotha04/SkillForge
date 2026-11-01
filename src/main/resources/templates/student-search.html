@@ -14,9 +14,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 
     <style>
-        body.dashboard-page {
-            padding-top: 32px;
-        }
+
 
         main.dashboard-container {
             margin-top: 0;
@@ -356,46 +354,7 @@
 
 <body class="dashboard-page">
 
-<header class="dashboard-header">
-
-    <a class="brand" th:href="@{/dashboard}">
-        <span class="brand-mark">S</span>
-        <span>SkillForge</span>
-    </a>
-
-    <nav class="dashboard-nav" aria-label="Main navigation">
-
-        <a th:href="@{/dashboard}">
-            Dashboard
-        </a>
-
-        <a th:href="@{/projects}">
-            Projects
-        </a>
-
-        <a class="active"
-           th:href="@{/students/search}">
-            Find teammates
-        </a>
-
-        <a th:href="@{/profile}">
-            My profile
-        </a>
-
-    </nav>
-
-    <form th:action="@{/logout}"
-          method="post"
-          class="logout-form">
-
-        <button type="submit"
-                class="header-action">
-            Sign out
-        </button>
-
-    </form>
-
-</header>
+<header th:replace="~{fragments/nav :: mainHeader('students')}"></header>
 
 <main class="dashboard-container">
 
