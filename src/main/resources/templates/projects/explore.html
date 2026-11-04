@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#172554">
+
+    <title>Explore Projects | SkillForge</title>
+
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
+
+    <style>
+        .explore-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 28px 0;
+        }
+
+        .explore-heading h1 {
+            font-size: 34px;
+            color: #172554;
+            margin: 6px 0;
+        }
+
+        .explore-heading p {
+            color: #64748b;
+            max-width: 680px;
+        }
+
+        .explore-search {
+            display: flex;
+            gap: 10px;
+            max-width: 760px;
+            margin: 24px 0 30px;
+        }
+
+        .explore-search input {
+            flex: 1;
+            min-width: 0;
+            padding: 14px 16px;
+            border: 1px solid #dbe2ef;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .explore-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 20px;
+        }
+
+        .explore-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 12px 35px rgba(15,23,42,.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .explore-card h2 {
+            font-size: 21px;
+            color: #172554;
+        }
+
+        .explore-card p {
+            color: #475569;
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+
+        .explore-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .explore-meta span {
+            background: #f1f5f9;
+            border-radius: 999px;
+            padding: 6px 10px;
+        }
+
+        .explore-skills {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .explore-skills span {
+            background: #eef2ff;
+            color: #3730a3;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .explore-card .explore-actions {
+            margin-top: auto;
+            padding-top: 10px;
+        }
+
+        .explore-empty {
+            padding: 48px 24px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+        }
+
+        .explore-empty p {
+            color: #64748b;
+            margin-top: 8px;
+        }
+
+        @media(max-width:600px) {
+            .explore-search {
+                flex-direction: column;
+            }
+
+            .explore-search button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-page">
+
+<header th:replace="~{fragments/nav :: mainHeader('explore')}"></header>
+
+<main class="dashboard-container">
+
+    <section class="explore-heading">
+        <div>
+            <p class="eyebrow">FIND YOUR NEXT TEAM</p>
+
+            <h1>Explore Projects</h1>
+
+            <p>
+                Discover active student projects, explore the skills
+                they need, and send a join request to a project owner.
+            </p>
+        </div>
+
+        <a class="button button-secondary" th:href="@{/projects}">
+            My Projects
+        </a>
+    </section>
+
+    <div class="message-stack"
+         th:if="${successMessage != null or errorMessage != null}">
+
+        <div class="alert alert-success"
+             role="status"
+             th:if="${successMessage != null}"
+             th:text="${successMessage}">
+        </div>
+
+        <div class="alert alert-error"
+             role="alert"
+             th:if="${errorMessage != null}"
+             th:text="${errorMessage}">
+        </div>
+    </div>
+
+    <form class="explore-search"
+          th:action="@{/explore/projects}"
+          method="get">
+
+        <input type="search"
+               name="q"
+               th:value="${query}"
+               placeholder="Search project name, description, or required skills"
+               aria-label="Search projects">
+
+        <button type="submit" class="button button-primary">
+            Search projects
+        </button>
+
+        <a class="button button-secondary"
+           th:href="@{/explore/projects}">
+            Clear
+        </a>
+    </form>
+
+    <section th:if="${projects != null and !projects.isEmpty()}"
+             class="explore-grid">
+
+        <article class="explore-card"
+                 th:each="item : ${projects}">
+
+            <div>
+                <p class="eyebrow">ACTIVE PROJECT</p>
+
+                <h2 th:text="${item.project.name}">
+                    Project name
+                </h2>
+
+                <p th:text="${item.project.description != null
+                    and !#strings.isEmpty(item.project.description)
+                    ? item.project.description
+                    : 'No description provided.'}">
+                    Project description
+                </p>
+            </div>
+
+            <div class="explore-meta">
+
+                <!-- Use DTO ownerName instead of accessing lazy JPA owner -->
+                <span th:text="|Owner: ${item.ownerName}|">
+                    Owner
+                </span>
+
+                <span th:text="|Team: ${item.currentMemberCount}/${item.project.maxTeamSize != null ? item.project.maxTeamSize : 'No limit'}|">
+                    Team capacity
+                </span>
+
+                <span th:if="${item.project.deadline != null}"
+                      th:text="|Deadline: ${#temporals.format(item.project.deadline, 'dd MMM yyyy')}|">
+                    Deadline
+                </span>
+
+            </div>
+
+            <div>
+                <p class="eyebrow">REQUIRED SKILLS</p>
+
+                <div class="explore-skills"
+                     th:if="${item.project.requiredSkillsText != null
+                         and !#strings.isEmpty(item.project.requiredSkillsText)}">
+
+                    <span th:each="skill : ${#strings.listSplit(item.project.requiredSkillsText, ',')}"
+                          th:if="${!#strings.isEmpty(#strings.trim(skill))}"
+                          th:text="${#strings.trim(skill)}">
+                        Java
+                    </span>
+
+                </div>
+
+                <p th:if="${item.project.requiredSkillsText == null
+                    or #strings.isEmpty(item.project.requiredSkillsText)}">
+                    No specific skills listed.
+                </p>
+            </div>
+
+            <div class="explore-actions">
+
+                <p th:if="${item.requestPending}"
+                   class="alert alert-info">
+                    Your join request is pending owner review.
+                </p>
+
+                <form th:unless="${item.requestPending}"
+                      th:action="@{/explore/projects/{id}/join(id=${item.project.id})}"
+                      method="post">
+
+                    <button type="submit"
+                            class="button button-primary">
+                        Request to Join
+                    </button>
+
+                </form>
+
+            </div>
+
+        </article>
+
+    </section>
+
+    <section class="explore-empty"
+             th:if="${projects == null or projects.isEmpty()}">
+
+        <h2>No available projects found</h2>
+
+        <p>
+            Try a different search, or check again when students
+            publish more projects.
+        </p>
+
+    </section>
+
+</main>
+
+</body>
+</html>

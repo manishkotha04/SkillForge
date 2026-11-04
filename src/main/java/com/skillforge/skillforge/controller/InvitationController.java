@@ -3,6 +3,8 @@ package com.skillforge.skillforge.controller;
 import com.skillforge.skillforge.AppUser;
 import com.skillforge.skillforge.UserRepository;
 import com.skillforge.skillforge.entity.ProjectInvitation;
+import com.skillforge.skillforge.entity.ProjectMember;
+import com.skillforge.skillforge.service.ProjectDiscoveryService;
 import com.skillforge.skillforge.service.ProjectService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
@@ -18,20 +20,18 @@ import java.util.NoSuchElementException;
 public class InvitationController {
 
     private final ProjectService projectService;
+    private final ProjectDiscoveryService projectDiscoveryService;
     private final UserRepository userRepository;
 
     public InvitationController(
             ProjectService projectService,
+            ProjectDiscoveryService projectDiscoveryService,
             UserRepository userRepository) {
-
         this.projectService = projectService;
+        this.projectDiscoveryService = projectDiscoveryService;
         this.userRepository = userRepository;
     }
 
-    /**
-     * Backward-compatible route. Invitations are now included in
-     * the central Notifications page.
-     */
     @GetMapping("/invitations")
     public String listInvitations() {
         return "redirect:/notifications";
@@ -43,43 +43,30 @@ public class InvitationController {
             @RequestParam(required = false) String username,
             @RequestParam(required = false) Long invitedUserId,
             RedirectAttributes redirectAttributes) {
-
         try {
             Long targetUserId;
-
             if (invitedUserId != null) {
                 targetUserId = invitedUserId;
-
             } else if (username != null && !username.trim().isEmpty()) {
-                AppUser invitedUser = userRepository
-                        .findByUsernameIgnoreCase(username.trim())
-                        .orElseThrow(() -> new NoSuchElementException(
-                                "No user found with that username."));
-
+                AppUser invitedUser = userRepository.findByUsernameIgnoreCase(username.trim())
+                        .orElseThrow(() -> new NoSuchElementException("No user found with that username."));
                 targetUserId = invitedUser.getId();
-
             } else {
+                throw new IllegalArgumentException("Please select a student to invite.");
+            }
+
+            if (projectDiscoveryService.hasPendingJoinRequest(projectId, targetUserId)) {
                 throw new IllegalArgumentException(
-                        "Please select a student to invite.");
+                        "This student already has a pending join request. Review it in Notifications instead of sending another invitation.");
             }
 
             projectService.inviteUser(projectId, targetUserId);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Invitation sent successfully.");
-
+            redirectAttributes.addFlashAttribute("successMessage", "Invitation sent successfully.");
         } catch (IllegalArgumentException | NoSuchElementException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
-
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         } catch (AccessDeniedException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
-
         return "redirect:/projects/" + projectId;
     }
 
@@ -88,25 +75,18 @@ public class InvitationController {
             @PathVariable Long projectId,
             @PathVariable Long userId,
             RedirectAttributes redirectAttributes) {
-
         try {
+            if (projectDiscoveryService.hasPendingJoinRequest(projectId, userId)) {
+                throw new IllegalArgumentException(
+                        "This student already has a pending join request. Review it in Notifications instead of sending another invitation.");
+            }
             projectService.inviteUser(projectId, userId);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Invitation sent successfully.");
-
+            redirectAttributes.addFlashAttribute("successMessage", "Invitation sent successfully.");
         } catch (IllegalArgumentException | NoSuchElementException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
-
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         } catch (AccessDeniedException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
-
         return "redirect:/students/search?projectId=" + projectId;
     }
 
@@ -114,25 +94,16 @@ public class InvitationController {
     public String acceptInvitation(
             @PathVariable Long invitationId,
             RedirectAttributes redirectAttributes) {
-
         try {
-            projectService.acceptInvitation(invitationId);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Invitation accepted.");
-
+            ProjectMember membership = projectService.acceptInvitation(invitationId);
+            projectDiscoveryService.reconcilePendingJoinRequestsAfterInvitationAccepted(
+                    membership.getProject().getId(), membership.getUser().getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Invitation accepted.");
         } catch (IllegalArgumentException | NoSuchElementException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
-
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         } catch (AccessDeniedException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 
@@ -140,25 +111,20 @@ public class InvitationController {
     public String rejectInvitation(
             @PathVariable Long invitationId,
             RedirectAttributes redirectAttributes) {
-
         try {
-            projectService.rejectInvitation(invitationId);
-
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Invitation rejected.");
-
+            ProjectInvitation invitation = projectService.rejectInvitation(invitationId);
+            if (invitation.getStatus() == com.skillforge.skillforge.enums.InvitationStatus.ACCEPTED) {
+                redirectAttributes.addFlashAttribute(
+                        "successMessage",
+                        "This student is already a project member. The duplicate invitation was closed; membership was not changed.");
+            } else {
+                redirectAttributes.addFlashAttribute("successMessage", "Invitation rejected.");
+            }
         } catch (IllegalArgumentException | NoSuchElementException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
-
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         } catch (AccessDeniedException exception) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 }
