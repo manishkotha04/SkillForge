@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Shared Task Chat | SkillForge</title>
+<link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/components.css}"><link rel="stylesheet" th:href="@{/css/dashboard.css}"><link rel="stylesheet" th:href="@{/css/projects.css}"><link rel="stylesheet" th:href="@{/css/tasks.css}">
+<link rel="stylesheet" th:href="@{/css/tasks-fr09.css}">
+</head>
+<body class="dashboard-page"><header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
+<main class="dashboard-container">
+<div class="alert alert-success" th:if="${successMessage != null}" th:text="${successMessage}"></div>
+<a class="pj-back" th:href="@{/tasks(projectId=${task.project.id})}">&larr; Back to tasks</a>
+<div class="pj-header"><div><p class="pj-eyebrow">SHARED TASK DISCUSSION</p><h1 th:text="${task.title}">Task</h1><p class="pj-subtitle">A conversation shared only by the students assigned to this task.</p></div></div>
+<section class="tk-chat-panel">
+<div class="tk-chat-members"><strong>Assigned teammates</strong><span th:each="assignee : ${task.assignees}" class="tk-assignee-chip" th:text="${assignee.fullName}">Assignee</span></div>
+<div class="tk-chat-messages" th:if="${!#lists.isEmpty(messages)}">
+<article class="tk-chat-message" th:each="message : ${messages}"><div class="tk-chat-message-head"><strong th:text="${message.author.fullName}">Student</strong><time th:text="${#temporals.format(message.createdAt,'dd MMM yyyy, hh:mm a')}">Date</time></div><p th:text="${message.content}">Message text</p></article>
+</div>
+<div class="tk-empty-inline" th:if="${#lists.isEmpty(messages)}">No messages yet. Start the task conversation.</div>
+<form class="tk-chat-form" th:if="${!task.project.archived}" th:action="@{/tasks/{id}/chat(id=${task.id})}" th:object="${messageRequest}" method="post">
+<label for="content">Message your teammates</label><textarea id="content" th:field="*{content}" rows="3" maxlength="2000" required placeholder="Share updates, questions or decisions..."></textarea><p class="field-error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></p><button class="button button-primary" type="submit">Send message</button>
+</form>
+<div class="alert alert-info" th:if="${task.project.archived}">This project is archived. The conversation is read-only.</div>
+</section></main></body></html>

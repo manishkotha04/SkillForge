@@ -26,98 +26,58 @@ public class PortfolioController {
 
     @GetMapping
     public String portfolio(Model model) {
-
-        model.addAttribute(
-                "items",
-                portfolioService.getMyPortfolio());
-
+        model.addAttribute("items", portfolioService.getMyPortfolio());
         return "portfolio";
     }
 
     @GetMapping("/new")
     public String newPortfolioItem(Model model) {
-
-        model.addAttribute(
-                "item",
-                new PortfolioItemRequest());
-
-        model.addAttribute(
-                "projects",
-                projectService.getMyOwnedProjects());
-
+        model.addAttribute("item", new PortfolioItemRequest());
+        model.addAttribute("projects", projectService.getMyProjects());
         return "portfolio-form";
     }
 
     @PostMapping
     public String createPortfolioItem(
-            @Valid @ModelAttribute("item")
-            PortfolioItemRequest request,
+            @Valid @ModelAttribute("item") PortfolioItemRequest request,
             BindingResult bindingResult,
             Model model) {
-
         if (bindingResult.hasErrors()) {
-            model.addAttribute(
-                    "projects",
-                    projectService.getMyOwnedProjects());
-
+            model.addAttribute("projects", projectService.getMyProjects());
             return "portfolio-form";
         }
-
         portfolioService.createPortfolioItem(request);
-
         return "redirect:/portfolio";
     }
 
     @GetMapping("/{id}/edit")
-    public String editPortfolioItem(
-            @PathVariable Long id,
-            Model model) {
-
-        PortfolioItem item =
-                portfolioService.getMyPortfolioItem(id);
-
-        PortfolioItemRequest request =
-                new PortfolioItemRequest();
-
+    public String editPortfolioItem(@PathVariable Long id, Model model) {
+        PortfolioItem item = portfolioService.getMyPortfolioItem(id);
+        PortfolioItemRequest request = new PortfolioItemRequest();
         request.setTitle(item.getTitle());
         request.setDescription(item.getDescription());
         request.setExternalUrl(item.getExternalUrl());
-
         if (item.getProject() != null) {
             request.setProjectId(item.getProject().getId());
         }
-
         model.addAttribute("item", request);
         model.addAttribute("itemId", id);
-        model.addAttribute(
-                "projects",
-                projectService.getMyOwnedProjects());
-
+        model.addAttribute("projects", projectService.getMyProjects());
         return "portfolio-edit";
     }
 
     @PostMapping("/{id}/edit")
     public String updatePortfolioItem(
             @PathVariable Long id,
-            @Valid @ModelAttribute("item")
-            PortfolioItemRequest request,
+            @Valid @ModelAttribute("item") PortfolioItemRequest request,
             BindingResult bindingResult,
             Model model) {
-
         if (bindingResult.hasErrors()) {
-            model.addAttribute(
-                    "itemId",
-                    id);
-
-            model.addAttribute(
-                    "projects",
-                    projectService.getMyOwnedProjects());
-
+            model.addAttribute("itemId", id);
+            model.addAttribute("projects", projectService.getMyProjects());
             return "portfolio-edit";
         }
-
         portfolioService.updatePortfolioItem(id, request);
-
         return "redirect:/portfolio";
     }
 }

@@ -382,7 +382,7 @@
         <a class="primary-button"
            th:href="@{/profile}">
             View my profile
-            <span aria-hidden="true">→</span>
+            <span aria-hidden="true">â†’</span>
         </a>
 
     </section>
@@ -395,7 +395,7 @@
         <div class="alert alert-success"
              th:if="${successMessage != null}">
 
-            <span class="alert-icon">✓</span>
+            <span class="alert-icon">âœ“</span>
             <span th:text="${successMessage}"></span>
 
         </div>
@@ -589,6 +589,13 @@
                     No skills added yet.
                 </p>
 
+                <!-- View the student's public portfolio -->
+                <div class="find-card-actions">
+                    <a class="button button-secondary button-small"
+                       th:href="@{/students/{studentId}/portfolio(studentId=${match.student.id})}">
+                        View Portfolio â†’
+                    </a>
+                </div>
                 <!-- Project invitation -->
 
                 <div class="find-card-actions"
@@ -620,7 +627,7 @@
              th:if="${studentMatches == null or studentMatches.isEmpty()}">
 
         <div class="find-empty-icon" aria-hidden="true">
-            ✦
+            âœ¦
         </div>
 
         <h2>
@@ -651,7 +658,7 @@
         </div>
 
         <a th:href="@{/profile}">
-            Update my profile →
+            Update my profile â†’
         </a>
 
     </section>

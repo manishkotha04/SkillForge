@@ -2,6 +2,7 @@ package com.skillforge.skillforge.controller;
 
 import com.skillforge.skillforge.dto.TaskCreateRequest;
 import com.skillforge.skillforge.dto.TaskUpdateRequest;
+import com.skillforge.skillforge.entity.Project;
 import com.skillforge.skillforge.entity.Task;
 import com.skillforge.skillforge.enums.TaskStatus;
 import com.skillforge.skillforge.service.TaskService;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/tasks")
 public class TaskController {
-
     private final TaskService taskService;
 
     public TaskController(TaskService taskService) {
@@ -22,126 +22,81 @@ public class TaskController {
     }
 
     @GetMapping
-    public String listTasks(
-            @RequestParam Long projectId,
-            Model model) {
-
-        model.addAttribute(
-                "tasks",
-                taskService.getTasksForProject(projectId));
-
+    public String listTasks(@RequestParam Long projectId, Model model) {
+        Project project = taskService.getProjectForTaskPage(projectId);
+        model.addAttribute("project", project);
         model.addAttribute("projectId", projectId);
-
+        model.addAttribute("currentUserId", taskService.getCurrentUserId());
+        model.addAttribute("tasks", taskService.getTasksForProject(projectId));
+        model.addAttribute("myTasks", taskService.getMyTasksForProject(projectId));
+        model.addAttribute("completedTasks", taskService.getCompletedTasksForProject(projectId));
         return "tasks";
     }
 
     @GetMapping("/new")
-    public String newTask(
-            @RequestParam Long projectId,
-            Model model) {
-
-        model.addAttribute(
-                "task",
-                new TaskCreateRequest());
-
+    public String newTask(@RequestParam Long projectId, Model model) {
+        Project project = taskService.getProjectForTaskPage(projectId);
+        model.addAttribute("task", new TaskCreateRequest());
         model.addAttribute("projectId", projectId);
-
-        model.addAttribute(
-        "members",
-        taskService.getProjectMembers(projectId));
-
+        model.addAttribute("project", project);
+        model.addAttribute("members", taskService.getProjectMembers(projectId));
         return "task-form";
     }
 
     @PostMapping
-    public String createTask(
-            @RequestParam Long projectId,
-            @Valid @ModelAttribute("task") TaskCreateRequest request,
-            BindingResult bindingResult,
-            Model model) {
-
+    public String createTask(@RequestParam Long projectId,
+                             @Valid @ModelAttribute("task") TaskCreateRequest request,
+                             BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
+            Project project = taskService.getProjectForTaskPage(projectId);
+            model.addAttribute("project", project);
             model.addAttribute("projectId", projectId);
-            model.addAttribute(
-                    "members",
-                    taskService.getProjectMembers(projectId));
+            model.addAttribute("members", taskService.getProjectMembers(projectId));
             return "task-form";
         }
-
         taskService.createTask(projectId, request);
-
         return "redirect:/tasks?projectId=" + projectId;
     }
 
     @GetMapping("/{id}/edit")
-    public String editTask(
-            @PathVariable Long id,
-            Model model) {
-
+    public String editTask(@PathVariable Long id, Model model) {
         Task task = taskService.getTask(id);
-
+        if (task.getProject().isArchived()) {
+            throw new IllegalStateException("Tasks in archived projects cannot be edited.");
+        }
         TaskUpdateRequest request = new TaskUpdateRequest();
-
         request.setTitle(task.getTitle());
         request.setDescription(task.getDescription());
         request.setDueDate(task.getDueDate());
         request.setStatus(task.getStatus());
-
-        if (task.getAssignee() != null) {
-            request.setAssigneeId(task.getAssignee().getId());
-        }
-
+        request.setAssigneeIds(task.getAssignees().stream().map(u -> u.getId()).toList());
         model.addAttribute("task", request);
-        model.addAttribute(
-                "projectId",
-                task.getProject().getId());
+        model.addAttribute("project", task.getProject());
+        model.addAttribute("projectId", task.getProject().getId());
         model.addAttribute("taskId", task.getId());
-
-        model.addAttribute(
-        "members",
-        taskService.getProjectMembers(task.getProject().getId()));
-
+        model.addAttribute("members", taskService.getProjectMembers(task.getProject().getId()));
         return "task-edit";
     }
 
     @PostMapping("/{id}/edit")
-    public String updateTask(
-            @PathVariable Long id,
-            @Valid @ModelAttribute("task") TaskUpdateRequest request,
-            BindingResult bindingResult,
-            Model model) {
-
+    public String updateTask(@PathVariable Long id,
+                             @Valid @ModelAttribute("task") TaskUpdateRequest request,
+                             BindingResult bindingResult, Model model) {
         Task existingTask = taskService.getTask(id);
-
         if (bindingResult.hasErrors()) {
-            model.addAttribute(
-                    "projectId",
-                    existingTask.getProject().getId());
-
+            model.addAttribute("project", existingTask.getProject());
+            model.addAttribute("projectId", existingTask.getProject().getId());
             model.addAttribute("taskId", id);
-
-            model.addAttribute(
-                    "members",
-                    taskService.getProjectMembers(
-                            existingTask.getProject().getId()));
-
+            model.addAttribute("members", taskService.getProjectMembers(existingTask.getProject().getId()));
             return "task-edit";
         }
-
         taskService.updateTask(id, request);
-
-        return "redirect:/tasks?projectId="
-                + existingTask.getProject().getId();
+        return "redirect:/tasks?projectId=" + existingTask.getProject().getId();
     }
 
     @PostMapping("/{id}/status")
-    public String updateTaskStatus(
-            @PathVariable Long id,
-            @RequestParam TaskStatus status) {
-
+    public String updateTaskStatus(@PathVariable Long id, @RequestParam TaskStatus status) {
         Task task = taskService.updateTaskStatus(id, status);
-
-        return "redirect:/tasks?projectId="
-                + task.getProject().getId();
+        return "redirect:/tasks?projectId=" + task.getProject().getId();
     }
 }

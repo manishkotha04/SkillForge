@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/components.css}">
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/projects.css}">
+    <link rel="stylesheet" th:href="@{/css/tasks-fr09.css}">
 </head>
 
 <body class="dashboard-page">
@@ -72,6 +73,10 @@
             <a class="button button-secondary"
                th:href="@{/tasks(projectId=${project.id})}">
                 View Tasks
+            </a>
+            <a class="button button-secondary"
+               th:href="@{/projects/{id}/activity(id=${project.id})}">
+                Project Activity
             </a>
 
             <a class="button button-quiet"

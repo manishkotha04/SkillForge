@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Project Activity | SkillForge</title>
+<link rel="stylesheet" th:href="@{/css/style.css}"><link rel="stylesheet" th:href="@{/css/components.css}"><link rel="stylesheet" th:href="@{/css/dashboard.css}"><link rel="stylesheet" th:href="@{/css/projects.css}"><link rel="stylesheet" th:href="@{/css/tasks.css}">
+<link rel="stylesheet" th:href="@{/css/tasks-fr09.css}"></head>
+<body class="dashboard-page"><header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
+<main class="dashboard-container"><a class="pj-back" th:href="@{/projects/{id}(id=${project.id})}">&larr; Back to project</a>
+<div class="pj-header"><div><p class="pj-eyebrow">PROJECT UPDATES</p><h1>Project Activity</h1><p class="pj-subtitle">A timeline of task creation, task completion, assignments and team-role or ownership changes.</p></div></div>
+<section class="tk-activity-list" th:if="${!#lists.isEmpty(activities)}"><article class="tk-activity-item" th:each="activity : ${activities}"><span class="tk-activity-dot"></span><div class="tk-activity-content"><div class="tk-activity-head"><strong th:text="${activity.actor != null ? activity.actor.fullName : 'SkillForge'}">Student</strong><span class="tk-activity-type" th:text="${activity.eventType.replace('_',' ')}">TASK CREATED</span></div><p th:text="${activity.message}">Activity</p><time th:text="${#temporals.format(activity.createdAt,'dd MMM yyyy, hh:mm a')}">Date</time></div></article></section>
+<section class="pj-empty" th:if="${#lists.isEmpty(activities)}"><h2>No project activity yet</h2><p>New tasks, completions and team changes will appear here.</p></section>
+<p class="tk-activity-footnote">Invitations, leave requests and ownership-transfer decisions sent to you remain in the main Notifications page.</p>
+</main></body></html>
