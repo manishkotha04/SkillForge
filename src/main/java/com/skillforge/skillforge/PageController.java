@@ -1,10 +1,14 @@
+
 package com.skillforge.skillforge;
 
 import com.skillforge.skillforge.enums.InvitationStatus;
 import com.skillforge.skillforge.repository.ProjectInvitationRepository;
 
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +37,7 @@ public class PageController {
 
     @GetMapping("/register")
     public String register(Model model) {
+
         if (!model.containsAttribute("registrationForm")) {
             model.addAttribute(
                     "registrationForm",
@@ -44,17 +49,31 @@ public class PageController {
 
     @PostMapping("/register")
     public String submitRegistration(
-            @ModelAttribute("registrationForm") RegistrationForm form,
+            @Valid @ModelAttribute("registrationForm")
+            RegistrationForm form,
+            BindingResult bindingResult,
             Model model) {
 
-        try {
-            registrationService.register(form);
-            return "redirect:/login?registered";
+        if (bindingResult.hasErrors()) {
 
-        } catch (IllegalArgumentException ex) {
             model.addAttribute(
                     "errorMessage",
-                    ex.getMessage());
+                    "Please correct the highlighted registration fields.");
+
+            return "auth/register";
+        }
+
+        try {
+
+            registrationService.register(form);
+
+            return "redirect:/login?registered";
+
+        } catch (IllegalArgumentException exception) {
+
+            model.addAttribute(
+                    "errorMessage",
+                    exception.getMessage());
 
             return "auth/register";
         }
@@ -74,7 +93,6 @@ public class PageController {
                 "pendingInvitationCount",
                 pendingInvitationCount);
 
-        // ADDED: used only for the personalised greeting
         model.addAttribute("currentUser", currentUser);
 
         return "dashboard";
