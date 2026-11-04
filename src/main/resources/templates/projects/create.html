@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -54,7 +54,7 @@
     <section class="pj-form-card">
 
         <form class="form-stack pj-form"
-              th:action="@{/projects}"
+              th:action="@{/projects/create-with-deadline}"
               method="post">
 
             <h2 class="pj-section-title">Project details</h2>
@@ -104,6 +104,13 @@
                           rows="4"
                           placeholder="For example: Java, SQL, HTML, CSS"></textarea>
 
+            </div>
+
+            <!-- Project deadline -->
+            <div class="form-field">
+                <label for="deadline">Project deadline<span class="pj-optional">Optional</span></label>
+                <input id="deadline" type="date" name="deadline">
+                <p class="field-hint">Leave empty when the project has no fixed deadline.</p>
             </div>
 
             <!-- Maximum team size -->

@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Project | SkillForge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/components.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/projects.css}">
+</head>
+<body class="dashboard-page">
+<header th:replace="~{fragments/nav :: mainHeader('projects')}"></header>
+<main class="dashboard-container">
+    <a class="pj-back" th:href="@{/projects/{id}(id=${projectId})}">&larr; Back to project</a>
+    <div class="pj-header">
+        <div>
+            <p class="pj-eyebrow">Project settings</p>
+            <h1>Edit project</h1>
+            <p class="pj-subtitle" th:text="${project.name}">Project name</p>
+        </div>
+    </div>
+    <div class="message-stack" th:if="${errorMessage}">
+        <div class="alert alert-error" role="alert" th:text="${errorMessage}"></div>
+    </div>
+    <section class="pj-form-card">
+        <form class="form-stack pj-form"
+              th:action="@{/projects/{id}/edit(id=${projectId})}"
+              th:object="${projectUpdateRequest}" method="post">
+            <div class="form-field">
+                <label for="name">Project name</label>
+                <input id="name" type="text" th:field="*{name}" maxlength="150" required>
+                <small class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+            </div>
+            <div class="form-field">
+                <label for="description">Description</label>
+                <textarea id="description" th:field="*{description}" maxlength="5000" rows="5"></textarea>
+                <small class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
+            </div>
+            <div class="form-field">
+                <label for="requiredSkillsText">Required skills</label>
+                <textarea id="requiredSkillsText" th:field="*{requiredSkillsText}" maxlength="2000" rows="3"></textarea>
+                <small class="field-hint">Separate skills with commas, for example: Java, SQL, HTML.</small>
+                <small class="field-error" th:if="${#fields.hasErrors('requiredSkillsText')}" th:errors="*{requiredSkillsText}"></small>
+            </div>
+            <div class="form-field">
+                <label for="maxTeamSize">Maximum team size</label>
+                <input id="maxTeamSize" type="number" th:field="*{maxTeamSize}" min="1" step="1" required>
+                <small class="field-hint">Includes the project owner and existing members.</small>
+                <small class="field-error" th:if="${#fields.hasErrors('maxTeamSize')}" th:errors="*{maxTeamSize}"></small>
+            </div>
+            <div class="form-field">
+                <label for="deadline">Project deadline</label>
+                <input id="deadline" type="date" th:field="*{deadline}">
+                <small class="field-hint">Leave empty when the project has no fixed deadline.</small>
+            </div>
+            <div class="pj-actions">
+                <button class="button button-primary" type="submit">Save changes</button>
+                <a class="button button-secondary" th:href="@{/projects/{id}(id=${projectId})}">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

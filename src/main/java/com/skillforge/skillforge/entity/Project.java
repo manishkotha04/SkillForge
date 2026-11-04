@@ -2,6 +2,7 @@ package com.skillforge.skillforge.entity;
 
 import com.skillforge.skillforge.AppUser;
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,6 +25,9 @@ public class Project {
     @Column(name = "max_team_size")
     private Integer maxTeamSize;
 
+    @Column(name = "deadline")
+    private LocalDate deadline;
+
     @Column(nullable = false)
     private boolean archived = false;
 
@@ -37,14 +41,14 @@ public class Project {
     protected Project() {
     }
 
-public Project(String name, String description,
-               String requiredSkillsText, AppUser owner) {
-    this.name = name;
-    this.description = description;
-    this.requiredSkillsText = requiredSkillsText;
-    this.owner = owner;
-    this.archived = false;
-}
+    public Project(String name, String description,
+                   String requiredSkillsText, AppUser owner) {
+        this.name = name;
+        this.description = description;
+        this.requiredSkillsText = requiredSkillsText;
+        this.owner = owner;
+        this.archived = false;
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -53,59 +57,20 @@ public Project(String name, String description,
         }
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getRequiredSkillsText() {
-        return requiredSkillsText;
-    }
-
-    public void setRequiredSkillsText(String requiredSkillsText) {
-        this.requiredSkillsText = requiredSkillsText;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public AppUser getOwner() {
-        return owner;
-    }
-
-    public void setOwner(AppUser owner) {
-        this.owner = owner;
-    }
-    
-    public Integer getMaxTeamSize() {
-        return maxTeamSize;
-    }
-
-    public void setMaxTeamSize(Integer maxTeamSize) {
-        this.maxTeamSize = maxTeamSize;
-    }
-
-    public boolean isArchived() {
-        return archived;
-    }
-
-    public void setArchived(boolean archived) {
-        this.archived = archived;
-    }
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getRequiredSkillsText() { return requiredSkillsText; }
+    public void setRequiredSkillsText(String requiredSkillsText) { this.requiredSkillsText = requiredSkillsText; }
+    public Integer getMaxTeamSize() { return maxTeamSize; }
+    public void setMaxTeamSize(Integer maxTeamSize) { this.maxTeamSize = maxTeamSize; }
+    public LocalDate getDeadline() { return deadline; }
+    public void setDeadline(LocalDate deadline) { this.deadline = deadline; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public AppUser getOwner() { return owner; }
+    public void setOwner(AppUser owner) { this.owner = owner; }
+    public boolean isArchived() { return archived; }
+    public void setArchived(boolean archived) { this.archived = archived; }
 }

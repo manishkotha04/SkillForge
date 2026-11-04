@@ -1,7 +1,10 @@
+
 package com.skillforge.skillforge.controller;
 
 import com.skillforge.skillforge.entity.Project;
+import com.skillforge.skillforge.service.ProjectManagementService;
 import com.skillforge.skillforge.service.ProjectService;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,19 +17,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final ProjectManagementService projectManagementService;
 
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(
+            ProjectService projectService,
+            ProjectManagementService projectManagementService) {
         this.projectService = projectService;
+        this.projectManagementService = projectManagementService;
     }
 
     @GetMapping("/projects")
     public String listProjects(Model model) {
-
         model.addAttribute("projects", projectService.getMyProjects());
         model.addAttribute(
                 "teamSummaries",
                 projectService.getMyProjectTeamSummaries());
-
         return "projects/list";
     }
 
@@ -45,22 +50,13 @@ public class ProjectController {
 
         try {
             projectService.createProject(
-                    name,
-                    description,
-                    requiredSkillsText,
-                    maxTeamSize);
-
+                    name, description, requiredSkillsText, maxTeamSize);
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Project created successfully.");
-
+                    "successMessage", "Project created successfully.");
             return "redirect:/projects";
-
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
-
+                    "errorMessage", exception.getMessage());
             return "redirect:/projects/new";
         }
     }
@@ -74,13 +70,15 @@ public class ProjectController {
                 projectService.getProjectForCurrentUser(projectId);
 
         model.addAttribute("project", project);
+        model.addAttribute(
+                "isProjectOwner",
+                projectService.isProjectOwner(projectId));
 
-        boolean isProjectOwner =
-                projectService.isProjectOwner(projectId);
+        model.addAttribute(
+                "canEditProject",
+                projectManagementService.canEditProject(projectId));
 
-        model.addAttribute("isProjectOwner", isProjectOwner);
-
-        if (isProjectOwner) {
+        if (projectService.isProjectOwner(projectId)) {
             model.addAttribute(
                     "projectMembers",
                     projectService.getProjectMembers(projectId));
@@ -98,29 +96,17 @@ public class ProjectController {
             @PathVariable Long projectId,
             @RequestParam Long nominatedUserId,
             RedirectAttributes redirectAttributes) {
-
         try {
-            projectService.requestOwnershipTransfer(
-                    projectId,
-                    nominatedUserId);
-
+            projectService.requestOwnershipTransfer(projectId, nominatedUserId);
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Ownership transfer request sent successfully.");
-
+                    "successMessage", "Ownership transfer request sent successfully.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/projects/" + projectId;
     }
 
-    /**
-     * Backward-compatible route. All pending request types now appear
-     * together in the Notifications centre.
-     */
     @GetMapping("/ownership-transfers")
     public String showOwnershipTransferRequests() {
         return "redirect:/notifications";
@@ -130,20 +116,14 @@ public class ProjectController {
     public String acceptOwnershipTransfer(
             @PathVariable Long transferId,
             RedirectAttributes redirectAttributes) {
-
         try {
             projectService.acceptOwnershipTransfer(transferId);
-
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Project ownership transferred successfully.");
-
+                    "successMessage", "Project ownership transferred successfully.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 
@@ -151,20 +131,14 @@ public class ProjectController {
     public String rejectOwnershipTransfer(
             @PathVariable Long transferId,
             RedirectAttributes redirectAttributes) {
-
         try {
             projectService.rejectOwnershipTransfer(transferId);
-
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Ownership transfer request rejected.");
-
+                    "successMessage", "Ownership transfer request rejected.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 
@@ -172,27 +146,17 @@ public class ProjectController {
     public String requestToLeaveProject(
             @PathVariable Long projectId,
             RedirectAttributes redirectAttributes) {
-
         try {
             projectService.requestToLeaveProject(projectId);
-
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Your leave request has been submitted successfully.");
-
+                    "successMessage", "Your leave request has been submitted successfully.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/projects/" + projectId;
     }
 
-    /**
-     * Backward-compatible route. Leave requests are now shown in
-     * the central Notifications page.
-     */
     @GetMapping("/leave-requests")
     public String showPendingLeaveRequests() {
         return "redirect:/notifications";
@@ -202,20 +166,14 @@ public class ProjectController {
     public String approveLeaveRequest(
             @PathVariable Long requestId,
             RedirectAttributes redirectAttributes) {
-
         try {
             projectService.approveLeaveRequest(requestId);
-
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Leave request approved. The member has been removed.");
-
+                    "successMessage", "Leave request approved. The member has been removed.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 
@@ -223,20 +181,14 @@ public class ProjectController {
     public String rejectLeaveRequest(
             @PathVariable Long requestId,
             RedirectAttributes redirectAttributes) {
-
         try {
             projectService.rejectLeaveRequest(requestId);
-
             redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Leave request rejected.");
-
+                    "successMessage", "Leave request rejected.");
         } catch (RuntimeException exception) {
             redirectAttributes.addFlashAttribute(
-                    "errorMessage",
-                    exception.getMessage());
+                    "errorMessage", exception.getMessage());
         }
-
         return "redirect:/notifications";
     }
 }

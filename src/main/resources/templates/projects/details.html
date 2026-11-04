@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -61,6 +61,12 @@
                th:if="${!project.archived and isProjectOwner}"
                th:href="@{/students/search(projectId=${project.id})}">
                 Find Teammates
+            </a>
+
+            <a class="button button-secondary"
+               th:if="${canEditProject and !project.archived}"
+               th:href="@{/projects/{id}/edit(id=${project.id})}">
+                Edit Project
             </a>
 
             <a class="button button-secondary"
@@ -158,6 +164,16 @@
                     Not specified
                 </div>
 
+            </div>
+
+            <div class="pj-info-item">
+                <span class="pj-label">Project deadline</span>
+                <div class="pj-text"
+                     th:text="${project.deadline != null
+                              ? #temporals.format(project.deadline, 'dd MMM yyyy')
+                              : 'No deadline set'}">
+                    No deadline set
+                </div>
             </div>
 
             <div class="pj-info-item">
