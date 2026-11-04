@@ -5,6 +5,7 @@ import com.skillforge.skillforge.dto.StudentSearchDto;
 import com.skillforge.skillforge.dto.StudentSummaryDto;
 import com.skillforge.skillforge.service.MatchingService;
 import com.skillforge.skillforge.service.ProjectService;
+import com.skillforge.skillforge.service.ProjectManagementService;
 import com.skillforge.skillforge.service.StudentDiscoveryService;
 
 import org.springframework.stereotype.Controller;
@@ -21,15 +22,18 @@ public class StudentDiscoveryController {
     private final StudentDiscoveryService studentDiscoveryService;
     private final MatchingService matchingService;
     private final ProjectService projectService;
+    private final ProjectManagementService projectManagementService;
 
     public StudentDiscoveryController(
             StudentDiscoveryService studentDiscoveryService,
             MatchingService matchingService,
-            ProjectService projectService) {
+            ProjectService projectService,
+            ProjectManagementService projectManagementService) {
 
         this.studentDiscoveryService = studentDiscoveryService;
         this.matchingService = matchingService;
         this.projectService = projectService;
+        this.projectManagementService = projectManagementService;
     }
 
     @GetMapping("/search")
@@ -80,7 +84,7 @@ public class StudentDiscoveryController {
 
         boolean canInvite =
                 projectId != null
-                        && projectService.isProjectOwner(projectId);
+                        && projectManagementService.canInviteToProject(projectId);
 
         model.addAttribute("canInvite", canInvite);
 

@@ -122,4 +122,91 @@ public class ProjectManagementService {
                 member.getUser().getId().equals(currentUser.getId())
                         && member.getRole() == ProjectMemberRole.LEADER);
     }
+
+    @Transactional(readOnly = true)
+    public boolean canInviteToProject(Long projectId) {
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId).orElse(null);
+        if (project == null || project.isArchived()) {
+            return false;
+        }
+        return isOwnerOrLeader(project, currentUser);
+    }
+
+    @Transactional
+    public ProjectMember appointLeader(Long projectId, Long memberUserId) {
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = findProject(projectId);
+        requireProjectOwner(project, currentUser);
+        requireActiveProject(project);
+
+        if (memberUserId == null || memberUserId.equals(project.getOwner().getId())) {
+            throw new IllegalArgumentException("Select an existing project member other than the owner.");
+        }
+
+        ProjectMember member = findMembership(projectId, memberUserId);
+        if (member.getRole() == ProjectMemberRole.LEADER) {
+            throw new IllegalArgumentException("This student is already a project leader.");
+        }
+        if (member.getRole() != ProjectMemberRole.MEMBER) {
+            throw new IllegalArgumentException("Only a current regular member can be appointed as leader.");
+        }
+
+        boolean anotherLeaderExists = projectMemberRepository.findByProject_Id(projectId).stream()
+                .anyMatch(existing -> existing.getRole() == ProjectMemberRole.LEADER
+                        && !existing.getUser().getId().equals(memberUserId));
+        if (anotherLeaderExists) {
+            throw new IllegalStateException(
+                    "This project already has a leader. Remove the current leader role before appointing another.");
+        }
+
+        member.setRole(ProjectMemberRole.LEADER);
+        return projectMemberRepository.save(member);
+    }
+
+    @Transactional
+    public ProjectMember removeLeader(Long projectId, Long memberUserId) {
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = findProject(projectId);
+        requireProjectOwner(project, currentUser);
+        requireActiveProject(project);
+
+        if (memberUserId == null || memberUserId.equals(project.getOwner().getId())) {
+            throw new IllegalArgumentException("The project owner cannot be removed as a leader.");
+        }
+
+        ProjectMember member = findMembership(projectId, memberUserId);
+        if (member.getRole() != ProjectMemberRole.LEADER) {
+            throw new IllegalArgumentException("This project member is not currently a leader.");
+        }
+
+        member.setRole(ProjectMemberRole.MEMBER);
+        return projectMemberRepository.save(member);
+    }
+
+    private void requireProjectOwner(Project project, AppUser currentUser) {
+        if (!project.getOwner().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Only the project owner can appoint or remove project leaders.");
+        }
+    }
+
+    private void requireActiveProject(Project project) {
+        if (project.isArchived()) {
+            throw new IllegalStateException("Archived projects cannot change team roles.");
+        }
+    }
+
+    private ProjectMember findMembership(Long projectId, Long userId) {
+        return projectMemberRepository.findByProject_Id(projectId).stream()
+                .filter(member -> member.getUser().getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("The selected student is not a current project member."));
+    }
+
+
+    @Transactional(readOnly = true)
+    public boolean hasProjectLeader(Long projectId) {
+        return projectMemberRepository.findByProject_Id(projectId).stream()
+                .anyMatch(member -> member.getRole() == ProjectMemberRole.LEADER);
+    }
 }

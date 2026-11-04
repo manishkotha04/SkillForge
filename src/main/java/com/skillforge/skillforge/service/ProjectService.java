@@ -214,9 +214,9 @@ public class ProjectService {
                     "Cannot invite users to an archived project.");
         }
 
-        if (!project.getOwner().getId().equals(currentUser.getId())) {
+        if (!isProjectOwnerOrLeader(project, currentUser)) {
             throw new AccessDeniedException(
-                    "Only the project owner can invite users.");
+                    "Only the project owner or an appointed project leader can invite users.");
         }
 
         Integer maxTeamSize = project.getMaxTeamSize();
@@ -660,5 +660,45 @@ public class ProjectService {
                 .existsByProject_IdAndRequestedBy_IdAndStatus(
                         projectId, currentUser.getId(),
                         LeaveRequestStatus.PENDING);
+    }
+
+    private boolean isProjectOwnerOrLeader(Project project, AppUser user) {
+        if (project.getOwner().getId().equals(user.getId())) {
+            return true;
+        }
+
+        return projectMemberRepository.findByProject_Id(project.getId()).stream()
+                .anyMatch(member ->
+                        member.getUser().getId().equals(user.getId())
+                        && member.getRole() == ProjectMemberRole.LEADER);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectMember> getProjectTeamForCurrentUser(Long projectId) {
+        getProjectForCurrentUser(projectId);
+        return projectMemberRepository.findByProject_Id(projectId);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectMemberRole getCurrentUserProjectRole(Long projectId) {
+        AppUser currentUser = currentUserService.getCurrentUser();
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ProjectNotFoundException(projectId));
+
+        if (project.getOwner().getId().equals(currentUser.getId())) {
+            return ProjectMemberRole.OWNER;
+        }
+
+        return projectMemberRepository.findByProject_Id(projectId).stream()
+                .filter(member -> member.getUser().getId().equals(currentUser.getId()))
+                .map(ProjectMember::getRole)
+                .findFirst()
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
+                        "You are not a member of this project."));
+    }
+
+    @Transactional(readOnly = true)
+    public Long getCurrentUserId() {
+        return currentUserService.getCurrentUser().getId();
     }
 }

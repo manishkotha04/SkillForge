@@ -77,12 +77,22 @@ public class ProjectController {
         model.addAttribute(
                 "canEditProject",
                 projectManagementService.canEditProject(projectId));
+        model.addAttribute(
+                "canInvite",
+                projectManagementService.canInviteToProject(projectId));
 
-        if (projectService.isProjectOwner(projectId)) {
-            model.addAttribute(
-                    "projectMembers",
-                    projectService.getProjectMembers(projectId));
-        } else {
+        model.addAttribute(
+                "projectMembers",
+                projectService.getProjectTeamForCurrentUser(projectId));
+        model.addAttribute(
+                "currentUserRole",
+                projectService.getCurrentUserProjectRole(projectId));
+        model.addAttribute("currentUserId", projectService.getCurrentUserId());
+        model.addAttribute(
+                "hasProjectLeader",
+                projectManagementService.hasProjectLeader(projectId));
+
+        if (!projectService.isProjectOwner(projectId)) {
             model.addAttribute(
                     "hasPendingLeaveRequest",
                     projectService.hasPendingLeaveRequest(projectId));

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -58,7 +58,7 @@
              aria-label="Project navigation">
 
             <a class="button button-primary"
-               th:if="${!project.archived and isProjectOwner}"
+               th:if="${!project.archived}"
                th:href="@{/students/search(projectId=${project.id})}">
                 Find Teammates
             </a>
@@ -191,6 +191,60 @@
 
         </div>
 
+                <section class="pj-section" th:if="${projectMembers != null}">
+            <h2>Project team</h2>
+            <p class="pj-section-intro">
+                Your role in this project is
+                <strong th:text="${currentUserRole}">MEMBER</strong>.
+                The list below shows the owner, leader and all project members.
+            </p>
+
+            <div class="pj-info">
+                <div class="pj-info-item" th:each="member : ${projectMembers}">
+                    <span class="pj-label" th:text="${member.user.fullName}">Student name</span>
+                    <span class="pj-text" th:text="${member.role}">MEMBER</span>
+                    <span class="pj-label" th:if="${member.user.id == currentUserId}">(You)</span>
+                </div>
+            </div>
+        </section>
+<section class="pj-section"
+                 th:if="${isProjectOwner and !project.archived}">
+            <h2>Project leader management</h2>
+            <p class="pj-section-intro">
+                Only you, as project owner, can appoint or remove project leaders.
+                Removing the leader role keeps the student as a regular project member.
+            </p>
+            <p class="pj-section-intro" th:if="${hasProjectLeader}">
+                Only one project leader is allowed. Remove the current leader role before appointing a different member.
+            </p>
+
+            <div class="pj-info"
+                 th:each="member : ${projectMembers}"
+                 th:if="${member.user.id != project.owner.id}">
+                <div class="pj-info-item">
+                    <span class="pj-label" th:text="${member.user.fullName}">Member name</span>
+                    <span class="pj-text" th:text="${member.role}">MEMBER</span>
+                </div>
+
+                <div class="pj-info-item">
+                    <form th:if="${member.role.name() == 'MEMBER' and !hasProjectLeader}"
+                          th:action="@{/projects/{projectId}/leaders/{userId}(projectId=${project.id},userId=${member.user.id})}"
+                          method="post">
+                        <button class="button button-primary button-small" type="submit">
+                            Appoint as leader
+                        </button>
+                    </form>
+
+                    <form th:if="${member.role.name() == 'LEADER'}"
+                          th:action="@{/projects/{projectId}/leaders/{userId}/remove(projectId=${project.id},userId=${member.user.id})}"
+                          method="post">
+                        <button class="button button-secondary button-small" type="submit">
+                            Remove leader role
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
         <div th:if="${isProjectOwner and !project.archived}">
     <h3>Transfer Project Ownership</h3>
 
@@ -219,14 +273,14 @@
     </a>
     </section>
 
-    <!-- Invite a member (owner of an active project only) -->
+    <!-- Invite a member (owner or appointed leader of an active project) -->
     <section class="pj-section"
-             th:if="${!project.archived and isProjectOwner}">
+             th:if="${!project.archived and canInvite}">
 
         <h2>Invite a member</h2>
 
         <p class="pj-section-intro">
-            You can invite a member directly by username,
+            As the owner or an appointed leader, you can invite a member directly by username,
             or use Find Teammates above to search by skills and interests.
         </p>
 

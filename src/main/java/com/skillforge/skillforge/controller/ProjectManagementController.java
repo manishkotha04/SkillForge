@@ -84,4 +84,33 @@ public class ProjectManagementController {
             return "projects/edit";
         }
     }
+
+    @PostMapping("/projects/{projectId}/leaders/{userId}")
+    public String appointLeader(
+            @PathVariable Long projectId,
+            @PathVariable Long userId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            projectManagementService.appointLeader(projectId, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Project leader appointed successfully.");
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+        }
+        return "redirect:/projects/" + projectId;
+    }
+
+    @PostMapping("/projects/{projectId}/leaders/{userId}/remove")
+    public String removeLeader(
+            @PathVariable Long projectId,
+            @PathVariable Long userId,
+            RedirectAttributes redirectAttributes) {
+        try {
+            projectManagementService.removeLeader(projectId, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "Project leader role removed. The student remains a project member.");
+        } catch (RuntimeException exception) {
+            redirectAttributes.addFlashAttribute("errorMessage", exception.getMessage());
+        }
+        return "redirect:/projects/" + projectId;
+    }
+
 }
