@@ -280,5 +280,19 @@ class RegistrationServiceTest {
         verify(userRepository, never())
                 .save(any(AppUser.class));
     }
+    @Test
+    void registerRejectsEmailWithoutDomainExtension() {
+
+        RegistrationForm form = validForm();
+        form.setEmail("manish@gamil");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> registrationService.register(form)
+        );
+
+        verifyNoInteractions(userRepository);
+        verifyNoInteractions(passwordEncoder);
+    }
 
 }

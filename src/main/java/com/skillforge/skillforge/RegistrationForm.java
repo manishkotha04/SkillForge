@@ -1,6 +1,6 @@
 
 package com.skillforge.skillforge;
-
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,6 +13,10 @@ public class RegistrationForm {
 
     @NotBlank(message = "Email address is required.")
     @Email(message = "Please enter a valid email address.")
+    @Pattern(
+            regexp = "^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\\.)+[A-Za-z]{2,63}$",
+            message = "Please enter an email with a valid domain extension, such as name@example.com."
+    )
     @Size(max = 254, message = "Email must not exceed 254 characters.")
     private String email;
 
