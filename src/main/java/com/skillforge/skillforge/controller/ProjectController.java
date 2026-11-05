@@ -31,7 +31,15 @@ public class ProjectController {
 
     @GetMapping("/projects")
     public String listProjects(Model model) {
-        model.addAttribute("projects", projectService.getMyProjects());
+        var projects = projectService.getMyProjects();
+        java.util.Map<Long, String> projectRoles = new java.util.HashMap<>();
+        for (Project project : projects) {
+            projectRoles.put(
+                    project.getId(),
+                    projectService.getCurrentUserProjectRole(project.getId()).name());
+        }
+        model.addAttribute("projects", projects);
+        model.addAttribute("projectRoles", projectRoles);
         model.addAttribute("teamSummaries", projectService.getMyProjectTeamSummaries());
         return "projects/list";
     }

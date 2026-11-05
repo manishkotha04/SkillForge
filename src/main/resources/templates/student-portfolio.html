@@ -35,7 +35,12 @@
 <body class="dashboard-page">
 <header th:replace="~{fragments/nav :: mainHeader('students')}"></header>
 <main class="dashboard-container">
-    <a class="pj-back" th:href="@{/students/search}">&larr; Back to Find Teammates</a>
+    <a class="pj-back"
+       th:if="${returnProjectId != null}"
+       th:href="@{/students/search(projectId=${returnProjectId}, query=${returnQuery})}">&larr; Back to project teammates</a>
+    <a class="pj-back"
+       th:unless="${returnProjectId != null}"
+       th:href="@{/students/search(query=${returnQuery})}">&larr; Back to Find Teammates</a>
 
     <section class="sp-header">
         <div>
@@ -43,7 +48,12 @@
             <h1 th:text="|${student.displayName}'s Portfolio|">Student Portfolio</h1>
             <p class="sp-subtitle">Explore this student's projects, work and achievements. Portfolio content is read-only for visitors.</p>
         </div>
-        <a class="button button-secondary" th:href="@{/students/search}">Find other teammates</a>
+        <a class="button button-secondary"
+           th:if="${returnProjectId != null}"
+           th:href="@{/students/search(projectId=${returnProjectId}, query=${returnQuery})}">Back to project teammates</a>
+        <a class="button button-secondary"
+           th:unless="${returnProjectId != null}"
+           th:href="@{/students/search(query=${returnQuery})}">Find other teammates</a>
     </section>
 
     <section class="sp-intro">

@@ -1,0 +1,19 @@
+.pj-archive-form { display: inline-flex; margin: 0; }
+.pj-archive-button {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #b42318;
+    cursor: pointer;
+}
+.pj-archive-button:hover { background: #fff5f5; border-color: #fca5a5; }
+.pj-archived-notice {
+    margin: 18px 0 24px;
+    padding: 15px 18px;
+    border: 1px solid #f5d7a1;
+    border-radius: 13px;
+    background: #fffbeb;
+    color: #854d0e;
+    line-height: 1.6;
+}
+.pj-archived-notice strong { display: block; margin-bottom: 3px; }
+.notification-archived-note { margin: 12px 0 0; color: #92400e; font-size: .9rem; }

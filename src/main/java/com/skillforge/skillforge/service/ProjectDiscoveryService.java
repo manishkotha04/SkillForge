@@ -140,6 +140,9 @@ public class ProjectDiscoveryService {
                 invitationRepository.findByInvitedUser_IdAndStatus(userId, InvitationStatus.PENDING);
         for (ProjectInvitation invitation : pendingInvitations) {
             Long projectId = invitation.getProject().getId();
+            if (invitation.getProject().isArchived()) {
+                continue;
+            }
             if (projectMemberRepository.existsByProject_IdAndUser_Id(projectId, userId)) {
                 invitation.setStatus(InvitationStatus.ACCEPTED);
                 invitationRepository.save(invitation);
@@ -167,6 +170,7 @@ public class ProjectDiscoveryService {
                 .findByRequestedBy_IdOrderByCreatedAtDesc(studentId);
         for (ProjectJoinRequest request : requests) {
             if (request.getProject().getId().equals(projectId)
+                    && !request.getProject().isArchived()
                     && request.getStatus() == ProjectJoinRequestStatus.PENDING) {
                 markApproved(request, request.getProject().getOwner());
                 joinRequestRepository.save(request);
@@ -181,6 +185,9 @@ public class ProjectDiscoveryService {
         Project project = request.getProject();
         requireOwner(project, currentUser);
         requirePending(request);
+        if (project.isArchived()) {
+            throw new IllegalStateException("Archived projects are read-only. Join requests cannot be reviewed.");
+        }
 
         // Repair a legacy/stale request instead of trying to add the same student twice.
         if (projectMemberRepository.existsByProject_IdAndUser_Id(
@@ -190,9 +197,6 @@ public class ProjectDiscoveryService {
             return joinRequestRepository.save(request);
         }
 
-        if (project.isArchived()) {
-            throw new IllegalStateException("Join requests cannot be approved for archived projects.");
-        }
         ensureCapacity(project);
 
         projectMemberRepository.save(new ProjectMember(
@@ -208,9 +212,11 @@ public class ProjectDiscoveryService {
         ProjectJoinRequest request = findJoinRequest(requestId);
         requireOwner(request.getProject(), currentUser);
         requirePending(request);
+        if (request.getProject().isArchived()) {
+            throw new IllegalStateException("Archived projects are read-only. Join requests cannot be reviewed.");
+        }
 
-        // A rejection is not a member-removal operation. If they are already
-        // in the team, close the stale request as approved and preserve membership.
+        // A rejection is not a member-removal operation.
         if (projectMemberRepository.existsByProject_IdAndUser_Id(
                 request.getProject().getId(), request.getRequestedBy().getId())) {
             markApproved(request, currentUser);
@@ -225,7 +231,8 @@ public class ProjectDiscoveryService {
     }
 
     private void reconcileRequestIfAlreadyMember(ProjectJoinRequest request) {
-        if (request.getStatus() == ProjectJoinRequestStatus.PENDING
+        if (!request.getProject().isArchived()
+                && request.getStatus() == ProjectJoinRequestStatus.PENDING
                 && projectMemberRepository.existsByProject_IdAndUser_Id(
                         request.getProject().getId(), request.getRequestedBy().getId())) {
             markApproved(request, request.getProject().getOwner());
@@ -242,6 +249,9 @@ public class ProjectDiscoveryService {
 
     private void closePendingInvitations(Long projectId, Long studentId) {
         for (ProjectInvitation invitation : invitationRepository.findByProject_Id(projectId)) {
+            if (invitation.getProject().isArchived()) {
+                continue;
+            }
             if (invitation.getInvitedUser().getId().equals(studentId)
                     && invitation.getStatus() == InvitationStatus.PENDING) {
                 invitation.setStatus(InvitationStatus.ACCEPTED);

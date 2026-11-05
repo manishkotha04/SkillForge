@@ -211,9 +211,24 @@
         }
 
         .find-card-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
             margin-top: 22px;
             padding-top: 18px;
             border-top: 1px solid #e2e8f0;
+        }
+
+        .find-card-actions form {
+            margin: 0;
+        }
+
+        .find-text-clamped {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
         }
 
         .find-empty {
@@ -552,20 +567,10 @@
                     About
                 </div>
 
-                <p class="find-text"
-                   th:text="${match.student.bio ?: 'No bio added yet.'}">
+                <p class="find-text find-text-clamped"
+                   th:text="${match.student.bio ?: 'No bio added yet.'}"
+                   th:title="${match.student.bio}">
                     Student bio
-                </p>
-
-                <!-- Interests -->
-
-                <div class="find-label">
-                    Interests
-                </div>
-
-                <p class="find-text"
-                   th:text="${match.student.interests ?: 'No interests added yet.'}">
-                    Student interests
                 </p>
 
                 <!-- All skills -->
@@ -589,30 +594,26 @@
                     No skills added yet.
                 </p>
 
-                <!-- View the student's public portfolio -->
+                <!-- Student portfolio and project invitation actions -->
                 <div class="find-card-actions">
                     <a class="button button-secondary button-small"
-                       th:href="@{/students/{studentId}/portfolio(studentId=${match.student.id})}">
-                        View Portfolio â†’
+                       th:if="${projectId != null}"
+                       th:href="@{/students/{studentId}/portfolio(studentId=${match.student.id}, projectId=${projectId}, query=${search.query})}">
+                        View Portfolio
                     </a>
-                </div>
-                <!-- Project invitation -->
+                    <a class="button button-secondary button-small"
+                       th:unless="${projectId != null}"
+                       th:href="@{/students/{studentId}/portfolio(studentId=${match.student.id}, query=${search.query})}">
+                        View Portfolio
+                    </a>
 
-                <div class="find-card-actions"
-                     th:if="${projectId != null and canInvite}">
-
-                    <form th:action="@{/projects/{projectId}/invitations/{userId}(
-                                        projectId=${projectId},
-                                        userId=${match.student.id})}"
+                    <form th:if="${projectId != null and canInvite}"
+                          th:action="@{/projects/{projectId}/invitations/{userId}(projectId=${projectId}, userId=${match.student.id})}"
                           method="post">
-
-                        <button class="button button-primary button-small"
-                                type="submit">
+                        <button class="button button-primary button-small" type="submit">
                             Invite to Project
                         </button>
-
                     </form>
-
                 </div>
 
             </article>

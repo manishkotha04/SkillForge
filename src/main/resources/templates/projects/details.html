@@ -12,6 +12,7 @@
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/projects.css}">
     <link rel="stylesheet" th:href="@{/css/tasks-fr09.css}">
+    <link rel="stylesheet" th:href="@{/css/project-archive.css}">
 </head>
 
 <body class="dashboard-page">
@@ -59,7 +60,7 @@
              aria-label="Project navigation">
 
             <a class="button button-primary"
-               th:if="${!project.archived}"
+               th:if="${canInvite and !project.archived}"
                th:href="@{/students/search(projectId=${project.id})}">
                 Find Teammates
             </a>
@@ -79,21 +80,27 @@
                 Project Activity
             </a>
 
-            <a class="button button-quiet"
-               th:href="@{/invitations}">
-                My Invitations
-            </a>
 
-                <a class="button button-quiet"
-                 th:if="${isProjectOwner}"
-                 th:href="@{/leave-requests}">
-                Leave Requests
-                </a>
 
-        </nav>
+
+            <form class="pj-archive-form"
+                  th:if="${isProjectOwner and !project.archived}"
+                  th:action="@{/projects/{projectId}/archive(projectId=${project.id})}"
+                  method="post"
+                  onsubmit="return confirm('Archive this project? The project will become read-only. Its records and history will be preserved.');">
+                <button type="submit" class="button pj-archive-button">
+                    Archive Project
+                </button>
+            </form></nav>
 
     </section>
 
+    <div class="pj-archived-notice" role="status" th:if="${project.archived}">
+        <strong>Archived project - read-only</strong>
+        This project has been archived by its owner. Existing project details, members, tasks,
+        discussions, portfolio links and activity history are preserved for authorized viewers.
+        New invitations, membership changes, task changes and messages are disabled.
+    </div>
     <!-- Flash messages -->
     <div class="message-stack"
          th:if="${successMessage != null or errorMessage != null}">
@@ -273,9 +280,7 @@
             <button type="submit">Send Transfer Request</button>
         </form>
     </div>
-    <a th:href="@{/ownership-transfers}">
-        Ownership Transfer Requests
-    </a>
+
     </section>
 
     <!-- Invite a member (owner or appointed leader of an active project) -->

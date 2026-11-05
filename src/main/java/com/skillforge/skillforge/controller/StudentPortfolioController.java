@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 @Controller
@@ -32,6 +33,8 @@ public class StudentPortfolioController {
     @GetMapping("/{studentId}/portfolio")
     public String viewStudentPortfolio(
             @PathVariable Long studentId,
+            @RequestParam(required = false) Long projectId,
+            @RequestParam(required = false) String query,
             Model model) {
 
         StudentSummaryDto student = studentDiscoveryService
@@ -42,6 +45,8 @@ public class StudentPortfolioController {
         model.addAttribute("student", student);
         model.addAttribute(
                 "items", portfolioService.getPortfolioForStudent(studentId));
+        model.addAttribute("returnProjectId", projectId);
+        model.addAttribute("returnQuery", query);
         return "student-portfolio";
     }
 }

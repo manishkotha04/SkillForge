@@ -36,6 +36,9 @@ public class TaskController {
     @GetMapping("/new")
     public String newTask(@RequestParam Long projectId, Model model) {
         Project project = taskService.getProjectForTaskPage(projectId);
+        if (project.isArchived()) {
+            throw new IllegalStateException("Archived projects are read-only. Tasks cannot be created.");
+        }
         model.addAttribute("task", new TaskCreateRequest());
         model.addAttribute("projectId", projectId);
         model.addAttribute("project", project);
@@ -47,6 +50,9 @@ public class TaskController {
     public String createTask(@RequestParam Long projectId,
                              @Valid @ModelAttribute("task") TaskCreateRequest request,
                              BindingResult bindingResult, Model model) {
+        if (taskService.getProjectForTaskPage(projectId).isArchived()) {
+            throw new IllegalStateException("Archived projects are read-only. Tasks cannot be created.");
+        }
         if (bindingResult.hasErrors()) {
             Project project = taskService.getProjectForTaskPage(projectId);
             model.addAttribute("project", project);
@@ -83,6 +89,9 @@ public class TaskController {
                              @Valid @ModelAttribute("task") TaskUpdateRequest request,
                              BindingResult bindingResult, Model model) {
         Task existingTask = taskService.getTask(id);
+        if (existingTask.getProject().isArchived()) {
+            throw new IllegalStateException("Archived projects are read-only. Tasks cannot be edited.");
+        }
         if (bindingResult.hasErrors()) {
             model.addAttribute("project", existingTask.getProject());
             model.addAttribute("projectId", existingTask.getProject().getId());

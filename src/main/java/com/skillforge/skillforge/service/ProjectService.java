@@ -286,16 +286,16 @@ public class ProjectService {
                     "This invitation is no longer pending.");
         }
 
-        if (LocalDateTime.now().isAfter(invitation.getExpiresAt())) {
-            invitation.setStatus(InvitationStatus.EXPIRED);
-            throw new IllegalArgumentException(
-                    "This invitation has expired.");
-        }
-
         Project project = invitation.getProject();
         if (project.isArchived()) {
             throw new IllegalArgumentException(
                     "Cannot join an archived project.");
+        }
+
+        if (LocalDateTime.now().isAfter(invitation.getExpiresAt())) {
+            invitation.setStatus(InvitationStatus.EXPIRED);
+            throw new IllegalArgumentException(
+                    "This invitation has expired.");
         }
 
         Long projectId = project.getId();
@@ -348,6 +348,11 @@ public class ProjectService {
         if (invitation.getStatus() != InvitationStatus.PENDING) {
             throw new IllegalArgumentException(
                     "This invitation is no longer pending.");
+        }
+
+        if (invitation.getProject().isArchived()) {
+            throw new IllegalArgumentException(
+                    "Archived projects are read-only. This invitation cannot be changed.");
         }
 
         invitation.setStatus(InvitationStatus.REJECTED);
